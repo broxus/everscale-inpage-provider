@@ -1,14 +1,14 @@
-import {ContractType} from "./models";
+import { ContractType } from './models';
 
 export interface Permissions {
-    tonClient: true,
-    accountInteraction: AccountInteractionItem[]
+  tonClient: true,
+  accountInteraction: AccountInteractionItem[]
 }
 
 export interface AccountInteractionItem {
-    address: string
-    publicKey: string
-    contractType: ContractType
+  address: string
+  publicKey: string
+  contractType: ContractType
 }
 
 export type Permission = keyof Permissions
