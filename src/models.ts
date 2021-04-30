@@ -79,3 +79,23 @@ export type AbiToken =
   | [AbiToken, AbiToken][];
 
 export type TokensObject = { [K in string]: AbiToken };
+
+export type HeadersObject = {
+  pubkey?: string
+  expire?: string | number
+  time?: string | number
+}
+
+export interface FunctionCall {
+  // Contract ABI
+  abi: string
+  // Specific method from specified contract ABI
+  method: string
+  // Method arguments
+  params: TokensObject
+}
+
+export interface ExternalFunctionCall extends FunctionCall {
+  // Optionally explicit header values
+  headers?: HeadersObject,
+}
