@@ -33,8 +33,7 @@ async function myApp() {
   });
 
   const selectedAddress = accountInteraction![0].address;
-  const dePoolAddress =
-    '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
+  const dePoolAddress = '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
 
   const { transaction } = await ton.sendMessage({
     preferredSender: selectedAddress,

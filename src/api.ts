@@ -1,5 +1,13 @@
 import { Permission, Permissions } from './permissions';
-import { ExternalFunctionCall, FullContractState, FunctionCall, TokensObject, Transaction } from './models';
+import {
+  ContractState,
+  ContractUpdatesSubscription,
+  ExternalFunctionCall,
+  FullContractState,
+  FunctionCall,
+  TokensObject,
+  Transaction
+} from './models';
 import { UniqueArray } from './utils';
 
 export type ProviderEvents = {
@@ -9,6 +17,11 @@ export type ProviderEvents = {
   // Called on each new transaction, received on subscription
   transactionFound: {
     transaction: Transaction
+  }
+
+  // Called every time contract state changes
+  contractStateChanged: {
+    state: ContractState
   }
 
   // Called each time the user changes network
@@ -31,8 +44,30 @@ export type ProviderApi = {
     output: Partial<Permissions>
   }
 
-  // Removes all permissions for current origin
+  // Removes all permissions for current origin and stops all subscriptions
   disconnect: {}
+
+  // Subscribes to contract updates.
+  // Can also be used to update subscriptions
+  subscribeToContract: {
+    input: {
+      // Contract address
+      address: string,
+      // Subscription changes
+      subscriptions: Partial<ContractUpdatesSubscription>
+    }
+  }
+
+  // Fully unsubscribe from specific contract updates
+  unsubscribeFromContract: {
+    input: {
+      // Contract address
+      address: string
+    }
+  }
+
+  // Fully unsubscribe from all contracts
+  unsubscribeFromAllContracts: {}
 
   // Returns provider api state
   getProviderState: {
@@ -41,6 +76,10 @@ export type ProviderApi = {
       selectedConnection: string
       // Object with active permissions attached data
       permissions: Partial<Permissions>
+      // Current subscription states
+      subscriptions: {
+        [address: string]: ContractUpdatesSubscription
+      },
     }
   }
 

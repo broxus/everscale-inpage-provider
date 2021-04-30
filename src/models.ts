@@ -24,6 +24,13 @@ export type ContractType =
   | 'SurfWallet'
   | 'WalletV3';
 
+export interface ContractUpdatesSubscription {
+  // Whether to listen contract state updates
+  state: boolean,
+  // Whether to listen new contract transactions
+  transactions: boolean
+}
+
 // Transaction stuff
 //
 
