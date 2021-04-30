@@ -29,19 +29,49 @@ export interface Ton {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 }
 
-let ton: Ton = (window as any).ton;
+type ProviderApiMethods = {
+  [P in ProviderMethod]: (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
+}
+
+export type IProviderRpcClient = {
+  [K in ProviderMethod | keyof Ton]: K extends keyof ProviderMethod
+    ? ProviderApiMethods[K]
+    : K extends keyof Ton
+      ? Ton[K]
+      : never
+}
+
+export const makeProviderRpcClient = (
+  ton: Ton
+): IProviderRpcClient => {
+  return new Proxy(ton, {
+    get: <K extends ProviderMethod>(
+      object: Ton,
+      method: K
+    ) => {
+      return (params: ProviderRequestParams<K>) =>
+        object.request({ method, params });
+    }
+  }) as IProviderRpcClient;
+};
+
+export function hasTonProvider() {
+  return (window as any).ton != null;
+}
+
+let tonProvider: IProviderRpcClient | null = hasTonProvider() ? makeProviderRpcClient((window as any).ton) : null;
 
 let resolveInitialized: (() => void) | undefined;
 const initializationPromise = new Promise<void>((resolve) => {
   resolveInitialized = () => resolve();
 });
 
-if (ton != null) {
+if (tonProvider != null) {
   resolveInitialized?.();
 } else {
   window.addEventListener('ton#initialized', (_data) => {
     resolveInitialized?.();
-    ton = (window as any).ton;
+    tonProvider = makeProviderRpcClient((window as any).ton);
   });
 }
 
@@ -49,4 +79,4 @@ export async function ensureProviderInitialized() {
   return initializationPromise;
 }
 
-export default ton;
+export default tonProvider!;

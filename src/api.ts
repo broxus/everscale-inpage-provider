@@ -1,4 +1,4 @@
-import { Permission } from './permissions';
+import { Permission, Permissions } from './permissions';
 import { FullContractState, TokensObject, Transaction } from './models';
 import { UniqueArray } from './utils';
 
