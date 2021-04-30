@@ -117,8 +117,9 @@ export type ProviderApi = {
 
 export type ProviderMethod = keyof ProviderApi
 export type ProviderRequestParams<T extends ProviderMethod> =
-  ProviderApi[T] extends { input?: infer I }
-    ? I extends undefined
-    ? ({} | undefined) : I
-    : never
-export type ProviderResponse<T extends ProviderMethod> = ProviderApi[T] extends { output?: infer O } ? O : never
+  ProviderApi[T] extends { input: infer I } ? I
+    : ProviderApi[T] extends {} ? undefined : never
+
+export type ProviderResponse<T extends ProviderMethod> =
+  ProviderApi[T] extends { output: infer O } ? O
+    : ProviderApi[T] extends {} ? undefined : never

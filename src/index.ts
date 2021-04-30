@@ -29,12 +29,16 @@ export interface Ton {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 }
 
+type RpcMethod<P extends ProviderMethod> = ProviderRequestParams<P> extends {}
+  ? (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
+  : () => Promise<ProviderResponse<P>>
+
 type ProviderApiMethods = {
-  [P in ProviderMethod]: (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
+  [P in ProviderMethod]: RpcMethod<P>
 }
 
 export type IProviderRpcClient = {
-  [K in ProviderMethod | keyof Ton]: K extends keyof ProviderMethod
+  [K in ProviderMethod | keyof Ton]: K extends ProviderMethod
     ? ProviderApiMethods[K]
     : K extends keyof Ton
       ? Ton[K]
@@ -49,8 +53,8 @@ export const makeProviderRpcClient = (
       object: Ton,
       method: K
     ) => {
-      return (params: ProviderRequestParams<K>) =>
-        object.request({ method, params });
+      return (params?: ProviderRequestParams<K>) =>
+        object.request({ method, params: params! });
     }
   }) as IProviderRpcClient;
 };
