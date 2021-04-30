@@ -1,4 +1,4 @@
-import { Permission, Permissions } from './permissions';
+import { AccountInteractionItem, Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
@@ -21,12 +21,20 @@ export type ProviderEvents = {
 
   // Called every time contract state changes
   contractStateChanged: {
+    // Contract address
+    address: string
+    // New contract state
     state: ContractState
   }
 
   // Called each time the user changes network
   networkChanged: {
     selectedConnection: string
+  }
+
+  // Called when an account has been removed from the current `accountInteraction` permission
+  accountRemoved: {
+    account: AccountInteractionItem
   }
 
   // Called when the user logs out of the extension
@@ -49,7 +57,7 @@ export type ProviderApi = {
 
   // Subscribes to contract updates.
   // Can also be used to update subscriptions
-  subscribeToContract: {
+  subscribe: {
     input: {
       // Contract address
       address: string,
@@ -59,7 +67,7 @@ export type ProviderApi = {
   }
 
   // Fully unsubscribe from specific contract updates
-  unsubscribeFromContract: {
+  unsubscribe: {
     input: {
       // Contract address
       address: string
@@ -67,7 +75,7 @@ export type ProviderApi = {
   }
 
   // Fully unsubscribe from all contracts
-  unsubscribeFromAllContracts: {}
+  unsubscribeAll: {}
 
   // Returns provider api state
   getProviderState: {
@@ -92,6 +100,26 @@ export type ProviderApi = {
     output: {
       // Contract state or `undefined` if it doesn't not exist
       state?: FullContractState
+    }
+  }
+
+  // Requests contract transactions
+  getTransactions: {
+    input: {
+      // Contract address
+      address: string
+      // Optional upper limit of logical time.
+      // If not specified, transactions will be requested starting with the latest one
+      beforeLt?: string
+      // Whether to include transaction with logical time == `beforeLt`.
+      // `false` by default
+      inclusive?: boolean
+    }
+    output: {
+      // Transactions list in descending order (from latest lt to the oldest)
+      transactions: Transaction[]
+      // Logical time of the oldest transaction. Can be used to continue transactions batch
+      oldestLt?: string
     }
   }
 
