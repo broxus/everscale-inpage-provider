@@ -24,20 +24,20 @@ import ton, {
 
 async function myApp() {
   if (!hasTonProvider()) {
-    throw new Error('TON provider not found')
+    throw new Error('TON provider not found');
   }
   await ensureProviderInitialized();
 
-  const { accountInteraction } = ton.requestPermissions({
-    permissions: ["tonClient", "accountInteraction"]
+  const { accountInteraction } = await ton.requestPermissions({
+    permissions: ['tonClient', 'accountInteraction']
   });
 
-  const selectedAddress = accountInteraction[0].address
+  const selectedAddress = accountInteraction![0].address;
   const dePoolAddress =
     '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
 
-  const { transaction } = ton.sendMessage({
-    preferredAccount: selectedAddress,
+  const { transaction } = await ton.sendMessage({
+    preferredSender: selectedAddress,
     address: dePoolAddress,
     amount: '10500000000',
     bounce: true,
@@ -45,23 +45,23 @@ async function myApp() {
       abi: DePoolAbi,
       method: 'addOrdinaryStake',
       params: {
-        stake: '10000000000',
+        stake: '10000000000'
       }
     }
   });
-  console.log(transaction)
+  console.log(transaction);
 
-  const { output, code } = ton.runLocal({
+  const { output, code } = await ton.runLocal({
     address: dePoolAddress,
     functionCall: {
       abi: DePoolAbi,
       method: 'getParticipantInfo',
       params: {
-        addr: selectedAddress,
+        addr: selectedAddress
       }
     }
-  })
-  console.log(output, code)
+  });
+  console.log(output, code);
 }
 
 const DePoolAbi = `{
