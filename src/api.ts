@@ -204,6 +204,22 @@ export type ProviderApi = {
     }
   }
 
+  // Decodes function call
+  decodeTransaction: {
+    input: {
+      // Transaction with the function call
+      transaction: Transaction
+      // Contract ABI
+      abi: string
+      // Specific method from specified contract ABI
+      method: string
+    }
+    output: {
+      input: TokensObject
+      output: TokensObject
+    }
+  }
+
   // Calculates transaction fees
   estimateFees: {
     input: {
