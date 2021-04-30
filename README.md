@@ -1,6 +1,6 @@
 ## TON inpage provider
 
-Web3-like interface to TON provided by TON Crystal Wallet browser extension.
+Web3-like interface to TON provided by the TON Crystal Wallet browser extension.
 
 ### How to install
 

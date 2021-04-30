@@ -4,7 +4,7 @@ import { UniqueArray } from './utils';
 
 export type ProviderEvents = {
   // Called when inpage provider disconnects from extension
-  disconnect: {}
+  disconnected: {}
 
   // Called on each new transaction, received on subscription
   transactionFound: {
@@ -159,8 +159,9 @@ export type ProviderApi = {
   // Shows an approval window to the user.
   sendMessage: {
     input: {
-      // Preferred account, which will be used to send the message
-      preferredAccount?: string,
+      // Preferred wallet address.
+      // This wallet will be used to send the message if specified
+      preferredSender?: string,
       // Message destination address
       address: string
       // Amount of nano TON to send
@@ -179,8 +180,12 @@ export type ProviderApi = {
   }
 
   // Sends an external message to the contract
+  // Shows and approval window to the user
   sendExternalMessage: {
     input: {
+      // The public key of the preferred account.
+      // This key will be used to sign the message if specified
+      preferredKey?: string
       // Message destination address
       address: string
       // Base64 encoded optional init data
