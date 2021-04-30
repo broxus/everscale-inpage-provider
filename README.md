@@ -24,7 +24,7 @@ import ton, {
 
 async function myApp() {
   if (!hasTonProvider()) {
-    throw Error('TON provider not found')
+    throw new Error('TON provider not found')
   }
   await ensureProviderInitialized();
 
