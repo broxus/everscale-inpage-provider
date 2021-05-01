@@ -102,8 +102,3 @@ export interface FunctionCall {
   // Method arguments
   params: TokensObject
 }
-
-export interface ExternalFunctionCall extends FunctionCall {
-  // Optionally explicit header values
-  headers?: HeadersObject,
-}

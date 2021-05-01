@@ -2,7 +2,6 @@ import { AccountInteractionItem, Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
-  ExternalFunctionCall,
   FullContractState,
   FunctionCall,
   TokensObject,
@@ -64,6 +63,7 @@ export type ProviderApi = {
       // Subscription changes
       subscriptions: Partial<ContractUpdatesSubscription>
     }
+    output: ContractUpdatesSubscription
   }
 
   // Fully unsubscribe from specific contract updates
@@ -114,6 +114,8 @@ export type ProviderApi = {
       // Whether to include transaction with logical time == `beforeLt`.
       // `false` by default
       inclusive?: boolean
+      // Optional limit. Values greater than 50 have no effect
+      limit?: number
     }
     output: {
       // Transactions list in descending order (from latest lt to the oldest)
@@ -128,10 +130,10 @@ export type ProviderApi = {
     input: {
       // Contract address
       address: string
-      // Base64 encoded optional cached contract state BOC
-      cachedState?: string
+      // Cached contract state
+      cachedState?: FullContractState
       // Function call params
-      functionCall: ExternalFunctionCall
+      functionCall: FunctionCall
     }
     output: {
       // Execution output
@@ -223,10 +225,11 @@ export type ProviderApi = {
   // Calculates transaction fees
   estimateFees: {
     input: {
+      // Preferred wallet address.
+      // This wallet will be used to send the message if specified
+      preferredSender?: string,
       // Message destination address
       address: string
-      // Base64 encoded optional cached contract state BOC
-      cachedState?: string
       // Amount of nano TON to send
       amount: string
       // Optional function call
@@ -274,7 +277,7 @@ export type ProviderApi = {
       // Base64 encoded optional init data
       initData?: string
       // Function call
-      payload: ExternalFunctionCall
+      payload: FunctionCall
     }
     output: {
       // Executed transaction
