@@ -1,4 +1,4 @@
-import { AccountInteractionItem, Permission, Permissions } from './permissions';
+import { Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
@@ -9,9 +9,20 @@ import {
 } from './models';
 import { UniqueArray } from './utils';
 
+export interface ProviderState {
+  // Selected connection name (Mainnet / Testnet)
+  selectedConnection: string
+  // Object with active permissions attached data
+  permissions: Partial<Permissions>
+  // Current subscription states
+  subscriptions: {
+    [address: string]: ContractUpdatesSubscription
+  },
+}
+
 export type ProviderEvents = {
   // Called when inpage provider disconnects from extension
-  disconnected: {}
+  disconnected: Error,
 
   // Called on each new transaction, received on subscription
   transactionFound: {
@@ -31,9 +42,11 @@ export type ProviderEvents = {
     selectedConnection: string
   }
 
-  // Called when an account has been removed from the current `accountInteraction` permission
-  accountRemoved: {
-    account: AccountInteractionItem
+  // Called when permissions are changed.
+  // Mostly when account has been removed from the current `accountInteraction` permission,
+  // or disconnect method was called
+  permissionsChanged: {
+    permissions: Permissions
   }
 
   // Called when the user logs out of the extension
@@ -291,6 +304,8 @@ export type ProviderApi = {
 export type ProviderEvent = keyof ProviderEvents
 
 export type ProviderEventData<T extends ProviderEvent> = ProviderEvents[T]
+
+export type ProviderEventCall<T extends ProviderEvent> = { method: T; params: ProviderEventData<T> }
 
 export type ProviderMethod = keyof ProviderApi
 

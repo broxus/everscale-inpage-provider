@@ -15,9 +15,7 @@ export interface TonRequest<T extends ProviderMethod> {
   params: ProviderRequestParams<T>
 }
 
-export interface Ton {
-  request<T extends ProviderMethod>(data: TonRequest<T>): Promise<ProviderResponse<T>>
-
+interface Emitter {
   addListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 
   on<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
@@ -29,58 +27,101 @@ export interface Ton {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 }
 
+export interface Ton extends Emitter {
+  request<T extends ProviderMethod>(data: TonRequest<T>): Promise<ProviderResponse<T>>
+}
+
 type RpcMethod<P extends ProviderMethod> = ProviderRequestParams<P> extends {}
   ? (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
   : () => Promise<ProviderResponse<P>>
+
+interface IProviderRpcClient extends Emitter {
+  ensureInitialized(): Promise<void>
+}
 
 type ProviderApiMethods = {
   [P in ProviderMethod]: RpcMethod<P>
 }
 
-export type IProviderRpcClient = {
-  [K in ProviderMethod | keyof Ton]: K extends ProviderMethod
+export type IProvider = {
+  [K in ProviderMethod | keyof IProviderRpcClient]: K extends ProviderMethod
     ? ProviderApiMethods[K]
-    : K extends keyof Ton
-      ? Ton[K]
+    : K extends keyof IProviderRpcClient
+      ? IProviderRpcClient[K]
       : never
 }
 
-export const makeProviderRpcClient = (
-  ton: Ton
-): IProviderRpcClient => {
-  return new Proxy(ton, {
-    get: <K extends ProviderMethod>(
-      object: Ton,
-      method: K
-    ) => {
-      return (params?: ProviderRequestParams<K>) =>
-        object.request({ method, params: params! });
+class ProviderRpcClient implements IProviderRpcClient {
+  private readonly _initializationPromise: Promise<void>;
+  private _ton?: Ton;
+
+  constructor() {
+    this._ton = (window as any).ton;
+    if (this._ton != null) {
+      this._initializationPromise = Promise.resolve();
+    } else {
+      let resolveInitialized: (() => void) | undefined;
+
+      this._initializationPromise = new Promise<void>((resolve) => {
+        resolveInitialized = () => resolve();
+      });
+
+      window.addEventListener('ton#initialized', (_data) => {
+        this._ton = (window as any).ton;
+        resolveInitialized?.();
+      });
     }
-  }) as IProviderRpcClient;
-};
+  }
+
+  public async ensureInitialized() {
+    await this._initializationPromise;
+  }
+
+  public get isInitialized() {
+    return this._ton != null;
+  }
+
+  public get ton() {
+    return this._ton!;
+  }
+
+  addListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+    this._ton?.addListener(eventName, listener);
+  }
+
+  on<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+    this._ton?.on(eventName, listener);
+  }
+
+  once<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+    this._ton?.once(eventName, listener);
+  }
+
+  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+    this._ton?.prependListener(eventName, listener);
+  }
+
+  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+    this._ton?.prependOnceListener(eventName, listener);
+  }
+}
 
 export function hasTonProvider() {
   return (window as any).ton != null;
 }
 
-let tonProvider: IProviderRpcClient | null = hasTonProvider() ? makeProviderRpcClient((window as any).ton) : null;
+const provider = new Proxy(new ProviderRpcClient(), {
+  get: <K extends ProviderMethod>(
+    object: ProviderRpcClient,
+    method: K
+  ) => {
+    const property = (object as any)[method];
+    if (property != null) {
+      return property;
+    }
 
-let resolveInitialized: (() => void) | undefined;
-const initializationPromise = new Promise<void>((resolve) => {
-  resolveInitialized = () => resolve();
-});
+    return (params?: ProviderRequestParams<K>) => object.ton.request({ method, params: params! });
+  }
+}) as unknown as IProvider;
 
-if (tonProvider != null) {
-  resolveInitialized?.();
-} else {
-  window.addEventListener('ton#initialized', (_data) => {
-    resolveInitialized?.();
-    tonProvider = makeProviderRpcClient((window as any).ton);
-  });
-}
-
-export async function ensureProviderInitialized() {
-  return initializationPromise;
-}
-
-export default tonProvider!;
+export default provider;

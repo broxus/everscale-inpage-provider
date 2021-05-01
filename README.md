@@ -17,16 +17,10 @@ npm install --save ton-inpage-provider
 ### Example
 
 ```typescript
-import ton, {
-  hasTonProvider,
-  ensureProviderInitialized
-} from 'ton-inpage-provider';
+import ton from 'ton-inpage-provider';
 
 async function myApp() {
-  if (!hasTonProvider()) {
-    throw new Error('TON provider not found');
-  }
-  await ensureProviderInitialized();
+  await ton.ensureInitialized();
 
   const { accountInteraction } = await ton.requestPermissions({
     permissions: ['tonClient', 'accountInteraction']
