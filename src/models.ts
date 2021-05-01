@@ -52,7 +52,7 @@ export interface Message {
   value: string,
   bounce: boolean,
   bounced: boolean,
-  body: string,
+  body?: string,
   bodyHash?: string,
 }
 
