@@ -205,8 +205,8 @@ export type ProviderApi = {
       // Decoded method name
       method: string
       // Decoded function arguments
-      output: TokensObject
-    }
+      input: TokensObject
+    } | {}
   }
 
   // Decodes body of outgoing message
@@ -225,7 +225,7 @@ export type ProviderApi = {
       method: string
       // Decoded function returned value
       output: TokensObject
-    }
+    } | {}
   }
 
   // Decodes function call
@@ -246,7 +246,7 @@ export type ProviderApi = {
       input: TokensObject
       // Decoded function returned value
       output: TokensObject
-    }
+    } | {}
   }
 
   // Calculates transaction fees
