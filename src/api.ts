@@ -5,7 +5,7 @@ import {
   FullContractState,
   FunctionCall,
   TokensObject,
-  Transaction
+  Transaction, TransactionsBatchInfo
 } from './models';
 import { UniqueArray } from './utils';
 
@@ -25,8 +25,11 @@ export type ProviderEvents = {
   disconnected: Error,
 
   // Called on each new transaction, received on subscription
-  transactionFound: {
-    transaction: Transaction
+  transactionsFound: {
+    // Guaranteed to be non-empty and ordered by descending lt
+    transactions: Transaction[]
+    // Describes transactions lt rage
+    info: TransactionsBatchInfo,
   }
 
   // Called every time contract state changes
@@ -192,12 +195,15 @@ export type ProviderApi = {
       body: string
       // Contract ABI
       abi: string
-      // Specific method from specified contract ABI
-      method: string
+      // Specific method from specified contract ABI.
+      // When an array of method names is passed it will try to decode until first successful
+      method: string | string[]
       // Function call type
       internal: boolean
     }
     output: {
+      // Decoded method name
+      method: string
       // Decoded function arguments
       output: TokensObject
     }
@@ -210,10 +216,13 @@ export type ProviderApi = {
       body: string
       // Contract ABI
       abi: string
-      // Specific method from specified contract ABI
-      method: string
+      // Specific method from specified contract ABI.
+      // When an array of method names is passed it will try to decode until first successful
+      method: string | string[]
     }
     output: {
+      // Decoded method name
+      method: string
       // Decoded function returned value
       output: TokensObject
     }
@@ -226,11 +235,16 @@ export type ProviderApi = {
       transaction: Transaction
       // Contract ABI
       abi: string
-      // Specific method from specified contract ABI
-      method: string
+      // Specific method from specified contract ABI.
+      // When an array of method names is passed it will try to decode until first successful
+      method: string | string[]
     }
     output: {
+      // Decoded method name
+      method: string
+      // Decoded function arguments
       input: TokensObject
+      // Decoded function returned value
       output: TokensObject
     }
   }
@@ -288,7 +302,7 @@ export type ProviderApi = {
       // Message destination address
       address: string
       // Base64 encoded optional init data
-      initData?: string
+      stateInit?: string
       // Function call
       payload: FunctionCall
     }

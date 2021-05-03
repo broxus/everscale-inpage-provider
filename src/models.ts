@@ -17,7 +17,7 @@ export interface GenTimings {
   genUtime: number,
 }
 
-export type ContractType =
+export type WalletContractType =
   | 'SafeMultisigWallet'
   | 'SafeMultisigWallet24h'
   | 'SetcodeMultisigWallet'
@@ -30,6 +30,14 @@ export interface ContractUpdatesSubscription {
   // Whether to listen new contract transactions
   transactions: boolean
 }
+
+export interface TransactionsBatchInfo {
+  minLt: string,
+  maxLt: string,
+  batchType: TransactionsBatchType,
+}
+
+export type TransactionsBatchType = 'old' | 'new';
 
 // Transaction stuff
 //
