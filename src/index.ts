@@ -5,6 +5,10 @@ import {
   ProviderRequestParams,
   ProviderResponse
 } from './api';
+import {
+  Transaction,
+  TransactionsBatchInfo
+} from './models';
 
 export * from './api';
 export * from './models';
@@ -65,6 +69,43 @@ if (document.readyState == 'complete') {
 export async function hasTonProvider() {
   await ensurePageLoaded;
   return (window as Record<string, any>).hasTonProvider === true;
+}
+
+// Modifies knownTransactions array, merging it with new transactions.
+// All arrays are assumed to be sorted by descending logical time.
+// Also this method does not remove duplicates.
+export function mergeTransactions(
+  knownTransactions: Transaction[],
+  newTransactions: Transaction[],
+  info: TransactionsBatchInfo
+): Transaction[] {
+  if (info.batchType == 'old') {
+    knownTransactions.push(...newTransactions);
+    return knownTransactions;
+  }
+
+  if (knownTransactions.length === 0) {
+    knownTransactions.push(...newTransactions);
+    return knownTransactions;
+  }
+
+  // Example:
+  // known lts: [N, N-1, N-2, N-3, (!) N-10,...]
+  // new lts: [N-4, N-5]
+  // batch info: { minLt: N-5, maxLt: N-4, batchType: 'new' }
+
+  // 1. Skip indices until known transaction lt is greater than the biggest in the batch
+  let i = 0;
+  while (
+    i < knownTransactions.length &&
+    knownTransactions[i].id.lt.localeCompare(info.maxLt) >= 0
+    ) {
+    ++i;
+  }
+
+  // 2. Insert new transactions
+  knownTransactions.splice(i, 0, ...newTransactions);
+  return knownTransactions;
 }
 
 class ProviderRpcClient implements IProviderRpcClient {
