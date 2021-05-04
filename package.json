@@ -1,6 +1,6 @@
 {
   "name": "ton-inpage-provider",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Web3-like interface to TON provided by TON Crystal Wallet browser extension",
   "repository": "https://github.com/broxus/ton-inpage-provider",
   "main": "dist/index.js",

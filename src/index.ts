@@ -51,11 +51,20 @@ export type IProvider = {
       : never
 }
 
+export function hasTonProvider() {
+  return (window as any).hasTonProvider === true;
+}
+
 class ProviderRpcClient implements IProviderRpcClient {
   private readonly _initializationPromise: Promise<void>;
   private _ton?: Ton;
 
   constructor() {
+    if (!hasTonProvider()) {
+      this._initializationPromise = Promise.reject(new Error('TON provider was not found'))
+      return;
+    }
+
     this._ton = (window as any).ton;
     if (this._ton != null) {
       this._initializationPromise = Promise.resolve();
@@ -104,10 +113,6 @@ class ProviderRpcClient implements IProviderRpcClient {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
     this._ton?.prependOnceListener(eventName, listener);
   }
-}
-
-export function hasTonProvider() {
-  return (window as any).ton != null;
 }
 
 const provider = new Proxy(new ProviderRpcClient(), {

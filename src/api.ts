@@ -252,11 +252,11 @@ export type ProviderApi = {
   // Calculates transaction fees
   estimateFees: {
     input: {
-      // Preferred wallet address.
-      // This wallet will be used to send the message if specified
-      preferredSender?: string,
+      // This wallet will be used to send the message.
+      // It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+      sender: string,
       // Message destination address
-      address: string
+      recipient: string
       // Amount of nano TON to send
       amount: string
       // Optional function call
@@ -273,10 +273,10 @@ export type ProviderApi = {
   sendMessage: {
     input: {
       // Preferred wallet address.
-      // This wallet will be used to send the message if specified
-      preferredSender?: string,
+      // It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+      sender: string,
       // Message destination address
-      address: string
+      recipient: string
       // Amount of nano TON to send
       amount: string
       // Whether to bounce message back on error
@@ -297,11 +297,11 @@ export type ProviderApi = {
   sendExternalMessage: {
     input: {
       // The public key of the preferred account.
-      // This key will be used to sign the message if specified
-      preferredKey?: string
+      // It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+      publicKey: string
       // Message destination address
-      address: string
-      // Base64 encoded optional init data
+      recipient: string
+      // Optional base64 encoded `.tvc` file
       stateInit?: string
       // Function call
       payload: FunctionCall
