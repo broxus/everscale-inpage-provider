@@ -51,8 +51,20 @@ export type IProvider = {
       : never
 }
 
-export function hasTonProvider() {
-  return (window as any).hasTonProvider === true;
+let ensurePageLoaded: Promise<void>;
+if (document.readyState == 'complete') {
+  ensurePageLoaded = Promise.resolve();
+} else {
+  ensurePageLoaded = new Promise<void>((resolve) => {
+    window.addEventListener('load', () => {
+      resolve();
+    });
+  });
+}
+
+export async function hasTonProvider() {
+  await ensurePageLoaded;
+  return (window as Record<string, any>).hasTonProvider === true;
 }
 
 class ProviderRpcClient implements IProviderRpcClient {
@@ -60,26 +72,28 @@ class ProviderRpcClient implements IProviderRpcClient {
   private _ton?: Ton;
 
   constructor() {
-    if (!hasTonProvider()) {
-      this._initializationPromise = Promise.reject(new Error('TON provider was not found'))
-      return;
-    }
-
     this._ton = (window as any).ton;
     if (this._ton != null) {
       this._initializationPromise = Promise.resolve();
-    } else {
-      let resolveInitialized: (() => void) | undefined;
-
-      this._initializationPromise = new Promise<void>((resolve) => {
-        resolveInitialized = () => resolve();
-      });
-
-      window.addEventListener('ton#initialized', (_data) => {
-        this._ton = (window as any).ton;
-        resolveInitialized?.();
-      });
+      return;
     }
+
+    this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
+      if (!hasTonProvider) {
+        reject(new Error('TON provider was not found'));
+        return;
+      }
+
+      this._ton = (window as any).ton;
+      if (this._ton != null) {
+        resolve();
+      } else {
+        window.addEventListener('ton#initialized', (_data) => {
+          this._ton = (window as any).ton;
+          resolve();
+        });
+      }
+    }));
   }
 
   public async ensureInitialized() {

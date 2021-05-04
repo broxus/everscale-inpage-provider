@@ -17,21 +17,24 @@ npm install --save ton-inpage-provider
 ### Example
 
 ```typescript
-import ton from 'ton-inpage-provider';
+import ton, { hasTonProvider } from 'ton-inpage-provider';
 
 async function myApp() {
+  if (!(await hasTonProvider())) {
+    throw new Error('Extension is not installed')
+  }
   await ton.ensureInitialized();
 
   const { accountInteraction } = await ton.requestPermissions({
     permissions: ['tonClient', 'accountInteraction']
   });
 
-  const selectedAddress = accountInteraction![0].address;
+  const selectedAddress = accountInteraction.address;
   const dePoolAddress = '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
 
   const { transaction } = await ton.sendMessage({
-    preferredSender: selectedAddress,
-    address: dePoolAddress,
+    sender: selectedAddress,
+    recipient: dePoolAddress,
     amount: '10500000000',
     bounce: true,
     payload: {
