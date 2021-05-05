@@ -25,9 +25,13 @@ export type WalletContractType =
   | 'WalletV3';
 
 export interface ContractUpdatesSubscription {
-  // Whether to listen contract state updates
+  /**
+   * Whether to listen contract state updates
+   */
   state: boolean,
-  // Whether to listen new contract transactions
+  /**
+   * Whether to listen new contract transactions
+   */
   transactions: boolean
 }
 
@@ -103,10 +107,16 @@ export type HeadersObject = {
 }
 
 export interface FunctionCall {
-  // Contract ABI
+  /**
+   * Contract ABI
+   */
   abi: string
-  // Specific method from specified contract ABI
+  /**
+   * Specific method from specified contract ABI
+   */
   method: string
-  // Method arguments
+  /**
+   * Method arguments
+   */
   params: TokensObject
 }

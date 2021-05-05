@@ -71,9 +71,16 @@ export async function hasTonProvider() {
   return (window as Record<string, any>).hasTonProvider === true;
 }
 
-// Modifies knownTransactions array, merging it with new transactions.
-// All arrays are assumed to be sorted by descending logical time.
-// Also this method does not remove duplicates.
+/**
+ * Modifies knownTransactions array, merging it with new transactions.
+ * All arrays are assumed to be sorted by descending logical time.
+ *
+ * > Note! This method does not remove duplicates.
+ *
+ * @param knownTransactions
+ * @param newTransactions
+ * @param info
+ */
 export function mergeTransactions(
   knownTransactions: Transaction[],
   newTransactions: Transaction[],
