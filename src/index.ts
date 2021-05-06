@@ -9,6 +9,7 @@ import {
   Transaction,
   TransactionsBatchInfo
 } from './models';
+import { IContract, AbiFunctionName, AbiFunctionParams, AbiFunctionOutput } from './utils';
 
 export * from './api';
 export * from './models';
@@ -190,5 +191,59 @@ const provider = new Proxy(new ProviderRpcClient(), {
     return (params?: ProviderRequestParams<K>) => object.ton.request({ method, params: params! });
   }
 }) as unknown as IProvider;
+
+/**
+ * Creates a typed wrapper around contract abi object and address
+ *
+ * @param abi
+ * @param address
+ *
+ * @example
+ * const abi = {
+ *   'ABI version': 2,
+ *   'header': ['time', 'expire'],
+ *   'functions': [
+ *     {
+ *       'name': 'testMethod',
+ *       'inputs': [
+ *         { 'name': 'param', 'type': 'address' }
+ *       ],
+ *       'outputs': [
+ *         { 'name': 'value0', 'type': 'uint256' }
+ *       ]
+ *     }
+ *   ]
+ * } as const; // < `as const` is required to make types deduction work
+ *
+ * const contract = makeTypedContract(abi, '....some address..')
+ * const { value0 } = await contract.testMethod({
+ *   param: '....another address...'
+ * })
+ * console.log(value0)
+ */
+export function makeTypedContract<C>(abi: C, address: string): IContract<C> {
+  class TypedContract {
+    abi: string;
+    address: string;
+
+    constructor(abi: any, address: string) {
+      this.abi = JSON.stringify(abi);
+      this.address = address;
+    }
+  }
+
+  return new Proxy(new TypedContract(abi, address), {
+    get: <K extends AbiFunctionName<C>>(object: TypedContract, method: K) => {
+      return (params: AbiFunctionParams<C, K>) => provider.runLocal({
+        address: object.address,
+        functionCall: {
+          abi: object.abi,
+          method: method as string,
+          params
+        }
+      });
+    }
+  }) as unknown as IContract<C>;
+}
 
 export default provider;
