@@ -96,7 +96,7 @@ export type AbiToken =
   | number
   | { [K in string]: AbiToken }
   | AbiToken[]
-  | [AbiToken, AbiToken][];
+  | (readonly [AbiToken, AbiToken])[];
 
 export type TokensObject = { [K in string]: AbiToken };
 

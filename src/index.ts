@@ -6,10 +6,19 @@ import {
   ProviderResponse
 } from './api';
 import {
+  TokensObject,
   Transaction,
   TransactionsBatchInfo
 } from './models';
-import { AbiFunctionName, AbiFunctionParams, AbiFunctionOutput, Address, AddressLiteral } from './utils';
+import {
+  AbiFunctionName,
+  AbiFunctionParams,
+  AbiFunctionOutput,
+  Address,
+  AddressLiteral,
+  AbiParam,
+  transformToSerializedObject, transformToParsedObject, ParsedTokensObject, ParsedAbiToken
+} from './utils';
 
 export * from './api';
 export * from './models';
@@ -242,17 +251,27 @@ type IContractMethods<C> = {
   [K in AbiFunctionName<C>]: (params: AbiFunctionParams<C, K>) => IContractMethod<AbiFunctionParams<C, K>, AbiFunctionOutput<C, K>>
 }
 
+type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] }
+
 export class Contract<Abi> {
   private readonly _abi: string;
+  private readonly _functions: { [name: string]: { inputs: AbiParam[], outputs: AbiParam[] } };
   private readonly _address: Address;
   private readonly _methods: IContractMethods<Abi>;
 
   constructor(abi: Abi, address: Address) {
     this._abi = JSON.stringify(abi);
+    this._functions = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
+      functions[item.name] = { inputs: item.inputs || [], outputs: item.outputs || [] };
+      return functions;
+    }, {} as typeof Contract.prototype._functions);
     this._address = address;
 
     class ContractMethod implements IContractMethod<any, any> {
-      constructor(readonly abi: string, readonly address: Address, readonly method: string, readonly params: any) {
+      readonly params: TokensObject;
+
+      constructor(private readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] }, readonly abi: string, readonly address: Address, readonly method: string, params: any) {
+        this.params = transformToSerializedObject(params);
       }
 
       async send(args: ISendInternal): Promise<Transaction> {
@@ -270,8 +289,8 @@ export class Contract<Abi> {
         return transaction;
       }
 
-      sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
-        return provider.sendExternalMessage({
+      async sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
+        let { transaction, output } = await provider.sendExternalMessage({
           publicKey: args.publicKey,
           recipient: this.address.toString(),
           stateInit: args.stateInit,
@@ -281,6 +300,12 @@ export class Contract<Abi> {
             params: this.params
           }
         });
+
+        if (output != null) {
+          (output as ParsedTokensObject) = transformToParsedObject(this.functionAbi.outputs, output);
+        }
+
+        return { transaction, output };
       }
 
       async call(): Promise<any> {
@@ -295,7 +320,10 @@ export class Contract<Abi> {
 
         if (output == null) {
           output = {};
+        } else {
+          (output as ParsedTokensObject) = transformToParsedObject(this.functionAbi.outputs, output);
         }
+
         output._tvmExitCode = code;
 
         return output;
@@ -304,7 +332,8 @@ export class Contract<Abi> {
 
     this._methods = new Proxy({}, {
       get: <K extends AbiFunctionName<Abi>>(_object: {}, method: K) => {
-        return (params: AbiFunctionParams<Abi, K>) => new ContractMethod(this._abi, this._address, method, params);
+        const rawAbi = (this._functions as any)[method];
+        return (params: AbiFunctionParams<Abi, K>) => new ContractMethod(rawAbi, this._abi, this._address, method, params);
       }
     }) as unknown as IContractMethods<Abi>;
   }

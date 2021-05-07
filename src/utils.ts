@@ -1,3 +1,5 @@
+import { AbiToken, TokensObject } from './models';
+
 export type UniqueArray<T> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
     ? ['Encountered value with duplicates:', X]
@@ -29,11 +31,12 @@ type TokenValuePublicKey = 'pubkey'
 type TokenValue<T, C> =
   T extends TokenValueUint | TokenValueInt | TokenValueGram | TokenValueTime | TokenValueExpire ? string | number
     : T extends TokenValueBool ? boolean
-    : T extends TokenValueCell | TokenValueAddress | TokenValueBytes | TokenValuePublicKey ? string
-      : T extends TokenValueTuple ? MergeObjectsArray<C>
-        : T extends `${infer K}[]` ? TokenValue<K, C>[]
-          : T extends `map(${infer K},${infer V})` ? (readonly [TokenValue<K, undefined>, TokenValue<V, C>])[]
-            : never
+    : T extends TokenValueCell | TokenValueBytes | TokenValuePublicKey ? string
+      : T extends TokenValueAddress ? Address
+        : T extends TokenValueTuple ? MergeObjectsArray<C>
+          : T extends `${infer K}[]` ? TokenValue<K, C>[]
+            : T extends `map(${infer K},${infer V})` ? (readonly [TokenValue<K, undefined>, TokenValue<V, C>])[]
+              : never
 
 type TokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ? K extends string ? { [P in K]: TokenValue<T, C> } : never : never
 type MergeObjectsArray<A> =
@@ -80,3 +83,114 @@ type IsHexString<T extends string, L extends readonly number[]> =
   T extends `${HexByte}${infer Tail}`
     ? IsHexString<Tail, [...L, 0]>
     : T extends '' ? L['length'] extends 32 ? true : never : never
+
+type AbiParamKind =
+  | TokenValueUint
+  | TokenValueInt
+  | TokenValueTuple
+  | TokenValueBool
+  | TokenValueCell
+  | TokenValueAddress
+  | TokenValueBytes
+  | TokenValueGram
+  | TokenValueTime
+  | TokenValueExpire
+  | TokenValuePublicKey
+
+type AbiParamArray = `${AbiParamKind}[]`
+
+type AbiParamMapping = `map(${TokenValueUint | TokenValueInt | TokenValueAddress},${AbiParamKind | `${AbiParamKind}[]`})`
+
+export type AbiParam = {
+  name: string,
+  type: AbiParamKind | AbiParamArray | AbiParamMapping,
+  components?: AbiParam[]
+}
+
+export type ParsedAbiToken =
+  | boolean
+  | string
+  | number
+  | Address
+  | { [K in string]: ParsedAbiToken }
+  | ParsedAbiToken[]
+  | (readonly [ParsedAbiToken, ParsedAbiToken])[];
+
+export type ParsedTokensObject = { [K in string]: ParsedAbiToken }
+
+export function transformToParsedObject(params: AbiParam[], object: TokensObject): ParsedTokensObject {
+  params.forEach((param) => {
+    (object as ParsedTokensObject)[param.name] = parseToken(param, object[param.name]);
+  });
+  return object;
+}
+
+function parseToken(param: AbiParam, token: AbiToken): ParsedAbiToken {
+  if (param.type.startsWith('map')) {
+    let [keyType, valueType] = param.type.split(',');
+    keyType = keyType.slice(4);
+    valueType = valueType.slice(0, -1);
+
+    (token as (readonly [AbiToken, AbiToken])[]).forEach(([key, value], i) => {
+      (token as (readonly [ParsedAbiToken, ParsedAbiToken])[])[i] = [parseToken({
+        name: '',
+        type: keyType as AbiParamKind
+      }, key), parseToken({
+        name: '',
+        type: valueType as AbiParamKind,
+        components: param.components
+      }, value)];
+    });
+
+    return token as ParsedAbiToken;
+  } else {
+    const rawType = param.type.endsWith('[]') ? param.type.slice(0, -2) : param.type;
+    const isArray = rawType != param.type;
+
+    if (isArray) {
+      const rawParam = { name: param.name, type: rawType, components: param.components } as AbiParam;
+
+      (token as AbiToken[]).forEach((item, i) => {
+        (token as ParsedAbiToken[])[i] = parseToken(rawParam, item);
+      });
+
+      return token as ParsedAbiToken;
+    } else if (rawType == 'tuple') {
+      param.components?.forEach((itemParam) => {
+        const tupleItem = (token as { [K in string]: AbiToken })[itemParam.name];
+        (token as { [K in string]: ParsedAbiToken })[itemParam.name] = parseToken(itemParam, tupleItem);
+      });
+
+      return token as ParsedAbiToken;
+    } else if (rawType == 'address') {
+      return new Address(token as string);
+    } else {
+      return token as ParsedAbiToken;
+    }
+  }
+}
+
+export function transformToSerializedObject(object: ParsedTokensObject): TokensObject {
+  return serializeToken(object) as TokensObject;
+}
+
+function serializeToken(token: ParsedAbiToken): AbiToken {
+  // custom types go first
+  if (token instanceof Address) {
+    return token.toString();
+  }
+
+  if (Array.isArray(token)) {
+    (token as ParsedAbiToken[]).forEach((value, i) => {
+      (token as AbiToken[])[i] = serializeToken(value);
+    });
+    return token as AbiToken;
+  } else if (typeof token === 'object') {
+    Object.keys(token).forEach((key) => {
+      token[key] = serializeToken(token[key]);
+    });
+    return token as AbiToken;
+  } else {
+    return token as AbiToken;
+  }
+}
