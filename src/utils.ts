@@ -12,9 +12,7 @@ export type InArray<T, X> = T extends readonly [X, ...infer _Rest]
       ? InArray<Rest, X>
       : false
 
-type FunctionObject<T> = T extends { name: infer K } ? K extends string ? { [P in K]: T } : never : never
-type MergeFunctionsArray<A> = A extends readonly [infer T, ...infer Ts] ? (FunctionObject<T> & MergeFunctionsArray<[...Ts]>)
-  : A extends readonly [infer T] ? FunctionObject<T> : A extends readonly [] ? {} : never
+type ArrayItemType<T extends readonly unknown[]> = T extends readonly (infer Ts)[] ? Ts : never;
 
 type TokenValueUint = 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'uint128' | 'uint256'
 type TokenValueInt = 'int8' | 'int16' | 'int32' | 'int64' | 'int128' | 'int256'
@@ -34,7 +32,8 @@ type TokenValue<T, C> =
     : T extends TokenValueCell | TokenValueAddress | TokenValueBytes | TokenValuePublicKey ? string
       : T extends TokenValueTuple ? MergeObjectsArray<C>
         : T extends `${infer K}[]` ? TokenValue<K, C>[]
-          : never
+          : T extends `map(${infer K},${infer V})` ? (readonly [TokenValue<K, undefined>, TokenValue<V, C>])[]
+            : never
 
 type TokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ? K extends string ? { [P in K]: TokenValue<T, C> } : never : never
 type MergeObjectsArray<A> =
@@ -42,10 +41,12 @@ type MergeObjectsArray<A> =
     ? (TokenObject<T> & MergeObjectsArray<[...Ts]>)
     : A extends readonly [infer T] ? TokenObject<T> : A extends readonly [] ? {} : never
 
-type AbiFunctions<C> = C extends { functions: infer F } ? MergeFunctionsArray<F> : never
-export type AbiFunctionName<C> = keyof AbiFunctions<C>
-export type AbiFunctionParams<C, T extends AbiFunctionName<C>> = MergeObjectsArray<AbiFunctions<C>[T]['inputs']>
-export type AbiFunctionOutput<C, T extends AbiFunctionName<C>> = MergeObjectsArray<AbiFunctions<C>[T]['outputs']>
+type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never
+type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>
+
+export type AbiFunctionName<C> = AbiFunction<C>['name']
+export type AbiFunctionParams<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['inputs']>
+export type AbiFunctionOutput<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['outputs']>
 
 export type IContract<C> = {
   [K in AbiFunctionName<C>]: (params: AbiFunctionParams<C, K>) => Promise<AbiFunctionOutput<C, K>>
