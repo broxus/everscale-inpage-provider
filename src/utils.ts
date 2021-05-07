@@ -42,12 +42,8 @@ type MergeObjectsArray<A> =
     : A extends readonly [infer T] ? TokenObject<T> : A extends readonly [] ? {} : never
 
 type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never
-type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>
-
 export type AbiFunctionName<C> = AbiFunction<C>['name']
+
+type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>
 export type AbiFunctionParams<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['inputs']>
 export type AbiFunctionOutput<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['outputs']>
-
-export type IContract<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionParams<C, K>) => Promise<AbiFunctionOutput<C, K>>
-}

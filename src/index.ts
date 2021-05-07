@@ -9,7 +9,7 @@ import {
   Transaction,
   TransactionsBatchInfo
 } from './models';
-import { IContract, AbiFunctionName, AbiFunctionParams, AbiFunctionOutput } from './utils';
+import { AbiFunctionName, AbiFunctionParams, AbiFunctionOutput } from './utils';
 
 export * from './api';
 export * from './models';
@@ -192,58 +192,101 @@ const provider = new Proxy(new ProviderRpcClient(), {
   }
 }) as unknown as IProvider;
 
-/**
- * Creates a typed wrapper around contract abi object and address
- *
- * @param abi
- * @param address
- *
- * @example
- * const abi = {
- *   'ABI version': 2,
- *   'header': ['time', 'expire'],
- *   'functions': [
- *     {
- *       'name': 'testMethod',
- *       'inputs': [
- *         { 'name': 'param', 'type': 'address' }
- *       ],
- *       'outputs': [
- *         { 'name': 'value0', 'type': 'uint256' }
- *       ]
- *     }
- *   ]
- * } as const; // < `as const` is required to make types deduction work
- *
- * const contract = makeTypedContract(abi, '....some address..')
- * const { value0 } = await contract.testMethod({
- *   param: '....another address...'
- * })
- * console.log(value0)
- */
-export function makeTypedContract<C>(abi: C, address: string): IContract<C> {
-  class TypedContract {
-    abi: string;
-    address: string;
+export default provider;
 
-    constructor(abi: any, address: string) {
-      this.abi = JSON.stringify(abi);
-      this.address = address;
-    }
-  }
-
-  return new Proxy(new TypedContract(abi, address), {
-    get: <K extends AbiFunctionName<C>>(object: TypedContract, method: K) => {
-      return (params: AbiFunctionParams<C, K>) => provider.runLocal({
-        address: object.address,
-        functionCall: {
-          abi: object.abi,
-          method: method as string,
-          params
-        }
-      });
-    }
-  }) as unknown as IContract<C>;
+interface ISendFrom<I> {
+  from: string,
+  to: string,
+  amount: string,
+  /**
+   * @default true
+   */
+  bounce?: boolean,
+  params: I,
 }
 
-export default provider;
+interface ISendExternal<I> {
+  publicKey: string,
+  to: string,
+  stateInit?: string,
+  params: I,
+}
+
+interface IRunLocal<I> {
+  address: string,
+  params: I,
+}
+
+interface IContractMethod<I, O> {
+  sendInternal(args: ISendFrom<I>): Promise<void>
+
+  sendExternal(args: ISendExternal<I>): Promise<{ transaction: Transaction, output?: O }>
+
+  runLocal(args: IRunLocal<I>): Promise<{ output?: O, code: number }>
+}
+
+type IContractMethods<C> = {
+  [K in AbiFunctionName<C>]: IContractMethod<AbiFunctionParams<C, K>, AbiFunctionOutput<C, K>>
+}
+
+export class Contract<Abi> {
+  private readonly _abi: string;
+  private readonly _methods: IContractMethods<Abi>;
+
+  constructor(abi: Abi) {
+    this._abi = JSON.stringify(abi);
+
+    class ContractMethod implements IContractMethod<any, any> {
+      constructor(private abi: string, private method: string) {
+      }
+
+      async sendInternal(args: ISendFrom<any>): Promise<void> {
+        await provider.sendMessage({
+          sender: args.from,
+          recipient: args.to,
+          amount: args.amount,
+          bounce: args.bounce == null ? true : args.bounce,
+          payload: {
+            abi: this.abi,
+            method: this.method,
+            params: args.params
+          }
+        });
+      }
+
+      sendExternal(args: ISendExternal<any>): Promise<{ transaction: Transaction, output?: any }> {
+        return provider.sendExternalMessage({
+          publicKey: args.publicKey,
+          recipient: args.to,
+          stateInit: args.stateInit,
+          payload: {
+            abi: this.abi,
+            method: this.method,
+            params: args.params
+          }
+        });
+      }
+
+      runLocal(args: IRunLocal<any>): Promise<{ output?: any; code: number }> {
+        return provider.runLocal({
+          address: args.address,
+          functionCall: {
+            abi: this.abi,
+            method: this.method,
+            params: args.params
+          }
+        });
+      }
+    }
+
+    this._methods = new Proxy({}, {
+      get: <K extends AbiFunctionName<Abi>>(_object: {}, method: K) => {
+        return new ContractMethod(this._abi, method);
+      }
+    }) as unknown as IContractMethods<Abi>;
+  }
+
+  public get methods() {
+    return this._methods;
+  }
+}
