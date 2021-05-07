@@ -516,10 +516,6 @@ export type ProviderApi = {
        * Executed transaction
        */
       transaction: Transaction
-      /**
-       * Parsed function call output
-       */
-      output?: TokensObject
     }
   }
 

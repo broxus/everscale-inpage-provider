@@ -217,10 +217,23 @@ interface IContractMethod<I, O> {
   readonly method: string
   readonly params: I
 
-  send(args: ISendInternal): Promise<void>
+  /**
+   * Sends internal message and returns wallet transactions
+   *
+   * @param args
+   */
+  send(args: ISendInternal): Promise<Transaction>
 
+  /**
+   * Sends external message and returns contract transaction with parsed output
+   *
+   * @param args
+   */
   sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: O }>
 
+  /**
+   * Runs message locally
+   */
   call(): Promise<{ output?: O, code: number }>
 }
 
@@ -241,8 +254,8 @@ export class Contract<Abi> {
       constructor(readonly abi: string, readonly address: string, readonly method: string, readonly params: any) {
       }
 
-      async send(args: ISendInternal): Promise<void> {
-        await provider.sendMessage({
+      async send(args: ISendInternal): Promise<Transaction> {
+        const { transaction } = await provider.sendMessage({
           sender: args.from,
           recipient: this.address,
           amount: args.amount,
@@ -253,6 +266,7 @@ export class Contract<Abi> {
             params: this.params
           }
         });
+        return transaction;
       }
 
       sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
