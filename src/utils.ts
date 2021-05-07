@@ -47,3 +47,36 @@ export type AbiFunctionName<C> = AbiFunction<C>['name']
 type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>
 export type AbiFunctionParams<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['inputs']>
 export type AbiFunctionOutput<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['outputs']>
+
+export class Address {
+  private readonly _address: string;
+
+  constructor(address: string) {
+    this._address = address;
+  }
+
+  public toString(): string {
+    return this._address;
+  }
+}
+
+export class AddressLiteral<T extends string> extends Address {
+  constructor(address: CheckAddress<T>) {
+    super(address);
+  }
+}
+
+type CheckAddress<T extends string> = AddressImpl<T, Lowercase<T>>;
+
+type AddressPrefix = '0:' | '-1:'
+type AddressImpl<T, Tl extends string> = Tl extends `${AddressPrefix}${infer Hash}`
+  ? true extends IsHexString<Hash, []>
+    ? T : never
+  : never;
+
+type HexSymbol = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f'
+type HexByte = `${HexSymbol}${HexSymbol}`
+type IsHexString<T extends string, L extends readonly number[]> =
+  T extends `${HexByte}${infer Tail}`
+    ? IsHexString<Tail, [...L, 0]>
+    : T extends '' ? L['length'] extends 32 ? true : never : never

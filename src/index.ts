@@ -9,11 +9,12 @@ import {
   Transaction,
   TransactionsBatchInfo
 } from './models';
-import { AbiFunctionName, AbiFunctionParams, AbiFunctionOutput } from './utils';
+import { AbiFunctionName, AbiFunctionParams, AbiFunctionOutput, Address, AddressLiteral } from './utils';
 
 export * from './api';
 export * from './models';
 export * from './permissions';
+export { Address, AddressLiteral } from './utils';
 
 export interface TonRequest<T extends ProviderMethod> {
   method: T
@@ -195,7 +196,7 @@ const provider = new Proxy(new ProviderRpcClient(), {
 export default provider;
 
 interface ISendInternal {
-  from: string,
+  from: Address,
   amount: string,
   /**
    * @default true
@@ -212,7 +213,7 @@ interface IContractMethod<I, O> {
   /**
    * Target contract address
    */
-  readonly address: string
+  readonly address: Address
   readonly abi: string
   readonly method: string
   readonly params: I
@@ -234,7 +235,7 @@ interface IContractMethod<I, O> {
   /**
    * Runs message locally
    */
-  call(): Promise<{ output?: O, code: number }>
+  call(): Promise<(O | undefined) & { _tvmExitCode: number }>
 }
 
 type IContractMethods<C> = {
@@ -243,21 +244,21 @@ type IContractMethods<C> = {
 
 export class Contract<Abi> {
   private readonly _abi: string;
-  private readonly _address: string;
+  private readonly _address: Address;
   private readonly _methods: IContractMethods<Abi>;
 
-  constructor(abi: Abi, address: string) {
+  constructor(abi: Abi, address: Address) {
     this._abi = JSON.stringify(abi);
     this._address = address;
 
     class ContractMethod implements IContractMethod<any, any> {
-      constructor(readonly abi: string, readonly address: string, readonly method: string, readonly params: any) {
+      constructor(readonly abi: string, readonly address: Address, readonly method: string, readonly params: any) {
       }
 
       async send(args: ISendInternal): Promise<Transaction> {
         const { transaction } = await provider.sendMessage({
-          sender: args.from,
-          recipient: this.address,
+          sender: args.from.toString(),
+          recipient: this.address.toString(),
           amount: args.amount,
           bounce: args.bounce == null ? true : args.bounce,
           payload: {
@@ -272,7 +273,7 @@ export class Contract<Abi> {
       sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
         return provider.sendExternalMessage({
           publicKey: args.publicKey,
-          recipient: this.address,
+          recipient: this.address.toString(),
           stateInit: args.stateInit,
           payload: {
             abi: this.abi,
@@ -282,15 +283,22 @@ export class Contract<Abi> {
         });
       }
 
-      call(): Promise<{ output?: any; code: number }> {
-        return provider.runLocal({
-          address: this.address,
+      async call(): Promise<any> {
+        let { output, code } = await provider.runLocal({
+          address: this.address.toString(),
           functionCall: {
             abi: this.abi,
             method: this.method,
             params: this.params
           }
         });
+
+        if (output == null) {
+          output = {};
+        }
+        output._tvmExitCode = code;
+
+        return output;
       }
     }
 
