@@ -17,7 +17,9 @@ import {
   Address,
   AddressLiteral,
   AbiParam,
-  transformToSerializedObject, transformToParsedObject, ParsedTokensObject, ParsedAbiToken
+  ParsedTokensObject,
+  transformToSerializedObject,
+  transformToParsedObject
 } from './utils';
 
 export * from './api';
@@ -30,8 +32,10 @@ export interface TonRequest<T extends ProviderMethod> {
   params: ProviderRequestParams<T>
 }
 
-interface Emitter {
+export interface Ton {
   addListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+
+  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 
   on<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 
@@ -40,9 +44,7 @@ interface Emitter {
   prependListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
 
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
-}
 
-export interface Ton extends Emitter {
   request<T extends ProviderMethod>(data: TonRequest<T>): Promise<ProviderResponse<T>>
 }
 
@@ -50,20 +52,8 @@ type RpcMethod<P extends ProviderMethod> = ProviderRequestParams<P> extends {}
   ? (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
   : () => Promise<ProviderResponse<P>>
 
-interface IProviderRpcClient extends Emitter {
-  ensureInitialized(): Promise<void>
-}
-
 type ProviderApiMethods = {
   [P in ProviderMethod]: RpcMethod<P>
-}
-
-export type IProvider = {
-  [K in ProviderMethod | keyof IProviderRpcClient]: K extends ProviderMethod
-    ? ProviderApiMethods[K]
-    : K extends keyof IProviderRpcClient
-      ? IProviderRpcClient[K]
-      : never
 }
 
 let ensurePageLoaded: Promise<void>;
@@ -126,11 +116,19 @@ export function mergeTransactions(
   return knownTransactions;
 }
 
-class ProviderRpcClient implements IProviderRpcClient {
+class ProviderRpcClient {
+  private readonly _api: ProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
   private _ton?: Ton;
 
   constructor() {
+    this._api = new Proxy({}, {
+      get: <K extends ProviderMethod>(
+        _object: ProviderRpcClient,
+        method: K
+      ) => (params?: ProviderRequestParams<K>) => this._ton!.request({ method, params: params! })
+    }) as unknown as ProviderApiMethods;
+
     this._ton = (window as any).ton;
     if (this._ton != null) {
       this._initializationPromise = Promise.resolve();
@@ -163,44 +161,45 @@ class ProviderRpcClient implements IProviderRpcClient {
     return this._ton != null;
   }
 
-  public get ton() {
+  public get raw() {
     return this._ton!;
   }
 
-  addListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+  public get api() {
+    return this._api;
+  }
+
+  addListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
     this._ton?.addListener(eventName, listener);
+    return listener;
   }
 
-  on<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+  removeListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): void {
+    this._ton?.removeListener(eventName, listener);
+  }
+
+  on<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
     this._ton?.on(eventName, listener);
+    return listener;
   }
 
-  once<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+  once<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
     this._ton?.once(eventName, listener);
+    return listener;
   }
 
-  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+  prependListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
     this._ton?.prependListener(eventName, listener);
+    return listener;
   }
 
-  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void {
+  prependOnceListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
     this._ton?.prependOnceListener(eventName, listener);
+    return listener;
   }
 }
 
-const provider = new Proxy(new ProviderRpcClient(), {
-  get: <K extends ProviderMethod>(
-    object: ProviderRpcClient,
-    method: K
-  ) => {
-    const property = (object as any)[method];
-    if (property != null) {
-      return property;
-    }
-
-    return (params?: ProviderRequestParams<K>) => object.ton.request({ method, params: params! });
-  }
-}) as unknown as IProvider;
+const provider = new ProviderRpcClient();
 
 export default provider;
 
@@ -275,7 +274,7 @@ export class Contract<Abi> {
       }
 
       async send(args: ISendInternal): Promise<Transaction> {
-        const { transaction } = await provider.sendMessage({
+        const { transaction } = await provider.api.sendMessage({
           sender: args.from.toString(),
           recipient: this.address.toString(),
           amount: args.amount,
@@ -290,7 +289,7 @@ export class Contract<Abi> {
       }
 
       async sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
-        let { transaction, output } = await provider.sendExternalMessage({
+        let { transaction, output } = await provider.api.sendExternalMessage({
           publicKey: args.publicKey,
           recipient: this.address.toString(),
           stateInit: args.stateInit,
@@ -309,7 +308,7 @@ export class Contract<Abi> {
       }
 
       async call(): Promise<any> {
-        let { output, code } = await provider.runLocal({
+        let { output, code } = await provider.api.runLocal({
           address: this.address.toString(),
           functionCall: {
             abi: this.abi,

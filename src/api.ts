@@ -73,7 +73,7 @@ export type ProviderEvents = {
    * or disconnect method was called
    */
   permissionsChanged: {
-    permissions: Permissions
+    permissions: Partial<Permissions>
   }
 
   /**
