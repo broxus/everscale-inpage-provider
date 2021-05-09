@@ -1,4 +1,5 @@
 import {
+  ProviderApi,
   ProviderEvent,
   ProviderEventData,
   ProviderMethod,
@@ -6,6 +7,7 @@ import {
   ProviderResponse
 } from './api';
 import {
+  ContractUpdatesSubscription,
   TokensObject,
   Transaction,
   TransactionsBatchInfo
@@ -19,7 +21,8 @@ import {
   AbiParam,
   ParsedTokensObject,
   transformToSerializedObject,
-  transformToParsedObject
+  transformToParsedObject,
+  getUniqueId
 } from './utils';
 
 export * from './api';
@@ -116,9 +119,49 @@ export function mergeTransactions(
   return knownTransactions;
 }
 
+type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
+
+export interface ISubscription<T extends ProviderEvent> {
+  /**
+   * Fires on each incoming event with the event object as argument.
+   *
+   * @param eventName 'data'
+   * @param listener
+   */
+  on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
+
+  /**
+   * Fires on successful re-subscription
+   *
+   * @param eventName 'subscribed'
+   * @param listener
+   */
+  on(eventName: 'subscribed', listener: () => void): this;
+
+  /**
+   * Fires on unsubscription
+   *
+   * @param eventName 'unsubscribed'
+   * @param listener
+   */
+  on(eventName: 'unsubscribed', listener: () => void): this;
+
+  /**
+   * Can be used to re-subscribe with the same parameters.
+   */
+  subscribe(): Promise<void>;
+
+  /**
+   * Unsubscribes the subscription.
+   */
+  unsubscribe(): Promise<void>
+}
+
 class ProviderRpcClient {
   private readonly _api: ProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
+  private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
+  private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _ton?: Ton;
 
   constructor() {
@@ -151,6 +194,33 @@ class ProviderRpcClient {
         });
       }
     }));
+
+    this._initializationPromise.then(() => {
+      if (this._ton == null) {
+        return;
+      }
+
+      const knownEvents: ProviderEvent[] = [
+        'disconnected',
+        'transactionsFound',
+        'contractStateChanged',
+        'networkChanged',
+        'permissionsChanged',
+        'loggedOut'
+      ];
+
+      for (const eventName of knownEvents) {
+        this._ton.addListener(eventName, (data) => {
+          const handlers = this._subscriptions[eventName];
+          if (handlers == null) {
+            return;
+          }
+          for (const handler of Object.values(handlers)) {
+            handler(data);
+          }
+        });
+      }
+    });
   }
 
   public async ensureInitialized() {
@@ -169,34 +239,171 @@ class ProviderRpcClient {
     return this._api;
   }
 
-  addListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
-    this._ton?.addListener(eventName, listener);
-    return listener;
+  public subscribe(eventName: 'disconnected'): Promise<ISubscription<'disconnected'>>;
+  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<ISubscription<'transactionsFound'>>;
+  public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<ISubscription<'contractStateChanged'>>;
+  public subscribe(eventName: 'networkChanged'): Promise<ISubscription<'networkChanged'>>;
+  public subscribe(eventName: 'permissionsChanged'): Promise<ISubscription<'permissionsChanged'>>;
+  public subscribe(eventName: 'loggedOut'): Promise<ISubscription<'loggedOut'>>;
+  public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<ISubscription<T>> {
+    class Subscription implements ISubscription<T> {
+      private readonly _listeners: { [K in SubscriptionEvent]: ((data?: any) => void)[] } = {
+        ['data']: [],
+        ['subscribed']: [],
+        ['unsubscribed']: []
+      };
+
+      constructor(
+        private readonly _subscribe: (s: Subscription) => Promise<void>,
+        private readonly _unsubscribe: () => Promise<void>) {
+      }
+
+      on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
+      on(eventName: 'subscribed', listener: () => void): this;
+      on(eventName: 'unsubscribed', listener: () => void): this;
+      on(eventName: SubscriptionEvent, listener: ((data: ProviderEventData<T>) => void) | (() => void)): this {
+        this._listeners[eventName].push(listener);
+        return this;
+      }
+
+      async subscribe(): Promise<void> {
+        await this._subscribe(this);
+        for (const handler of this._listeners['subscribed']) {
+          handler();
+        }
+      }
+
+      async unsubscribe(): Promise<void> {
+        await this._unsubscribe();
+        for (const handler of this._listeners['unsubscribed']) {
+          handler();
+        }
+      }
+
+      notify(data: ProviderEventData<T>) {
+        for (const handler of this._listeners['data']) {
+          handler(data);
+        }
+      }
+    }
+
+    let existingSubscriptions = this._getEventSubscriptions(eventName);
+
+    const id = getUniqueId();
+
+    switch (eventName) {
+      case 'disconnected':
+      case 'networkChanged':
+      case 'permissionsChanged':
+      case 'loggedOut': {
+        const subscription = new Subscription(async (subscription) => {
+          if (existingSubscriptions[id] != null) {
+            return;
+          }
+          existingSubscriptions[id] = (data) => {
+            subscription.notify(data);
+          };
+        }, async () => {
+          delete existingSubscriptions[id];
+        });
+        await subscription.subscribe();
+        return subscription;
+      }
+      case 'transactionsFound':
+      case 'contractStateChanged': {
+        const address = params!.address.toString();
+
+        const subscription = new Subscription(async (subscription) => {
+          if (existingSubscriptions[id] != null) {
+            return;
+          }
+          existingSubscriptions[id] = (data) => {
+            subscription.notify(data);
+          };
+
+          let contractSubscriptions = this._contractSubscriptions[address];
+          if (contractSubscriptions == null) {
+            contractSubscriptions = {};
+            this._contractSubscriptions[address] = contractSubscriptions;
+          }
+
+          contractSubscriptions[id] = {
+            state: eventName == 'contractStateChanged',
+            transactions: eventName == 'transactionsFound'
+          };
+
+          const { before, after } = foldSubscriptions(Object.values(contractSubscriptions), contractSubscriptions[id]);
+
+          try {
+            if (before.transactions != after.transactions || before.state != after.state) {
+              await this.api.subscribe({ address, subscriptions: after });
+            }
+          } catch (e) {
+            delete existingSubscriptions[id];
+            delete contractSubscriptions[id];
+            throw e;
+          }
+        }, async () => {
+          delete existingSubscriptions[id];
+
+          const contractSubscriptions = this._contractSubscriptions[address];
+          if (contractSubscriptions == null) {
+            return;
+          }
+          const updates = contractSubscriptions[id];
+
+          const { before, after } = foldSubscriptions(Object.values(contractSubscriptions), updates);
+          delete contractSubscriptions[id];
+
+          if (!after.transactions && !after.state) {
+            await this.api.unsubscribe({ address });
+          } else if (before.transactions != after.transactions || before.state != after.state) {
+            await this.api.subscribe({ address, subscriptions: after });
+          }
+        });
+        await subscription.subscribe();
+        return subscription;
+      }
+      default: {
+        throw new Error(`Unknown event ${eventName}`);
+      }
+    }
   }
 
-  removeListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): void {
-    this._ton?.removeListener(eventName, listener);
+  private _getEventSubscriptions<T extends ProviderEvent>(
+    eventName: T
+  ): ({ [id: number]: (data: ProviderEventData<T>) => void }) {
+    let existingSubscriptions = this._subscriptions[eventName];
+    if (existingSubscriptions == null) {
+      existingSubscriptions = {};
+      this._subscriptions[eventName] = existingSubscriptions;
+    }
+
+    return existingSubscriptions as { [id: number]: (data: ProviderEventData<T>) => void };
+  }
+}
+
+function foldSubscriptions(
+  subscriptions: Iterable<ContractUpdatesSubscription>,
+  except?: ContractUpdatesSubscription
+): { before: ContractUpdatesSubscription, after: ContractUpdatesSubscription } {
+  const before = { state: false, transactions: false };
+  const after = except != null ? Object.assign({}, before) : before;
+
+  for (const item of subscriptions) {
+    if (after.transactions && after.state) {
+      break;
+    }
+
+    before.state ||= item.state;
+    before.transactions ||= item.transactions;
+    if (item != except) {
+      after.state ||= item.state;
+      after.transactions ||= item.transactions;
+    }
   }
 
-  on<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
-    this._ton?.on(eventName, listener);
-    return listener;
-  }
-
-  once<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
-    this._ton?.once(eventName, listener);
-    return listener;
-  }
-
-  prependListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
-    this._ton?.prependListener(eventName, listener);
-    return listener;
-  }
-
-  prependOnceListener<T extends ProviderEvent, L extends (data: ProviderEventData<T>) => void>(eventName: T, listener: L): L {
-    this._ton?.prependOnceListener(eventName, listener);
-    return listener;
-  }
+  return { before, after };
 }
 
 const provider = new ProviderRpcClient();
