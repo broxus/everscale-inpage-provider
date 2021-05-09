@@ -25,14 +25,14 @@ async function myApp() {
   }
   await ton.ensureInitialized();
 
-  const { accountInteraction } = await ton.requestPermissions({
+  const { accountInteraction } = await ton.api.requestPermissions({
     permissions: ['tonClient', 'accountInteraction']
   });
 
   const selectedAddress = accountInteraction.address;
   const dePoolAddress = '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
 
-  const { transaction } = await ton.sendMessage({
+  const { transaction } = await ton.api.sendMessage({
     sender: selectedAddress,
     recipient: dePoolAddress,
     amount: '10500000000',
@@ -47,7 +47,7 @@ async function myApp() {
   });
   console.log(transaction);
 
-  const { output, code } = await ton.runLocal({
+  const { output, code } = await ton.api.runLocal({
     address: dePoolAddress,
     functionCall: {
       abi: DePoolAbi,
