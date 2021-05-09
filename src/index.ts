@@ -175,25 +175,24 @@ class ProviderRpcClient {
     this._ton = (window as any).ton;
     if (this._ton != null) {
       this._initializationPromise = Promise.resolve();
-      return;
-    }
+    } else {
+      this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
+        if (!hasTonProvider) {
+          reject(new Error('TON provider was not found'));
+          return;
+        }
 
-    this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
-      if (!hasTonProvider) {
-        reject(new Error('TON provider was not found'));
-        return;
-      }
-
-      this._ton = (window as any).ton;
-      if (this._ton != null) {
-        resolve();
-      } else {
-        window.addEventListener('ton#initialized', (_data) => {
-          this._ton = (window as any).ton;
+        this._ton = (window as any).ton;
+        if (this._ton != null) {
           resolve();
-        });
-      }
-    }));
+        } else {
+          window.addEventListener('ton#initialized', (_data) => {
+            this._ton = (window as any).ton;
+            resolve();
+          });
+        }
+      }));
+    }
 
     this._initializationPromise.then(() => {
       if (this._ton == null) {
