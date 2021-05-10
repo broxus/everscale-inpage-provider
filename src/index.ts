@@ -331,11 +331,14 @@ class ProviderRpcClient {
             transactions: eventName == 'transactionsFound'
           };
 
-          const { before, after } = foldSubscriptions(Object.values(contractSubscriptions), contractSubscriptions[id]);
+          const {
+            total,
+            withoutExcluded
+          } = foldSubscriptions(Object.values(contractSubscriptions), contractSubscriptions[id]);
 
           try {
-            if (before.transactions != after.transactions || before.state != after.state) {
-              await this.api.subscribe({ address, subscriptions: after });
+            if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
+              await this.api.subscribe({ address, subscriptions: total });
             }
           } catch (e) {
             delete existingSubscriptions[id];
@@ -351,13 +354,13 @@ class ProviderRpcClient {
           }
           const updates = contractSubscriptions[id];
 
-          const { before, after } = foldSubscriptions(Object.values(contractSubscriptions), updates);
+          const { total, withoutExcluded } = foldSubscriptions(Object.values(contractSubscriptions), updates);
           delete contractSubscriptions[id];
 
-          if (!after.transactions && !after.state) {
+          if (!withoutExcluded.transactions && !withoutExcluded.state) {
             await this.api.unsubscribe({ address });
-          } else if (before.transactions != after.transactions || before.state != after.state) {
-            await this.api.subscribe({ address, subscriptions: after });
+          } else if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
+            await this.api.subscribe({ address, subscriptions: withoutExcluded });
           }
         });
         await subscription.subscribe();
@@ -384,25 +387,25 @@ class ProviderRpcClient {
 
 function foldSubscriptions(
   subscriptions: Iterable<ContractUpdatesSubscription>,
-  except?: ContractUpdatesSubscription
-): { before: ContractUpdatesSubscription, after: ContractUpdatesSubscription } {
-  const before = { state: false, transactions: false };
-  const after = except != null ? Object.assign({}, before) : before;
+  except: ContractUpdatesSubscription
+): { total: ContractUpdatesSubscription, withoutExcluded: ContractUpdatesSubscription } {
+  const total = { state: false, transactions: false };
+  const withoutExcluded = Object.assign({}, total);
 
   for (const item of subscriptions) {
-    if (after.transactions && after.state) {
+    if (withoutExcluded.transactions && withoutExcluded.state) {
       break;
     }
 
-    before.state ||= item.state;
-    before.transactions ||= item.transactions;
+    total.state ||= item.state;
+    total.transactions ||= item.transactions;
     if (item != except) {
-      after.state ||= item.state;
-      after.transactions ||= item.transactions;
+      withoutExcluded.state ||= item.state;
+      withoutExcluded.transactions ||= item.transactions;
     }
   }
 
-  return { before, after };
+  return { total, withoutExcluded };
 }
 
 const provider = new ProviderRpcClient();
