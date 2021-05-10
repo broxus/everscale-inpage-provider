@@ -316,8 +316,10 @@ class ProviderRpcClient {
           if (existingSubscriptions[id] != null) {
             return;
           }
-          existingSubscriptions[id] = (data) => {
-            subscription.notify(data);
+          existingSubscriptions[id] = (data: any) => {
+            if (data.address == address) {
+              subscription.notify(data);
+            }
           };
 
           let contractSubscriptions = this._contractSubscriptions[address];

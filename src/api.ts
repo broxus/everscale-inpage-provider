@@ -37,6 +37,10 @@ export type ProviderEvents = {
    */
   transactionsFound: {
     /**
+     * Contract address
+     */
+    address: string
+    /**
      * Guaranteed to be non-empty and ordered by descending lt
      */
     transactions: Transaction[]
