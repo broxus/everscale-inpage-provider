@@ -579,11 +579,19 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      const { method, input, output } = result;
+      let { method, input, output } = result;
 
       const rawAbi = (this._functions as any)[method];
-      (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
-      (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+      if (rawAbi.inputs != null) {
+        (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+      } else {
+        (input as ParsedTokensObject) = {}
+      }
+      if (rawAbi.outputs != null) {
+        (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+      } else {
+        (output as ParsedTokensObject) = {}
+      }
 
       return { method, input, output } as any;
     } catch (_) {
@@ -603,10 +611,14 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      const { method, input } = result;
+      let { method, input } = result;
 
       const rawAbi = (this._functions as any)[method];
-      (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+      if (rawAbi.inputs != null) {
+        (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+      } else {
+        (input as ParsedTokensObject) = {}
+      }
 
       return { method, input } as any;
     } catch (_) {
@@ -625,10 +637,14 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      const { method, output } = result;
+      let { method, output } = result;
 
       const rawAbi = (this._functions as any)[method];
-      (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+      if (rawAbi.outputs != null) {
+        (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+      } else {
+        (output as ParsedTokensObject) = {}
+      }
 
       return { method, output } as any;
     } catch (_) {
