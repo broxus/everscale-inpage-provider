@@ -569,58 +569,70 @@ export class Contract<Abi> {
   }
 
   public async decodeTransaction(args: IDecodeTransaction<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject, output: ParsedTokensObject } | undefined> {
-    const result = await provider.api.decodeTransaction({
-      transaction: args.transaction,
-      abi: this._abi,
-      method: args.methods
-    });
-    if (result == null) {
+    try {
+      const result = await provider.api.decodeTransaction({
+        transaction: args.transaction,
+        abi: this._abi,
+        method: args.methods
+      });
+      if (result == null) {
+        return undefined;
+      }
+
+      const { method, input, output } = result;
+
+      const rawAbi = (this._functions as any)[method];
+      (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+      (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+
+      return { method, input, output } as any;
+    } catch (_) {
       return undefined;
     }
-
-    const { method, input, output } = result;
-
-    const rawAbi = (this._functions as any)[method];
-    (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
-    (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
-
-    return { method, input, output } as any;
   }
 
   public async decodeInputMessage(args: IDecodeInput<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject } | undefined> {
-    const result = await provider.api.decodeInput({
-      abi: this._abi,
-      body: args.body,
-      internal: args.internal,
-      method: args.methods
-    });
-    if (result == null) {
+    try {
+      const result = await provider.api.decodeInput({
+        abi: this._abi,
+        body: args.body,
+        internal: args.internal,
+        method: args.methods
+      });
+      if (result == null) {
+        return undefined;
+      }
+
+      const { method, input } = result;
+
+      const rawAbi = (this._functions as any)[method];
+      (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+
+      return { method, input } as any;
+    } catch (_) {
       return undefined;
     }
-
-    const { method, input } = result;
-
-    const rawAbi = (this._functions as any)[method];
-    (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
-
-    return { method, input } as any;
   }
 
   public async decodeOutputMessage(args: IDecodeOutput<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject } | undefined> {
-    const result = await provider.api.decodeOutput({
-      abi: this._abi,
-      body: args.body,
-      method: args.methods
-    });
-    if (result == null) {
+    try {
+      const result = await provider.api.decodeOutput({
+        abi: this._abi,
+        body: args.body,
+        method: args.methods
+      });
+      if (result == null) {
+        return undefined;
+      }
+
+      const { method, output } = result;
+
+      const rawAbi = (this._functions as any)[method];
+      (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
+
+      return { method, output } as any;
+    } catch (_) {
       return undefined;
     }
-
-    const { method, output } = result;
-
-    const rawAbi = (this._functions as any)[method];
-    (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
-
-    return { method, output } as any;
   }
 }
