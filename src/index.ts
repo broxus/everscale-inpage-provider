@@ -428,6 +428,12 @@ interface ISendExternal {
   stateInit?: string,
 }
 
+export class TvmException extends Error {
+  constructor(public readonly code: number) {
+    super(`TvmException: ${code}`);
+  }
+}
+
 interface IContractMethod<I, O> {
   /**
    * Target contract address
@@ -454,7 +460,7 @@ interface IContractMethod<I, O> {
   /**
    * Runs message locally
    */
-  call(): Promise<(O | undefined) & { _tvmExitCode: number }>
+  call(): Promise<O>
 }
 
 type IContractMethods<C> = {
@@ -544,15 +550,12 @@ export class Contract<Abi> {
           }
         });
 
-        if (output == null) {
-          output = {};
+        if (output == null || code != 0) {
+          throw new TvmException(code);
         } else {
           (output as ParsedTokensObject) = transformToParsedObject(this.functionAbi.outputs, output);
+          return output;
         }
-
-        output._tvmExitCode = code;
-
-        return output;
       }
     }
 
@@ -585,12 +588,12 @@ export class Contract<Abi> {
       if (rawAbi.inputs != null) {
         (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
       } else {
-        (input as ParsedTokensObject) = {}
+        (input as ParsedTokensObject) = {};
       }
       if (rawAbi.outputs != null) {
         (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
       } else {
-        (output as ParsedTokensObject) = {}
+        (output as ParsedTokensObject) = {};
       }
 
       return { method, input, output } as any;
@@ -617,7 +620,7 @@ export class Contract<Abi> {
       if (rawAbi.inputs != null) {
         (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
       } else {
-        (input as ParsedTokensObject) = {}
+        (input as ParsedTokensObject) = {};
       }
 
       return { method, input } as any;
@@ -643,7 +646,7 @@ export class Contract<Abi> {
       if (rawAbi.outputs != null) {
         (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
       } else {
-        (output as ParsedTokensObject) = {}
+        (output as ParsedTokensObject) = {};
       }
 
       return { method, output } as any;
