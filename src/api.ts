@@ -2,7 +2,6 @@ import { Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
-  DecodedEvent,
   FullContractState,
   FunctionCall,
   TokensObject,
@@ -515,7 +514,10 @@ export type ProviderApi = {
       /**
        * Successfully decoded events
        */
-      events: DecodedEvent[]
+      events: {
+        event: string,
+        data: TokensObject
+      }[]
     }
   }
 

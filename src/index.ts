@@ -24,7 +24,7 @@ import {
   AbiEventName,
   transformToSerializedObject,
   transformToParsedObject,
-  getUniqueId
+  getUniqueId, AbiEventParams
 } from './utils';
 
 export * from './api';
@@ -480,20 +480,28 @@ interface IDecodeTransaction<Abi> {
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 }
 
+type IDecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: AbiFunctionParams<Abi, T>, output: AbiFunctionOutput<Abi, T> } : never
+
 interface IDecodeInput<Abi> {
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
   internal: boolean;
 }
 
+type IDecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: AbiFunctionParams<Abi, T> } : never
+
 interface IDecodeOutput<Abi> {
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 }
 
+type IDecodedOutput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, output: AbiFunctionOutput<Abi, T> } : never
+
 interface IDecodeTransactionEvents {
   transaction: Transaction;
 }
+
+type IDecodedEvent<Abi, T> = T extends AbiEventName<Abi> ? { event: T, data: AbiEventParams<Abi, T> } : never
 
 export class Contract<Abi> {
   private readonly _abi: string;
@@ -596,7 +604,7 @@ export class Contract<Abi> {
     return this._methods;
   }
 
-  public async decodeTransaction(args: IDecodeTransaction<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject, output: ParsedTokensObject } | undefined> {
+  public async decodeTransaction(args: IDecodeTransaction<Abi>): Promise<IDecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
       const result = await provider.api.decodeTransaction({
         transaction: args.transaction,
@@ -627,7 +635,7 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeTransactionEvents(args: IDecodeTransactionEvents): Promise<{ event: AbiEventName<Abi>, data: ParsedTokensObject }[]> {
+  public async decodeTransactionEvents(args: IDecodeTransactionEvents): Promise<IDecodedEvent<Abi, AbiEventName<Abi>>[]> {
     try {
       const { events } = await provider.api.decodeTransactionEvents({
         transaction: args.transaction,
@@ -652,7 +660,7 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeInputMessage(args: IDecodeInput<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject } | undefined> {
+  public async decodeInputMessage(args: IDecodeInput<Abi>): Promise<IDecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
       const result = await provider.api.decodeInput({
         abi: this._abi,
@@ -679,7 +687,7 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeOutputMessage(args: IDecodeOutput<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject } | undefined> {
+  public async decodeOutputMessage(args: IDecodeOutput<Abi>): Promise<IDecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
       const result = await provider.api.decodeOutput({
         abi: this._abi,
