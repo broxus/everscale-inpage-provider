@@ -240,6 +240,10 @@ export type ProviderApi = {
        * Logical time of the oldest transaction. Can be used to continue transactions batch
        */
       oldestLt?: string
+      /**
+       * Whether there are still some transactions left
+       */
+      idEnd: boolean
     }
   }
 
