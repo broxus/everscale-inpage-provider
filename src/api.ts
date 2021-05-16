@@ -5,7 +5,7 @@ import {
   FullContractState,
   FunctionCall,
   TokensObject,
-  Transaction, TransactionsBatchInfo
+  Transaction, TransactionId, TransactionsBatchInfo
 } from './models';
 import { UniqueArray } from './utils';
 
@@ -217,15 +217,9 @@ export type ProviderApi = {
        */
       address: string
       /**
-       * Optional upper limit of logical time.
-       * If not specified, transactions will be requested starting with the latest one
+       * Id of the transaction from which to request the next batch
        */
-      beforeLt?: string
-      /**
-       * Whether to include transaction with logical time == `beforeLt`.
-       * `false` by default
-       */
-      inclusive?: boolean
+      continuation?: TransactionId
       /**
        * Optional limit. Values greater than 50 have no effect
        */
@@ -237,13 +231,9 @@ export type ProviderApi = {
        */
       transactions: Transaction[]
       /**
-       * Logical time of the oldest transaction. Can be used to continue transactions batch
+       * Previous transaction id of the last transaction in result. Can be used to continue transactions batch
        */
-      oldestLt?: string
-      /**
-       * Whether there are still some transactions left
-       */
-      idEnd: boolean
+      continuation?: TransactionId
     }
   }
 
