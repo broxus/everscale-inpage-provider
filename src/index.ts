@@ -22,7 +22,7 @@ import {
   ParsedTokensObject,
   transformToSerializedObject,
   transformToParsedObject,
-  getUniqueId, UniqueArray
+  getUniqueId, UniqueArray, AbiEventName
 } from './utils';
 
 export * from './api';
@@ -489,18 +489,42 @@ interface IDecodeOutput<Abi> {
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 }
 
+interface IDecodeTransactionEvents<Abi> {
+  transaction: Transaction;
+  events: UniqueArray<AbiEventName<Abi>[]>;
+}
+
 export class Contract<Abi> {
   private readonly _abi: string;
+  private readonly _eventsAbi: string;
   private readonly _functions: { [name: string]: { inputs: AbiParam[], outputs: AbiParam[] } };
+  private readonly _events: { [name: string]: { inputs: AbiParam[] } };
   private readonly _address: Address;
   private readonly _methods: IContractMethods<Abi>;
 
   constructor(abi: Abi, address: Address) {
+    if (!Array.isArray((abi as any).functions)) {
+      throw new Error('Invalid abi. Functions array required');
+    }
+    if (!Array.isArray((abi as any).events)) {
+      throw new Error('Invalid abi. Events array required');
+    }
+
     this._abi = JSON.stringify(abi);
     this._functions = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
       functions[item.name] = { inputs: item.inputs || [], outputs: item.outputs || [] };
       return functions;
     }, {} as typeof Contract.prototype._functions);
+
+    const eventsAbi = Object.assign({}, abi);
+    (eventsAbi as any).functions = (abi as any).events || [];
+    delete (eventsAbi as any).events;
+    this._eventsAbi = JSON.stringify(eventsAbi);
+    this._events = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
+      events[item.name] = { inputs: item.inputs || [] };
+      return events;
+    }, {} as typeof Contract.prototype._events);
+
     this._address = address;
 
     class ContractMethod implements IContractMethod<any, any> {
@@ -605,6 +629,41 @@ export class Contract<Abi> {
     } catch (_) {
       return undefined;
     }
+  }
+
+  public async decodeTransactionEvents(args: IDecodeTransactionEvents<Abi>): Promise<{ event: AbiEventName<Abi>, data: ParsedTokensObject }[]> {
+    const result: { event: AbiEventName<Abi>, data: ParsedTokensObject }[] = [];
+
+    for (const message of args.transaction.outMessages) {
+      if (message.dst != null || message.body == null) {
+        continue;
+      }
+
+      try {
+        const event = await provider.api.decodeInput({
+          abi: this._eventsAbi,
+          body: message.body,
+          method: args.events,
+          internal: true
+        });
+        if (event == null) {
+          continue;
+        }
+
+        let { method, input } = event;
+        const rawAbi = (this._events as any)[method];
+        if (rawAbi.inputs != null) {
+          (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
+        } else {
+          (input as ParsedTokensObject) = {};
+        }
+
+        result.push({ event: method as any, data: input });
+      } catch (_) {
+      }
+    }
+
+    return result;
   }
 
   public async decodeInputMessage(args: IDecodeInput<Abi>): Promise<{ method: AbiFunctionName<Abi>, input: ParsedTokensObject } | undefined> {

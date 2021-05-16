@@ -51,6 +51,12 @@ type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { n
 export type AbiFunctionParams<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['inputs']>
 export type AbiFunctionOutput<C, T extends AbiFunctionName<C>> = MergeObjectsArray<PickFunction<C, T>['outputs']>
 
+type AbiEvent<C> = C extends { events: infer E } ? E extends readonly unknown[] ? ArrayItemType<E> : never : never
+export type AbiEventName<C> = AbiEvent<C>['name']
+
+type PickEvent<C, T extends AbiEventName<C>> = Extract<AbiEvent<C>, { name: T }>
+export type AbiEventParams<C, T extends AbiEventName<C>> = MergeObjectsArray<PickEvent<C, T>['inputs']>
+
 export class Address {
   private readonly _address: string;
 
@@ -195,11 +201,11 @@ function serializeToken(token: ParsedAbiToken): AbiToken {
   }
 }
 
-const MAX = 4294967295
+const MAX = 4294967295;
 
-let idCounter = Math.floor(Math.random() * MAX)
+let idCounter = Math.floor(Math.random() * MAX);
 
 export function getUniqueId(): number {
-  idCounter = (idCounter + 1) % MAX
-  return idCounter
+  idCounter = (idCounter + 1) % MAX;
+  return idCounter;
 }
