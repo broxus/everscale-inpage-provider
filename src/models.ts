@@ -120,3 +120,8 @@ export interface FunctionCall {
    */
   params: TokensObject
 }
+
+export interface DecodedEvent {
+  event: string,
+  data: TokensObject
+}

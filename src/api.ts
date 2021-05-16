@@ -2,6 +2,7 @@ import { Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
+  DecodedEvent,
   FullContractState,
   FunctionCall,
   TokensObject,
@@ -162,6 +163,10 @@ export type ProviderApi = {
    */
   getProviderState: {
     output: {
+      /**
+       * Provider api version
+       */
+      version: string
       /**
        * Selected connection name (Mainnet / Testnet)
        */
@@ -408,6 +413,45 @@ export type ProviderApi = {
   }
 
   /**
+   * Decodes body of event message
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  decodeEvent: {
+    input: {
+      /**
+       * Base64 encoded message body BOC
+       */
+      body: string
+      /**
+       * Contract ABI
+       */
+      abi: string
+      /**
+       * Specific event from specified contract ABI.
+       * When an array of event names is passed it will try to decode until first successful
+       *
+       * > Note! If **`event`** param was provided as string, it will assume that message body contains
+       * > specified event and this method will either return output or throw an exception. If you just want
+       * > to **_try_** to decode specified event, use **`['event']`**, in that case it will return null
+       * > if message body doesn't contain requested event.
+       */
+      event: string | string[]
+    }
+    output: {
+      /**
+       * Decoded event name
+       */
+      event: string
+      /**
+       * Decoded event data
+       */
+      data: TokensObject
+    } | null
+  }
+
+  /**
    * Decodes function call
    *
    * ---
@@ -448,6 +492,31 @@ export type ProviderApi = {
        */
       output: TokensObject
     } | null
+  }
+
+  /**
+   * Decodes transaction events
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  decodeTransactionEvents: {
+    input: {
+      /**
+       * Transaction with the function call
+       */
+      transaction: Transaction
+      /**
+       * Contract ABI
+       */
+      abi: string
+    }
+    output: {
+      /**
+       * Successfully decoded events
+       */
+      events: DecodedEvent[]
+    }
   }
 
   /**
