@@ -7,7 +7,7 @@ import {
   ProviderResponse
 } from './api';
 import {
-  ContractUpdatesSubscription,
+  ContractUpdatesSubscription, FullContractState,
   TokensObject,
   Transaction,
   TransactionsBatchInfo
@@ -428,6 +428,10 @@ interface ISendExternal {
   stateInit?: string,
 }
 
+interface ICall {
+  cachedState?: FullContractState;
+}
+
 export class TvmException extends Error {
   constructor(public readonly code: number) {
     super(`TvmException: ${code}`);
@@ -460,7 +464,7 @@ interface IContractMethod<I, O> {
   /**
    * Runs message locally
    */
-  call(): Promise<O>
+  call(args?: ICall): Promise<O>
 }
 
 type IContractMethods<C> = {
@@ -540,9 +544,10 @@ export class Contract<Abi> {
         return { transaction, output };
       }
 
-      async call(): Promise<any> {
+      async call(args: ICall = {}): Promise<any> {
         let { output, code } = await provider.api.runLocal({
           address: this.address.toString(),
+          cachedState: args.cachedState,
           functionCall: {
             abi: this.abi,
             method: this.method,
