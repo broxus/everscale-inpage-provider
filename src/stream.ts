@@ -1,36 +1,150 @@
 import { ProviderEvent, ProviderEventData } from './api';
-import { Address } from './utils';
+import { Address, getUniqueId } from './utils';
 import { ProviderRpcClient, ISubscription } from './index';
 
-export class SubscriptionStream {
+type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
+
+type SubscriptionsWithAddress = {
+  [K in SubscriptionWithAddress]?: {
+    subscription: Promise<ISubscription<K>>
+    handlers: {
+      [id: number]: {
+        onData: (event: ProviderEventData<K>) => void,
+        onEnd: () => void
+      }
+    }
+  }
+};
+
+export class Subscriber {
+  private readonly subscriptions: { [address: string]: SubscriptionsWithAddress } = {};
+
   constructor(private readonly ton: ProviderRpcClient) {
   }
 
-  public async transactions(address: Address): Promise<Stream<ProviderEventData<'transactionsFound'>>> {
-    const subscription = await this.ton.subscribe('transactionsFound', {
-      address
-    });
-    return new StreamImpl((extractor: (event: ProviderEventData<'transactionsFound'>) => void) => {
-      subscription.on('data', extractor);
-    }, identity);
+  public transactions(address: Address): Stream<ProviderEventData<'transactionsFound'>> {
+    return this._addSubscription('transactionsFound', address);
   }
 
-  public async states(address: Address): Promise<Stream<ProviderEventData<'contractStateChanged'>>> {
-    const subscription = await this.ton.subscribe('contractStateChanged', {
-      address
-    });
-    return new StreamImpl((extractor: (event: ProviderEventData<'contractStateChanged'>) => void) => {
-      subscription.on('data', extractor);
+  public states(address: Address): Stream<ProviderEventData<'contractStateChanged'>> {
+    return this._addSubscription('contractStateChanged', address);
+  }
+
+  public async unsubscribe(): Promise<void> {
+    const subscriptions = Object.assign({}, this.subscriptions);
+    for (const address of Object.keys(this.subscriptions)) {
+      delete this.subscriptions[address];
+    }
+
+    await Promise.all(
+      Object.values(subscriptions)
+        .map((item: SubscriptionsWithAddress) => {
+          const events = Object.assign({}, item);
+          for (const event of Object.keys(events)) {
+            delete item[event as unknown as SubscriptionWithAddress];
+          }
+
+          return Promise.all(
+            Object.values(events).map((eventData) => {
+              if (eventData == null) {
+                return;
+              }
+
+              return eventData.subscription.then((item: ISubscription<SubscriptionWithAddress>) => {
+                return item.unsubscribe();
+              }).catch(() => {
+                // ignore
+              });
+            })
+          );
+        })
+    );
+  }
+
+  private _addSubscription<T extends keyof SubscriptionsWithAddress>(event: T, address: Address): Stream<ProviderEventData<T>> {
+    type EventData = Required<SubscriptionsWithAddress>[T];
+
+    const id = getUniqueId();
+
+    return new StreamImpl((onData, onEnd) => {
+      let subscriptions = this.subscriptions[address.toString()] as SubscriptionsWithAddress | undefined;
+      let eventData = subscriptions?.[event] as EventData | undefined;
+      if (eventData == null) {
+        const handlers = {
+          [id]: { onData, onEnd }
+        } as EventData['handlers'];
+
+        eventData = {
+          subscription: (this.ton.subscribe as any)(event, {
+            address
+          }).then((subscription: ISubscription<T>) => {
+            subscription.on('data', (data) => {
+              Object.values(handlers).forEach(({ onData }) => {
+                onData(data);
+              });
+            });
+            subscription.on('unsubscribed', () => {
+              Object.values(handlers).forEach(({ onEnd }) => {
+                delete handlers[id];
+                onEnd();
+              });
+            });
+            return subscription;
+          }).catch((e: Error) => {
+            console.error(e);
+            Object.values(handlers).forEach(({ onEnd }) => {
+              delete handlers[id];
+              onEnd();
+            });
+            throw e;
+          }),
+          handlers
+        } as EventData;
+
+        if (subscriptions == null) {
+          subscriptions = {
+            [event]: eventData
+          };
+          this.subscriptions[address.toString()] = subscriptions;
+        } else {
+          subscriptions[event] = eventData;
+        }
+      } else {
+        eventData.handlers[id] = { onData, onEnd } as EventData['handlers'][number];
+      }
+    }, () => {
+      const subscriptions = this.subscriptions[address.toString()] as SubscriptionsWithAddress | undefined;
+      if (subscriptions == null) {
+        return;
+      }
+
+      const eventData = subscriptions[event] as EventData | undefined;
+      if (eventData != null) {
+        delete eventData.handlers[id];
+        if (Object.keys(eventData.handlers).length === 0) {
+          const subscription = eventData.subscription as Promise<ISubscription<T>>;
+          delete subscriptions[event];
+
+          subscription
+            .then((subscription) => subscription.unsubscribe())
+            .catch(console.debug);
+        }
+      }
+
+      if (Object.keys(subscriptions).length === 0) {
+        delete this.subscriptions[address.toString()];
+      }
     }, identity);
   }
 }
 
-function identity<T>(data: T) {
-  return data;
+function identity<P>(event: P, handler: (item: P) => void): void {
+  handler(event);
 }
 
 export interface Stream<P, T = P> {
-  readonly makeProducer: (handler: (event: P) => void, unsubscribed: () => void) => void
+  readonly makeProducer: (onData: (event: P) => void, onEnd: () => void) => void;
+  readonly stopProducer: () => void;
 
   first(): Promise<T>
 
@@ -54,13 +168,17 @@ export interface Stream<P, T = P> {
 class StreamImpl<P, T> implements Stream<P, T> {
   constructor(
     readonly makeProducer: (onEvent: (event: P) => void, onEnd: () => void) => void,
+    readonly stopProducer: () => void,
     readonly extractor: (event: P, handler: (item: T) => void) => void) {
   }
 
   public first(): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       this.makeProducer((event) => {
-        this.extractor(event, resolve);
+        this.extractor(event, (item) => {
+          this.stopProducer();
+          resolve(item);
+        });
       }, () => reject(new Error('Subscription closed')));
     });
   }
@@ -85,11 +203,14 @@ class StreamImpl<P, T> implements Stream<P, T> {
 
       this.makeProducer(onEvent, checkEnd);
       other.makeProducer(onEvent, checkEnd);
+    }, () => {
+      this.stopProducer();
+      other.stopProducer();
     }, this.extractor) as Stream<P, T>;
   }
 
   public filter(f: (item: T) => boolean): Stream<P, T> {
-    return new StreamImpl(this.makeProducer, (event, handler) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
       this.extractor(event, (item) => {
         if (f(item)) {
           handler(item);
@@ -99,7 +220,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
   }
 
   public filterMap<U>(f: (item: T) => (U | undefined)): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, (event, handler) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
       this.extractor(event, (item) => {
         const newItem = f(item);
         if (newItem !== undefined) {
@@ -114,7 +235,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
   }
 
   public flatMap<U>(f: (item: T) => U[]): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, (event, handler) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
       this.extractor(event, (item) => {
         const items = f(item);
         for (const newItem of items) {
@@ -129,7 +250,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
       index: 0
     };
 
-    return new StreamImpl(this.makeProducer, (event, handler) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
       this.extractor(event, (item) => {
         if (state.index >= n) {
           handler(item);
@@ -145,7 +266,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
       shouldSkip: true
     };
 
-    return new StreamImpl(this.makeProducer, (event, handler) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
       this.extractor(event, (item) => {
         if (!state.shouldSkip || !f(item)) {
           state.shouldSkip = false;

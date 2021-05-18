@@ -15,6 +15,7 @@ import {
   AddressLiteral,
   getUniqueId
 } from './utils';
+import { Subscriber } from './stream';
 
 export * from './api';
 export * from './models';
@@ -231,9 +232,13 @@ export class ProviderRpcClient {
     return this._api;
   }
 
-  public subscribe(eventName: 'disconnected'): Promise<ISubscription<'disconnected'>>;
-  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<ISubscription<'transactionsFound'>>;
+  public createSubscriber(): Subscriber {
+    return new Subscriber(this);
+  }
+
   public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<ISubscription<'contractStateChanged'>>;
+  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<ISubscription<'transactionsFound'>>;
+  public subscribe(eventName: 'disconnected'): Promise<ISubscription<'disconnected'>>;
   public subscribe(eventName: 'networkChanged'): Promise<ISubscription<'networkChanged'>>;
   public subscribe(eventName: 'permissionsChanged'): Promise<ISubscription<'permissionsChanged'>>;
   public subscribe(eventName: 'loggedOut'): Promise<ISubscription<'loggedOut'>>;
