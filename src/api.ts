@@ -169,7 +169,7 @@ export type ProviderApi = {
       /**
        * Provider api version in uint32 format (xxxyyyzzz)
        */
-      numericVersion: string
+      numericVersion: number
       /**
        * Selected connection name (Mainnet / Testnet)
        */
