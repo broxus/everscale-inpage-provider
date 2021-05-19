@@ -163,9 +163,13 @@ export type ProviderApi = {
   getProviderState: {
     output: {
       /**
-       * Provider api version
+       * Provider api version in semver format (x.y.z)
        */
       version: string
+      /**
+       * Provider api version in uint32 format (xxxyyyzzz)
+       */
+      numericVersion: string
       /**
        * Selected connection name (Mainnet / Testnet)
        */
