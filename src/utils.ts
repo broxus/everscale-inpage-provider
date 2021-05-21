@@ -38,6 +38,14 @@ export class Address {
   public toString(): string {
     return this._address;
   }
+
+  public equals(other: Address | string): boolean {
+    if (other instanceof Address) {
+      return this._address == other._address;
+    } else {
+      return this._address == other;
+    }
+  }
 }
 
 /**
