@@ -1,6 +1,16 @@
-## TON inpage provider
-
-Web3-like interface to TON provided by the TON Crystal Wallet browser extension.
+<p align="center">
+    <h3 align="center">TON inpage provider</h3>
+    <p align="center">Web3-like interface to TON provided by the TON Crystal Wallet browser extension.</p>
+    <p align="center">
+        <a href="/LICENSE">
+            <img alt="GitHub" src="https://img.shields.io/github/license/broxus/ton-inpage-provider" />
+        </a>
+        <a href="https://www.npmjs.com/package/ton-inpage-provider">
+            <img alt="npm" src="https://img.shields.io/npm/v/ton-inpage-provider">
+        </a>
+    </p>
+    <p align="center"><b><a href="https://broxus.github.io/ton-inpage-provider/index.html">Documentation</a></b></p>
+</p>
 
 ### How to install
 
@@ -12,7 +22,9 @@ npm install --save ton-inpage-provider
 
 - [`src/api.ts`](./src/api.ts) - RPC interface description
 - [`src/models.ts`](./src/models.ts) - general models, used in RPC interface
-- [`src/permissions.ts`](./src/permissions.ts) - permission-specific models
+- [`src/contract.ts`](./src/contract.ts) - typed contracts wrapper
+- [`src/stream.ts`](./src/stream.ts) - user-friendly api for streams
+- [`src/utils.ts`](./src/utils.ts) - some useful stuff
 
 ### Example
 
