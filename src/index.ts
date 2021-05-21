@@ -11,11 +11,16 @@ import {
 } from './api';
 
 import {
+  AbiParam,
   ContractUpdatesSubscription,
+  MergeInputObjectsArray,
+  MergeOutputObjectsArray,
+  Transaction,
+  TransactionId,
   parsePermissions,
   parseTokensObject,
   parseTransaction,
-  serializeTokensObject
+  serializeTokensObject, ReadonlyAbiParam
 } from './models';
 
 import {
@@ -399,7 +404,7 @@ export class ProviderRpcClient {
     return {
       ...state,
       permissions: parsePermissions(state.permissions)
-    };
+    } as ProviderApiResponse<'getProviderState'>;
   }
 
   /**
@@ -411,7 +416,7 @@ export class ProviderRpcClient {
   public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
     return await this._api.getFullContractState({
       address: args.address.toString()
-    });
+    }) as ProviderApiResponse<'getFullContractState'>;
   }
 
   /**
@@ -428,7 +433,7 @@ export class ProviderRpcClient {
     return {
       transactions: transactions.map(parseTransaction),
       continuation
-    };
+    } as ProviderApiResponse<'getTransactions'>;
   }
 
   /**
@@ -442,7 +447,7 @@ export class ProviderRpcClient {
       ...args,
       initParams: serializeTokensObject(args.initParams)
     });
-    return { address: new Address(address) };
+    return { address: new Address(address) } as ProviderApiResponse<'getExpectedAddress'>;
   }
 
   /**
@@ -451,11 +456,11 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `tonClient`
    */
-  public async packIntoCell(args: ProviderApiRequestParams<'packIntoCell'>): Promise<ProviderApiResponse<'packIntoCell'>> {
+  public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, data: MergeInputObjectsArray<P> }): Promise<ProviderApiResponse<'packIntoCell'>> {
     return await this._api.packIntoCell({
-      ...args,
+      structure: args.structure as unknown as AbiParam[],
       data: serializeTokensObject(args.data)
-    });
+    }) as ProviderApiResponse<'packIntoCell'>;
   }
 
   /**
@@ -464,10 +469,13 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `tonClient`
    */
-  public async unpackFromCell(args: ProviderApiRequestParams<'unpackFromCell'>): Promise<ProviderApiResponse<'unpackFromCell'>> {
-    const { data } = await this._api.unpackFromCell(args);
+  public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, boc: string, allowPartial: boolean }): Promise<{ data: MergeOutputObjectsArray<P> }> {
+    const { data } = await this._api.unpackFromCell({
+      ...args,
+      structure: args.structure as unknown as AbiParam[]
+    });
     return {
-      data: parseTokensObject(args.structure, data)
+      data: parseTokensObject(args.structure as unknown as AbiParam[], data) as MergeOutputObjectsArray<P>
     };
   }
 

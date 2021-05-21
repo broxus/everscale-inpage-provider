@@ -22,10 +22,10 @@ export interface FullContractState extends ContractState {
 /**
  * @category Models
  */
-export interface GenTimings {
+export type GenTimings = {
   genLt: string;
   genUtime: number;
-}
+};
 
 /**
  * @category Models
@@ -40,7 +40,7 @@ export type WalletContractType =
 /**
  * @category Models
  */
-export interface ContractUpdatesSubscription {
+export type ContractUpdatesSubscription = {
   /**
    * Whether to listen contract state updates
    */
@@ -49,16 +49,16 @@ export interface ContractUpdatesSubscription {
    * Whether to listen new contract transactions
    */
   transactions: boolean;
-}
+};
 
 /**
  * @category Models
  */
-export interface TransactionsBatchInfo {
+export type TransactionsBatchInfo = {
   minLt: string;
   maxLt: string;
   batchType: TransactionsBatchType;
-}
+};
 
 /**
  * @category Models
@@ -68,7 +68,7 @@ export type TransactionsBatchType = 'old' | 'new';
 /**
  * @category Models
  */
-export interface Transaction<Addr = Address> {
+export type Transaction<Addr = Address> = {
   id: TransactionId;
   prevTransactionId?: TransactionId;
   createdAt: number;
@@ -78,7 +78,7 @@ export interface Transaction<Addr = Address> {
   totalFees: string;
   inMessage: Message<Addr>;
   outMessages: Message<Addr>[];
-}
+};
 
 /**
  * @category Models
@@ -110,7 +110,7 @@ export function parseTransaction(transaction: RawTransaction): Transaction {
 /**
  * @category Models
  */
-export interface Message<Addr = Address> {
+export type Message<Addr = Address> = {
   src?: Addr;
   dst?: Addr;
   value: string;
@@ -118,7 +118,7 @@ export interface Message<Addr = Address> {
   bounced: boolean;
   body?: string;
   bodyHash?: string;
-}
+};
 
 /**
  * @category Models
@@ -155,33 +155,33 @@ export type AccountStatus = 'uninit' | 'frozen' | 'active' | 'nonexist';
 /**
  * @category Models
  */
-export interface LastTransactionId {
+export type LastTransactionId = {
   isExact: boolean;
   lt: string;
   hash?: string;
-}
+};
 
 /**
  * @category Models
  */
-export interface TransactionId {
+export type TransactionId = {
   lt: string;
   hash: string;
-}
+};
 
 /* Permissions stuff */
 
 /**
  * @category Models
  */
-export interface Permissions<Addr = Address> {
+export type Permissions<Addr = Address> = {
   tonClient: true;
   accountInteraction: {
     address: Addr;
     publicKey: string;
     contractType: WalletContractType;
   }
-}
+};
 
 /**
  * @category Models
@@ -223,11 +223,11 @@ export type PermissionData<T extends Permission, Addr = Address> = Permissions<A
 /**
  * @category Models
  */
-export interface SignedMessage {
+export type SignedMessage = {
   bodyHash: string;
   expireAt: number;
   boc: string;
-}
+};
 
 /**
  * @category Models
@@ -259,7 +259,7 @@ export type RawTokensObject = TokensObject<string>;
 /**
  * @category Models
  */
-export interface FunctionCall<Addr = Address> {
+export type FunctionCall<Addr = Address> = {
   /**
    * Contract ABI
    */
@@ -318,6 +318,15 @@ export type AbiParam = {
   type: AbiParamKind | AbiParamKindMap | AbiParamKindArray;
   components?: AbiParam[];
 };
+
+/**
+ * @category Models
+ */
+export type ReadonlyAbiParam = {
+  name: string;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray;
+  components?: readonly ReadonlyAbiParam[];
+}
 
 /**
  * @category Models
@@ -449,12 +458,18 @@ export type InputTokenObject<O> = O extends { name: infer K, type: infer T, comp
 export type OutputTokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ?
   K extends string ? { [P in K]: OutputTokenValue<T, C> } : never : never;
 
-type MergeInputObjectsArray<A> =
+/**
+ * @category Models
+ */
+export type MergeInputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>)
     : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? {} : never;
 
-type MergeOutputObjectsArray<A> =
+/**
+ * @category Models
+ */
+export type MergeOutputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>)
     : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? {} : never;

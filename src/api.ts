@@ -228,7 +228,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract state or `undefined` if it doesn't exist
        */
-      state?: FullContractState;
+      state: FullContractState | undefined;
     };
   };
 
@@ -261,7 +261,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Previous transaction id of the last transaction in result. Can be used to continue transactions batch
        */
-      continuation?: TransactionId;
+      continuation: TransactionId | undefined;
     };
   };
 
@@ -290,7 +290,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Execution output
        */
-      output?: TokensObject<Addr>;
+      output: TokensObject<Addr> | undefined;
       /**
        * TVM execution code
        */
@@ -705,7 +705,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Parsed function call output
        */
-      output?: TokensObject<Addr>;
+      output: TokensObject<Addr> | undefined;
     };
   };
 };
