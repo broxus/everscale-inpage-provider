@@ -22,6 +22,9 @@ import {
 
 import provider from './index';
 
+/**
+ * @category Contract
+ */
 export class Contract<Abi> {
   private readonly _abi: string;
   private readonly _functions: { [name: string]: { inputs: AbiParam[], outputs: AbiParam[] } };
@@ -224,13 +227,19 @@ export class Contract<Abi> {
   }
 }
 
+/**
+ * @category Contract
+ */
 export class TvmException extends Error {
   constructor(public readonly code: number) {
     super(`TvmException: ${code}`);
   }
 }
 
-interface IContractMethod<I, O> {
+/**
+ * @category Contract
+ */
+export interface IContractMethod<I, O> {
   /**
    * Target contract address
    */

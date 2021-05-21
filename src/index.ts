@@ -30,11 +30,16 @@ import { Contract } from './contract';
 
 export * from './api';
 export * from './models';
-export { Contract, TvmException } from './contract';
+export { Contract, TvmException, IContractMethod } from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
 
-export interface Ton {
+/**
+ * @category Provider
+ */
+export interface Provider {
+  request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>
+
   addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
   removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
@@ -46,8 +51,6 @@ export interface Ton {
   prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
-
-  request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>
 }
 
 let ensurePageLoaded: Promise<void>;
@@ -61,17 +64,23 @@ if (document.readyState == 'complete') {
   });
 }
 
+/**
+ * @category Provider
+ */
 export async function hasTonProvider(): Promise<boolean> {
   await ensurePageLoaded;
   return (window as Record<string, any>).hasTonProvider === true;
 }
 
+/**
+ * @category Provider
+ */
 export class ProviderRpcClient {
   private readonly _api: RawProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
-  private _ton?: Ton;
+  private _ton?: Provider;
 
   constructor() {
     this._api = new Proxy({}, {
@@ -167,7 +176,7 @@ export class ProviderRpcClient {
   /**
    * Raw provider
    */
-  public get raw(): Ton {
+  public get raw(): Provider {
     return this._ton!;
   }
 
@@ -475,6 +484,9 @@ export class ProviderRpcClient {
   }
 }
 
+/**
+ * @category Provider
+ */
 export interface ISubscription<T extends ProviderEvent> {
   /**
    * Fires on each incoming event with the event object as argument.
@@ -513,12 +525,18 @@ export interface ISubscription<T extends ProviderEvent> {
 
 type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
 
+/**
+ * @category Provider
+ */
 export class ProviderNotFoundException extends Error {
   constructor() {
     super('TON provider was not found');
   }
 }
 
+/**
+ * @category Provider
+ */
 export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends {}
   ? (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
   : () => Promise<RawProviderApiResponse<P>>
@@ -552,4 +570,7 @@ function foldSubscriptions(
 
 const provider = new ProviderRpcClient();
 
+/**
+ * @category Provider
+ */
 export default provider;

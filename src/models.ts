@@ -2,6 +2,9 @@ import { Address, ArrayItemType } from './utils';
 
 /* Account stuff */
 
+/**
+ * @category Models
+ */
 export interface ContractState {
   balance: string;
   genTimings: GenTimings;
@@ -9,15 +12,24 @@ export interface ContractState {
   isDeployed: boolean;
 }
 
+/**
+ * @category Models
+ */
 export interface FullContractState extends ContractState {
   boc: string;
 }
 
+/**
+ * @category Models
+ */
 export interface GenTimings {
   genLt: string;
   genUtime: number;
 }
 
+/**
+ * @category Models
+ */
 export type WalletContractType =
   | 'SafeMultisigWallet'
   | 'SafeMultisigWallet24h'
@@ -25,6 +37,9 @@ export type WalletContractType =
   | 'SurfWallet'
   | 'WalletV3';
 
+/**
+ * @category Models
+ */
 export interface ContractUpdatesSubscription {
   /**
    * Whether to listen contract state updates
@@ -36,14 +51,23 @@ export interface ContractUpdatesSubscription {
   transactions: boolean;
 }
 
+/**
+ * @category Models
+ */
 export interface TransactionsBatchInfo {
   minLt: string;
   maxLt: string;
   batchType: TransactionsBatchType;
 }
 
+/**
+ * @category Models
+ */
 export type TransactionsBatchType = 'old' | 'new';
 
+/**
+ * @category Models
+ */
 export interface Transaction<Addr = Address> {
   id: TransactionId;
   prevTransactionId?: TransactionId;
@@ -56,8 +80,14 @@ export interface Transaction<Addr = Address> {
   outMessages: Message<Addr>[];
 }
 
+/**
+ * @category Models
+ */
 export type RawTransaction = Transaction<string>;
 
+/**
+ * @category Models
+ */
 export function serializeTransaction(transaction: Transaction): RawTransaction {
   return {
     ...transaction,
@@ -66,6 +96,9 @@ export function serializeTransaction(transaction: Transaction): RawTransaction {
   };
 }
 
+/**
+ * @category Models
+ */
 export function parseTransaction(transaction: RawTransaction): Transaction {
   return {
     ...transaction,
@@ -74,6 +107,9 @@ export function parseTransaction(transaction: RawTransaction): Transaction {
   };
 }
 
+/**
+ * @category Models
+ */
 export interface Message<Addr = Address> {
   src?: Addr;
   dst?: Addr;
@@ -84,8 +120,14 @@ export interface Message<Addr = Address> {
   bodyHash?: string;
 }
 
+/**
+ * @category Models
+ */
 export type RawMessage = Message<string>;
 
+/**
+ * @category Models
+ */
 export function serializeMessage(message: Message): RawMessage {
   return {
     ...message,
@@ -94,6 +136,9 @@ export function serializeMessage(message: Message): RawMessage {
   };
 }
 
+/**
+ * @category Models
+ */
 export function parseMessage(message: RawMessage): Message {
   return {
     ...message,
@@ -102,14 +147,23 @@ export function parseMessage(message: RawMessage): Message {
   };
 }
 
+/**
+ * @category Models
+ */
 export type AccountStatus = 'uninit' | 'frozen' | 'active' | 'nonexist';
 
+/**
+ * @category Models
+ */
 export interface LastTransactionId {
   isExact: boolean;
   lt: string;
   hash?: string;
 }
 
+/**
+ * @category Models
+ */
 export interface TransactionId {
   lt: string;
   hash: string;
@@ -117,6 +171,9 @@ export interface TransactionId {
 
 /* Permissions stuff */
 
+/**
+ * @category Models
+ */
 export interface Permissions<Addr = Address> {
   tonClient: true;
   accountInteraction: {
@@ -126,8 +183,14 @@ export interface Permissions<Addr = Address> {
   }
 }
 
+/**
+ * @category Models
+ */
 export type RawPermissions = Permissions<string>;
 
+/**
+ * @category Models
+ */
 export function parsePermissions(permissions: Partial<RawPermissions>): Partial<Permissions> {
   return {
     ...permissions,
@@ -135,6 +198,9 @@ export function parsePermissions(permissions: Partial<RawPermissions>): Partial<
   };
 }
 
+/**
+ * @category Models
+ */
 export function parseAccountInteraction(accountInteraction: Required<RawPermissions>['accountInteraction']): Required<Permissions>['accountInteraction'] {
   return {
     ...accountInteraction,
@@ -142,18 +208,30 @@ export function parseAccountInteraction(accountInteraction: Required<RawPermissi
   };
 }
 
+/**
+ * @category Models
+ */
 export type Permission = keyof Permissions;
 
+/**
+ * @category Models
+ */
 export type PermissionData<T extends Permission, Addr = Address> = Permissions<Addr>[T];
 
 /* ABI stuff */
 
+/**
+ * @category Models
+ */
 export interface SignedMessage {
   bodyHash: string;
   expireAt: number;
   boc: string;
 }
 
+/**
+ * @category Models
+ */
 export type TokenValue<Addr = Address> =
   | boolean
   | string
@@ -163,12 +241,24 @@ export type TokenValue<Addr = Address> =
   | TokenValue<Addr>[]
   | (readonly [TokenValue<Addr>, TokenValue<Addr>])[];
 
+/**
+ * @category Models
+ */
 export type RawTokenValue = TokenValue<string>;
 
+/**
+ * @category Models
+ */
 export type TokensObject<Addr = Address> = { [K in string]: TokenValue<Addr> };
 
+/**
+ * @category Models
+ */
 export type RawTokensObject = TokensObject<string>;
 
+/**
+ * @category Models
+ */
 export interface FunctionCall<Addr = Address> {
   /**
    * Contract ABI
@@ -184,23 +274,29 @@ export interface FunctionCall<Addr = Address> {
   params: TokensObject<Addr>;
 }
 
+/**
+ * @category Models
+ */
 export type RawFunctionCall = FunctionCall<string>;
 
-export type AbiParamKindUint = 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
-export type AbiParamKindInt = 'int8' | 'int16' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
-export type AbiParamKindTuple = 'tuple';
-export type AbiParamKindBool = 'bool';
-export type AbiParamKindCell = 'cell';
-export type AbiParamKindAddress = 'address';
-export type AbiParamKindBytes = 'bytes';
-export type AbiParamKindGram = 'gram';
-export type AbiParamKindTime = 'time';
-export type AbiParamKindExpire = 'expire';
-export type AbiParamKindPublicKey = 'pubkey';
-export type AbiParamKindArray = `${AbiParamKind}[]`;
+type AbiParamKindUint = 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
+type AbiParamKindInt = 'int8' | 'int16' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
+type AbiParamKindTuple = 'tuple';
+type AbiParamKindBool = 'bool';
+type AbiParamKindCell = 'cell';
+type AbiParamKindAddress = 'address';
+type AbiParamKindBytes = 'bytes';
+type AbiParamKindGram = 'gram';
+type AbiParamKindTime = 'time';
+type AbiParamKindExpire = 'expire';
+type AbiParamKindPublicKey = 'pubkey';
+type AbiParamKindArray = `${AbiParamKind}[]`;
 
-export type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress},${AbiParamKind | `${AbiParamKind}[]`})`;
+type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress},${AbiParamKind | `${AbiParamKind}[]`})`;
 
+/**
+ * @category Models
+ */
 export type AbiParamKind =
   | AbiParamKindUint
   | AbiParamKindInt
@@ -214,12 +310,18 @@ export type AbiParamKind =
   | AbiParamKindExpire
   | AbiParamKindPublicKey;
 
+/**
+ * @category Models
+ */
 export type AbiParam = {
   name: string;
   type: AbiParamKind | AbiParamKindMap | AbiParamKindArray;
   components?: AbiParam[];
 };
 
+/**
+ * @category Models
+ */
 export function serializeTokensObject(object: TokensObject): RawTokensObject {
   return serializeTokenValue(object as TokenValue) as RawTokensObject;
 }
@@ -246,6 +348,9 @@ function serializeTokenValue(token: TokenValue): RawTokenValue {
   }
 }
 
+/**
+ * @category Models
+ */
 export function parseTokensObject(params: AbiParam[], object: RawTokensObject): TokensObject {
   const result: TokensObject = {};
   for (const param of params) {
@@ -303,6 +408,9 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
   }
 }
 
+/**
+ * @category Models
+ */
 export type HeadersObject = {
   pubkey?: string;
   expire?: string | number;
@@ -329,9 +437,15 @@ type OutputTokenValue<T, C> =
             : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
               : never;
 
+/**
+ * @category Models
+ */
 export type InputTokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ?
   K extends string ? { [P in K]: InputTokenValue<T, C> } : never : never;
 
+/**
+ * @category Models
+ */
 export type OutputTokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ?
   K extends string ? { [P in K]: OutputTokenValue<T, C> } : never : never;
 
@@ -348,14 +462,32 @@ type MergeOutputObjectsArray<A> =
 type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never;
 type AbiEvent<C> = C extends { events: infer E } ? E extends readonly unknown[] ? ArrayItemType<E> : never : never;
 
+/**
+ * @category Models
+ */
 export type AbiFunctionName<C> = AbiFunction<C>['name'];
+/**
+ * @category Models
+ */
 export type AbiEventName<C> = AbiEvent<C>['name'];
 
 type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>;
 type PickEvent<C, T extends AbiEventName<C>> = Extract<AbiEvent<C>, { name: T }>;
 
+/**
+ * @category Models
+ */
 export type AbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeInputObjectsArray<PickFunction<C, T>['inputs']>;
 
+/**
+ * @category Models
+ */
 export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<PickFunction<C, T>['inputs']>;
+/**
+ * @category Models
+ */
 export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<PickFunction<C, T>['outputs']>;
+/**
+ * @category Models
+ */
 export type DecodedAbiEventData<C, T extends AbiEventName<C>> = MergeOutputObjectsArray<PickEvent<C, T>['inputs']>;

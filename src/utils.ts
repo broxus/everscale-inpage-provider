@@ -1,11 +1,17 @@
 import { Transaction, TransactionsBatchInfo } from './models';
 
+/**
+ * @category Utils
+ */
 export type UniqueArray<T> = T extends readonly [infer X, ...infer Rest]
   ? InArray<Rest, X> extends true
     ? ['Encountered value with duplicates:', X]
     : readonly [X, ...UniqueArray<Rest>]
   : T
 
+/**
+ * @category Utils
+ */
 export type InArray<T, X> = T extends readonly [X, ...infer _Rest]
   ? true
   : T extends readonly [X]
@@ -14,8 +20,14 @@ export type InArray<T, X> = T extends readonly [X, ...infer _Rest]
       ? InArray<Rest, X>
       : false
 
+/**
+ * @category Utils
+ */
 export type ArrayItemType<T extends readonly unknown[]> = T extends readonly (infer Ts)[] ? Ts : never;
 
+/**
+ * @category Utils
+ */
 export class Address {
   private readonly _address: string;
 
@@ -28,6 +40,9 @@ export class Address {
   }
 }
 
+/**
+ * @category Utils
+ */
 export class AddressLiteral<T extends string> extends Address {
   constructor(address: CheckAddress<T>) {
     super(address);
@@ -58,6 +73,8 @@ type IsHexString<T extends string, L extends readonly number[]> =
  * @param knownTransactions
  * @param newTransactions
  * @param info
+ *
+ * @category Utils
  */
 export function mergeTransactions<Addr>(
   knownTransactions: Transaction<Addr>[],

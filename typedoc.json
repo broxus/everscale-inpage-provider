@@ -1,0 +1,20 @@
+{
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "out": "docs",
+  "readme": "none",
+  "excludePrivate": true,
+  "includeVersion": true,
+  "categorizeByGroup": false,
+  "categoryOrder": [
+    "Provider",
+    "Contract",
+    "Stream",
+    "Models",
+    "Provider Api",
+    "Utils",
+    "*"
+  ],
+  "hideGenerator": true
+}

@@ -14,6 +14,9 @@ import {
 
 import { UniqueArray, Address } from './utils';
 
+/**
+ * @category Provider Api
+ */
 export interface ProviderState<Addr = Address> {
   /**
    * Selected connection name (Mainnet / Testnet)
@@ -31,8 +34,14 @@ export interface ProviderState<Addr = Address> {
   };
 }
 
+/**
+ * @category Provider Api
+ */
 export type RawProviderState = ProviderState<string>
 
+/**
+ * @category Provider Api
+ */
 export type ProviderEvents<Addr = Address> = {
   /**
    * Called when inpage provider disconnects from extension
@@ -93,8 +102,14 @@ export type ProviderEvents<Addr = Address> = {
   loggedOut: {};
 }
 
+/**
+ * @category Provider Api
+ */
 export type RawProviderEvents = ProviderEvents<string>;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderApi<Addr = Address> = {
   /**
    * Requests new permissions for current origin.
@@ -695,27 +710,58 @@ export type ProviderApi<Addr = Address> = {
   };
 };
 
+/**
+ * @category Provider Api
+ */
 export type RawProviderApi = ProviderApi<string>;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderEvent = keyof ProviderEvents;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderEventData<T extends ProviderEvent, Addr = Address> = ProviderEvents<Addr>[T];
+
+/**
+ * @category Provider Api
+ */
 export type RawProviderEventData<T extends ProviderEvent> = ProviderEventData<T, string>;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderMethod = keyof ProviderApi;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> =
   ProviderApi<Addr>[T] extends { input: infer I } ? I
     : ProviderApi<Addr>[T] extends {} ? undefined : never;
 
+/**
+ * @category Provider Api
+ */
 export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiRequestParams<T, string>;
 
+/**
+ * @category Provider Api
+ */
 export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> =
   ProviderApi<Addr>[T] extends { output: infer O } ? O
     : ProviderApi<Addr>[T] extends {} ? undefined : never;
 
+/**
+ * @category Provider Api
+ */
 export type RawProviderApiResponse<T extends ProviderMethod> = ProviderApiResponse<T, string>;
 
+/**
+ * @category Provider Api
+ */
 export interface RawProviderRequest<T extends ProviderMethod> {
   method: T
   params: RawProviderApiRequestParams<T>

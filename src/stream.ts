@@ -16,6 +16,9 @@ type SubscriptionsWithAddress = {
   }
 };
 
+/**
+ * @category Stream
+ */
 export class Subscriber {
   private readonly subscriptions: { [address: string]: SubscriptionsWithAddress } = {};
 
@@ -142,6 +145,9 @@ function identity<P>(event: P, handler: (item: P) => void): void {
   handler(event);
 }
 
+/**
+ * @category Stream
+ */
 export interface Stream<P, T = P> {
   readonly makeProducer: (onData: (event: P) => void, onEnd: () => void) => void;
   readonly stopProducer: () => void;
