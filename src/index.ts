@@ -35,7 +35,7 @@ import { Contract } from './contract';
 
 export * from './api';
 export * from './models';
-export { Contract, TvmException, IContractMethod } from './contract';
+export { Contract, TvmException, ContractMethod } from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
 
@@ -234,37 +234,37 @@ export class ProviderRpcClient {
   /**
    * Called every time contract state changes
    */
-  public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<ISubscription<'contractStateChanged'>>;
+  public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<Subscription<'contractStateChanged'>>;
 
   /**
    * Called on each new transactions batch, received on subscription
    */
-  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<ISubscription<'transactionsFound'>>;
+  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<Subscription<'transactionsFound'>>;
 
   /**
    * Called when inpage provider disconnects from extension
    */
-  public subscribe(eventName: 'disconnected'): Promise<ISubscription<'disconnected'>>;
+  public subscribe(eventName: 'disconnected'): Promise<Subscription<'disconnected'>>;
 
   /**
    * Called each time the user changes network
    */
-  public subscribe(eventName: 'networkChanged'): Promise<ISubscription<'networkChanged'>>;
+  public subscribe(eventName: 'networkChanged'): Promise<Subscription<'networkChanged'>>;
 
   /**
    * Called when permissions are changed.
    * Mostly when account has been removed from the current `accountInteraction` permission,
    * or disconnect method was called
    */
-  public subscribe(eventName: 'permissionsChanged'): Promise<ISubscription<'permissionsChanged'>>;
+  public subscribe(eventName: 'permissionsChanged'): Promise<Subscription<'permissionsChanged'>>;
 
   /**
    * Called when the user logs out of the extension
    */
-  public subscribe(eventName: 'loggedOut'): Promise<ISubscription<'loggedOut'>>;
+  public subscribe(eventName: 'loggedOut'): Promise<Subscription<'loggedOut'>>;
 
-  public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<ISubscription<T>> {
-    class Subscription<T extends ProviderEvent> implements ISubscription<T> {
+  public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<Subscription<T>> {
+    class SubscriptionImpl<T extends ProviderEvent> implements Subscription<T> {
       private readonly _listeners: { [K in SubscriptionEvent]: ((data?: any) => void)[] } = {
         ['data']: [],
         ['subscribed']: [],
@@ -272,7 +272,7 @@ export class ProviderRpcClient {
       };
 
       constructor(
-        private readonly _subscribe: (s: Subscription<T>) => Promise<void>,
+        private readonly _subscribe: (s: SubscriptionImpl<T>) => Promise<void>,
         private readonly _unsubscribe: () => Promise<void>) {
       }
 
@@ -314,7 +314,7 @@ export class ProviderRpcClient {
       case 'networkChanged':
       case 'permissionsChanged':
       case 'loggedOut': {
-        const subscription = new Subscription<T>(async (subscription) => {
+        const subscription = new SubscriptionImpl<T>(async (subscription) => {
           if (existingSubscriptions[id] != null) {
             return;
           }
@@ -331,7 +331,7 @@ export class ProviderRpcClient {
       case 'contractStateChanged': {
         const address = params!.address.toString();
 
-        const subscription = new Subscription<T>(async (subscription) => {
+        const subscription = new SubscriptionImpl<T>(async (subscription) => {
           if (existingSubscriptions[id] != null) {
             return;
           }
@@ -495,7 +495,7 @@ export class ProviderRpcClient {
 /**
  * @category Provider
  */
-export interface ISubscription<T extends ProviderEvent> {
+export interface Subscription<T extends ProviderEvent> {
   /**
    * Fires on each incoming event with the event object as argument.
    *

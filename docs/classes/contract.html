@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Contract | ton-inpage-provider - v0.1.3</title>
-	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.3">
+	<title>Contract | ton-inpage-provider - v0.1.4</title>
+	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.4">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ton-inpage-provider - v0.1.3</a>
+					<a href="../index.html" class="title">ton-inpage-provider - v0.1.4</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../index.html">ton-inpage-provider - v0.1.3</a>
+					<a href="../index.html">ton-inpage-provider - v0.1.4</a>
 				</li>
 				<li>
 					<a href="contract.html">Contract</a>
@@ -168,7 +168,7 @@
 					<a name="methods" class="tsd-anchor"></a>
 					<h3>methods</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> methods<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IContractMethods</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> methods<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ContractMethods</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -177,7 +177,7 @@
 									<li>Defined in src/contract.ts:123</li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IContractMethods</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ContractMethods</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -188,7 +188,7 @@
 					<a name="decodeinputmessage" class="tsd-anchor"></a>
 					<h3>decode<wbr>Input<wbr>Message</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">decode<wbr>Input<wbr>Message<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IDecodeInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">decode<wbr>Input<wbr>Message<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DecodeInputParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -200,10 +200,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>args: <span class="tsd-signature-type">IDecodeInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>args: <span class="tsd-signature-type">DecodeInputParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedInput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -211,7 +211,7 @@
 					<a name="decodeoutputmessage" class="tsd-anchor"></a>
 					<h3>decode<wbr>Output<wbr>Message</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">decode<wbr>Output<wbr>Message<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IDecodeOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">decode<wbr>Output<wbr>Message<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DecodeOutputParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -223,10 +223,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>args: <span class="tsd-signature-type">IDecodeOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>args: <span class="tsd-signature-type">DecodeOutputParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedOutput</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -234,7 +234,7 @@
 					<a name="decodetransaction" class="tsd-anchor"></a>
 					<h3>decode<wbr>Transaction</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">decode<wbr>Transaction<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IDecodeTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">decode<wbr>Transaction<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DecodeTransactionParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -246,10 +246,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>args: <span class="tsd-signature-type">IDecodeTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>args: <span class="tsd-signature-type">DecodeTransactionParams</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IDecodedTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DecodedTransaction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abifunctionname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiFunctionName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -257,7 +257,7 @@
 					<a name="decodetransactionevents" class="tsd-anchor"></a>
 					<h3>decode<wbr>Transaction<wbr>Events</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">decode<wbr>Transaction<wbr>Events<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IDecodeTransactionEvents</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IDecodedEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abieventname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiEventName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">decode<wbr>Transaction<wbr>Events<span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DecodeTransactionEventsParams</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DecodedEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abieventname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiEventName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -269,10 +269,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>args: <span class="tsd-signature-type">IDecodeTransactionEvents</span></h5>
+									<h5>args: <span class="tsd-signature-type">DecodeTransactionEventsParams</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IDecodedEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abieventname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiEventName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DecodedEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">, </span><a href="../index.html#abieventname" class="tsd-signature-type" data-tsd-kind="Type alias">AbiEventName</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>

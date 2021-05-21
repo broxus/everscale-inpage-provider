@@ -1,12 +1,12 @@
 import { ProviderEvent, ProviderEventData } from './api';
 import { Address, getUniqueId } from './utils';
-import { ProviderRpcClient, ISubscription } from './index';
+import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
 
 type SubscriptionsWithAddress = {
   [K in SubscriptionWithAddress]?: {
-    subscription: Promise<ISubscription<K>>
+    subscription: Promise<Subscription<K>>
     handlers: {
       [id: number]: {
         onData: (event: ProviderEventData<K>) => void,
@@ -53,7 +53,7 @@ export class Subscriber {
                 return;
               }
 
-              return eventData.subscription.then((item: ISubscription<SubscriptionWithAddress>) => {
+              return eventData.subscription.then((item: Subscription<SubscriptionWithAddress>) => {
                 return item.unsubscribe();
               }).catch(() => {
                 // ignore
@@ -80,7 +80,7 @@ export class Subscriber {
         eventData = {
           subscription: (this.ton.subscribe as any)(event, {
             address
-          }).then((subscription: ISubscription<T>) => {
+          }).then((subscription: Subscription<T>) => {
             subscription.on('data', (data) => {
               Object.values(handlers).forEach(({ onData }) => {
                 onData(data);
@@ -125,7 +125,7 @@ export class Subscriber {
       if (eventData != null) {
         delete eventData.handlers[id];
         if (Object.keys(eventData.handlers).length === 0) {
-          const subscription = eventData.subscription as Promise<ISubscription<T>>;
+          const subscription = eventData.subscription as Promise<Subscription<T>>;
           delete subscriptions[event];
 
           subscription
