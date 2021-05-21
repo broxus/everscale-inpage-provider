@@ -1,16 +1,24 @@
 import {
-  AbiEventName, AbiEventParams,
-  AbiFunctionName,
-  AbiFunctionOutput,
-  AbiFunctionParams,
-  AbiParam,
   Address,
-  ParsedTokensObject,
-  UniqueArray,
-  transformToParsedObject,
-  transformToSerializedObject
+  UniqueArray
 } from './utils';
-import { FullContractState, TokensObject, Transaction } from './models';
+import {
+  AbiParam,
+  FullContractState,
+  RawTokensObject,
+  TokensObject,
+  Transaction,
+  AbiFunctionName,
+  AbiEventName,
+  AbiFunctionInputs,
+  DecodedAbiFunctionOutputs,
+  DecodedAbiFunctionInputs,
+  DecodedAbiEventData,
+  serializeTokensObject,
+  parseTransaction,
+  parseTokensObject,
+  serializeTransaction
+} from './models';
 
 import provider from './index';
 
@@ -43,14 +51,14 @@ export class Contract<Abi> {
     this._address = address;
 
     class ContractMethod implements IContractMethod<any, any> {
-      readonly params: TokensObject;
+      readonly params: RawTokensObject;
 
-      constructor(private readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] }, readonly abi: string, readonly address: Address, readonly method: string, params: any) {
-        this.params = transformToSerializedObject(params);
+      constructor(private readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] }, readonly abi: string, readonly address: Address, readonly method: string, params: TokensObject) {
+        this.params = serializeTokensObject(params);
       }
 
       async send(args: ISendInternal): Promise<Transaction> {
-        const { transaction } = await provider.api.sendMessage({
+        const { transaction } = await provider.rawApi.sendMessage({
           sender: args.from.toString(),
           recipient: this.address.toString(),
           amount: args.amount,
@@ -61,11 +69,11 @@ export class Contract<Abi> {
             params: this.params
           }
         });
-        return transaction;
+        return parseTransaction(transaction);
       }
 
       async sendExternal(args: ISendExternal): Promise<{ transaction: Transaction, output?: any }> {
-        let { transaction, output } = await provider.api.sendExternalMessage({
+        let { transaction, output } = await provider.rawApi.sendExternalMessage({
           publicKey: args.publicKey,
           recipient: this.address.toString(),
           stateInit: args.stateInit,
@@ -76,15 +84,14 @@ export class Contract<Abi> {
           }
         });
 
-        if (output != null) {
-          (output as ParsedTokensObject) = transformToParsedObject(this.functionAbi.outputs, output);
-        }
-
-        return { transaction, output };
+        return {
+          transaction: parseTransaction(transaction),
+          output: output != null ? parseTokensObject(this.functionAbi.outputs, output) : undefined
+        };
       }
 
       async call(args: ICall = {}): Promise<any> {
-        let { output, code } = await provider.api.runLocal({
+        let { output, code } = await provider.rawApi.runLocal({
           address: this.address.toString(),
           cachedState: args.cachedState,
           functionCall: {
@@ -97,8 +104,7 @@ export class Contract<Abi> {
         if (output == null || code != 0) {
           throw new TvmException(code);
         } else {
-          (output as ParsedTokensObject) = transformToParsedObject(this.functionAbi.outputs, output);
-          return output;
+          return parseTokensObject(this.functionAbi.outputs, output);
         }
       }
     }
@@ -106,7 +112,7 @@ export class Contract<Abi> {
     this._methods = new Proxy({}, {
       get: <K extends AbiFunctionName<Abi>>(_object: {}, method: K) => {
         const rawAbi = (this._functions as any)[method];
-        return (params: AbiFunctionParams<Abi, K>) => new ContractMethod(rawAbi, this._abi, this._address, method, params);
+        return (params: AbiFunctionInputs<Abi, K>) => new ContractMethod(rawAbi, this._abi, this._address, method, params);
       }
     }) as unknown as IContractMethods<Abi>;
   }
@@ -121,8 +127,8 @@ export class Contract<Abi> {
 
   public async decodeTransaction(args: IDecodeTransaction<Abi>): Promise<IDecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.api.decodeTransaction({
-        transaction: args.transaction,
+      const result = await provider.rawApi.decodeTransaction({
+        transaction: serializeTransaction(args.transaction),
         abi: this._abi,
         method: args.methods
       });
@@ -132,19 +138,13 @@ export class Contract<Abi> {
 
       let { method, input, output } = result;
 
-      const rawAbi = (this._functions as any)[method];
-      if (rawAbi.inputs != null) {
-        (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
-      } else {
-        (input as ParsedTokensObject) = {};
-      }
-      if (rawAbi.outputs != null) {
-        (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
-      } else {
-        (output as ParsedTokensObject) = {};
-      }
+      const rawAbi = this._functions[method];
 
-      return { method, input, output } as any;
+      return {
+        method,
+        input: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, input) : {},
+        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {}
+      } as IDecodedTransaction<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;
     }
@@ -152,32 +152,31 @@ export class Contract<Abi> {
 
   public async decodeTransactionEvents(args: IDecodeTransactionEvents): Promise<IDecodedEvent<Abi, AbiEventName<Abi>>[]> {
     try {
-      const { events } = await provider.api.decodeTransactionEvents({
-        transaction: args.transaction,
+      const { events } = await provider.rawApi.decodeTransactionEvents({
+        transaction: serializeTransaction(args.transaction),
         abi: this._abi
       });
 
-      for (let item of events) {
-        let { event, data } = item;
+      const result: IDecodedEvent<Abi, AbiEventName<Abi>>[] = [];
 
-        const rawAbi = (this._events as any)[event];
-        if (rawAbi.inputs != null) {
-          (item.data as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, data);
-        } else {
-          (item.data as ParsedTokensObject) = {};
-        }
+      for (const { event, data } of events) {
+        const rawAbi = this._events[event];
+
+        result.push({
+          event,
+          data: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, data) : {}
+        } as IDecodedEvent<Abi, AbiEventName<Abi>>);
       }
 
-      return events as any;
-    } catch (e) {
-      console.debug(e);
+      return result;
+    } catch (_) {
       return [];
     }
   }
 
   public async decodeInputMessage(args: IDecodeInput<Abi>): Promise<IDecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.api.decodeInput({
+      const result = await provider.rawApi.decodeInput({
         abi: this._abi,
         body: args.body,
         internal: args.internal,
@@ -189,14 +188,12 @@ export class Contract<Abi> {
 
       let { method, input } = result;
 
-      const rawAbi = (this._functions as any)[method];
-      if (rawAbi.inputs != null) {
-        (input as ParsedTokensObject) = transformToParsedObject(rawAbi.inputs, input);
-      } else {
-        (input as ParsedTokensObject) = {};
-      }
+      const rawAbi = this._functions[method];
 
-      return { method, input } as any;
+      return {
+        method,
+        input: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, input) : {}
+      } as IDecodedInput<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;
     }
@@ -204,7 +201,7 @@ export class Contract<Abi> {
 
   public async decodeOutputMessage(args: IDecodeOutput<Abi>): Promise<IDecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.api.decodeOutput({
+      const result = await provider.rawApi.decodeOutput({
         abi: this._abi,
         body: args.body,
         method: args.methods
@@ -215,14 +212,12 @@ export class Contract<Abi> {
 
       let { method, output } = result;
 
-      const rawAbi = (this._functions as any)[method];
-      if (rawAbi.outputs != null) {
-        (output as ParsedTokensObject) = transformToParsedObject(rawAbi.outputs, output);
-      } else {
-        (output as ParsedTokensObject) = {};
-      }
+      const rawAbi = this._functions[method];
 
-      return { method, output } as any;
+      return {
+        method,
+        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {}
+      } as IDecodedOutput<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;
     }
@@ -265,7 +260,7 @@ interface IContractMethod<I, O> {
 }
 
 type IContractMethods<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionParams<C, K>) => IContractMethod<AbiFunctionParams<C, K>, AbiFunctionOutput<C, K>>
+  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => IContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>
 }
 
 type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] }
@@ -293,7 +288,8 @@ interface IDecodeTransaction<Abi> {
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 }
 
-type IDecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: AbiFunctionParams<Abi, T>, output: AbiFunctionOutput<Abi, T> } : never
+type IDecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi> ?
+  { method: T, input: DecodedAbiFunctionInputs<Abi, T>, output: DecodedAbiFunctionOutputs<Abi, T> } : never;
 
 interface IDecodeInput<Abi> {
   body: string;
@@ -301,17 +297,17 @@ interface IDecodeInput<Abi> {
   internal: boolean;
 }
 
-type IDecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: AbiFunctionParams<Abi, T> } : never
+type IDecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: DecodedAbiFunctionInputs<Abi, T> } : never
 
 interface IDecodeOutput<Abi> {
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 }
 
-type IDecodedOutput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, output: AbiFunctionOutput<Abi, T> } : never
+type IDecodedOutput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, output: DecodedAbiFunctionOutputs<Abi, T> } : never
 
 interface IDecodeTransactionEvents {
   transaction: Transaction;
 }
 
-type IDecodedEvent<Abi, T> = T extends AbiEventName<Abi> ? { event: T, data: AbiEventParams<Abi, T> } : never
+type IDecodedEvent<Abi, T> = T extends AbiEventName<Abi> ? { event: T, data: DecodedAbiEventData<Abi, T> } : never

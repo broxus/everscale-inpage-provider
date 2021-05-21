@@ -2,55 +2,51 @@ import {
   ProviderEvent,
   ProviderEventData,
   ProviderMethod,
-  ProviderRequestParams,
-  ProviderResponse
+  ProviderApiResponse,
+  RawProviderEventData,
+  RawProviderRequest,
+  RawProviderApiRequestParams,
+  RawProviderApiResponse,
+  ProviderApiRequestParams
 } from './api';
+
 import {
   ContractUpdatesSubscription,
-  Transaction,
-  TransactionsBatchInfo
+  parsePermissions,
+  parseTransaction,
+  serializeTokensObject
 } from './models';
+
 import {
   Address,
   AddressLiteral,
   getUniqueId
 } from './utils';
+
 import { Subscriber } from './stream';
+
+import { Contract } from './contract';
 
 export * from './api';
 export * from './models';
-export * from './permissions';
-export * from './contract';
-export * from './stream';
-export { Address, AddressLiteral } from './utils';
-
-export interface TonRequest<T extends ProviderMethod> {
-  method: T
-  params: ProviderRequestParams<T>
-}
+export { Contract, TvmException } from './contract';
+export { Stream, Subscriber } from './stream';
+export { Address, AddressLiteral, mergeTransactions } from './utils';
 
 export interface Ton {
-  addListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  on<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  once<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: ProviderEventData<T>) => void): void
+  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
 
-  request<T extends ProviderMethod>(data: TonRequest<T>): Promise<ProviderResponse<T>>
-}
-
-type RpcMethod<P extends ProviderMethod> = ProviderRequestParams<P> extends {}
-  ? (args: ProviderRequestParams<P>) => Promise<ProviderResponse<P>>
-  : () => Promise<ProviderResponse<P>>
-
-type ProviderApiMethods = {
-  [P in ProviderMethod]: RpcMethod<P>
+  request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>
 }
 
 let ensurePageLoaded: Promise<void>;
@@ -64,95 +60,13 @@ if (document.readyState == 'complete') {
   });
 }
 
-export async function hasTonProvider() {
+export async function hasTonProvider(): Promise<boolean> {
   await ensurePageLoaded;
   return (window as Record<string, any>).hasTonProvider === true;
 }
 
-/**
- * Modifies knownTransactions array, merging it with new transactions.
- * All arrays are assumed to be sorted by descending logical time.
- *
- * > Note! This method does not remove duplicates.
- *
- * @param knownTransactions
- * @param newTransactions
- * @param info
- */
-export function mergeTransactions(
-  knownTransactions: Transaction[],
-  newTransactions: Transaction[],
-  info: TransactionsBatchInfo
-): Transaction[] {
-  if (info.batchType == 'old') {
-    knownTransactions.push(...newTransactions);
-    return knownTransactions;
-  }
-
-  if (knownTransactions.length === 0) {
-    knownTransactions.push(...newTransactions);
-    return knownTransactions;
-  }
-
-  // Example:
-  // known lts: [N, N-1, N-2, N-3, (!) N-10,...]
-  // new lts: [N-4, N-5]
-  // batch info: { minLt: N-5, maxLt: N-4, batchType: 'new' }
-
-  // 1. Skip indices until known transaction lt is greater than the biggest in the batch
-  let i = 0;
-  while (
-    i < knownTransactions.length &&
-    knownTransactions[i].id.lt.localeCompare(info.maxLt) >= 0
-    ) {
-    ++i;
-  }
-
-  // 2. Insert new transactions
-  knownTransactions.splice(i, 0, ...newTransactions);
-  return knownTransactions;
-}
-
-type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
-
-export interface ISubscription<T extends ProviderEvent> {
-  /**
-   * Fires on each incoming event with the event object as argument.
-   *
-   * @param eventName 'data'
-   * @param listener
-   */
-  on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
-
-  /**
-   * Fires on successful re-subscription
-   *
-   * @param eventName 'subscribed'
-   * @param listener
-   */
-  on(eventName: 'subscribed', listener: () => void): this;
-
-  /**
-   * Fires on unsubscription
-   *
-   * @param eventName 'unsubscribed'
-   * @param listener
-   */
-  on(eventName: 'unsubscribed', listener: () => void): this;
-
-  /**
-   * Can be used to re-subscribe with the same parameters.
-   */
-  subscribe(): Promise<void>;
-
-  /**
-   * Unsubscribes the subscription.
-   */
-  unsubscribe(): Promise<void>
-}
-
 export class ProviderRpcClient {
-  private readonly _api: ProviderApiMethods;
+  private readonly _api: RawProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
@@ -163,8 +77,8 @@ export class ProviderRpcClient {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
         method: K
-      ) => (params?: ProviderRequestParams<K>) => this._ton!.request({ method, params: params! })
-    }) as unknown as ProviderApiMethods;
+      ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! })
+    }) as unknown as RawProviderApiMethods;
 
     this._ton = (window as any).ton;
     if (this._ton != null) {
@@ -172,7 +86,7 @@ export class ProviderRpcClient {
     } else {
       this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
         if (!hasTonProvider) {
-          reject(new Error('TON provider was not found'));
+          reject(new ProviderNotFoundException());
           return;
         }
 
@@ -193,57 +107,149 @@ export class ProviderRpcClient {
         return;
       }
 
-      const knownEvents: ProviderEvent[] = [
-        'disconnected',
-        'transactionsFound',
-        'contractStateChanged',
-        'networkChanged',
-        'permissionsChanged',
-        'loggedOut'
-      ];
+      const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
+        'disconnected': (data) => data,
+        'transactionsFound': (data) => ({
+          address: new Address(data.address),
+          transactions: data.transactions.map(parseTransaction),
+          info: data.info
+        }),
+        'contractStateChanged': (data) => ({
+          address: new Address(data.address),
+          state: data.state
+        }),
+        'networkChanged': data => data,
+        'permissionsChanged': (data) => ({
+          permissions: parsePermissions(data.permissions)
+        }),
+        'loggedOut': data => data
+      };
 
-      for (const eventName of knownEvents) {
-        this._ton.addListener(eventName, (data) => {
-          const handlers = this._subscriptions[eventName];
+      for (const [eventName, extractor] of Object.entries(knownEvents)) {
+        this._ton.addListener(eventName as ProviderEvent, (data) => {
+          const handlers = this._subscriptions[eventName as ProviderEvent];
           if (handlers == null) {
             return;
           }
+          const parsed = (extractor as any)(data);
           for (const handler of Object.values(handlers)) {
-            handler(data);
+            handler(parsed);
           }
         });
       }
     });
   }
 
-  public async ensureInitialized() {
+  /**
+   * Checks whether ton provider exists.
+   */
+  public async hasProvider(): Promise<boolean> {
+    return hasTonProvider();
+  }
+
+  /**
+   * Waits until provider api will be available.
+   *
+   * @throws ProviderNotFoundException when no provider found
+   */
+  public async ensureInitialized(): Promise<void> {
     await this._initializationPromise;
   }
 
-  public get isInitialized() {
+  /**
+   * Whether provider api is ready
+   */
+  public get isInitialized(): boolean {
     return this._ton != null;
   }
 
-  public get raw() {
+  /**
+   * Raw provider
+   */
+  public get raw(): Ton {
     return this._ton!;
   }
 
-  public get api() {
+  /**
+   * Raw provider api
+   */
+  public get rawApi(): RawProviderApiMethods {
     return this._api;
   }
 
+  /**
+   * Creates typed contract wrapper.
+   *
+   * @param abi Readonly object (must be declared with `as const`)
+   * @param address Default contract address
+   */
+  public createContract<Abi>(abi: Abi, address: Address): Contract<Abi> {
+    return new Contract<Abi>(abi, address);
+  }
+
+  /**
+   * Creates subscriptions group
+   */
   public createSubscriber(): Subscriber {
     return new Subscriber(this);
   }
 
+  /**
+   * Requests new permissions for current origin.
+   * Shows an approval window to the user.
+   * Will overwrite already existing permissions
+   *
+   * ---
+   * Required permissions: none
+   */
+  public async requestPermissions(args: ProviderApiRequestParams<'requestPermissions'>): Promise<ProviderApiResponse<'requestPermissions'>> {
+    const result = await this._api.requestPermissions({
+      permissions: args.permissions
+    });
+    return parsePermissions(result);
+  }
+
+  /**
+   * Removes all permissions for current origin and stops all subscriptions
+   */
+  public async disconnect(): Promise<void> {
+    await this._api.disconnect();
+  }
+
+  /**
+   * Called every time contract state changes
+   */
   public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<ISubscription<'contractStateChanged'>>;
+
+  /**
+   * Called on each new transactions batch, received on subscription
+   */
   public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<ISubscription<'transactionsFound'>>;
+
+  /**
+   * Called when inpage provider disconnects from extension
+   */
   public subscribe(eventName: 'disconnected'): Promise<ISubscription<'disconnected'>>;
+
+  /**
+   * Called each time the user changes network
+   */
   public subscribe(eventName: 'networkChanged'): Promise<ISubscription<'networkChanged'>>;
+
+  /**
+   * Called when permissions are changed.
+   * Mostly when account has been removed from the current `accountInteraction` permission,
+   * or disconnect method was called
+   */
   public subscribe(eventName: 'permissionsChanged'): Promise<ISubscription<'permissionsChanged'>>;
+
+  /**
+   * Called when the user logs out of the extension
+   */
   public subscribe(eventName: 'loggedOut'): Promise<ISubscription<'loggedOut'>>;
+
   public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<ISubscription<T>> {
-    class Subscription implements ISubscription<T> {
+    class Subscription<T extends ProviderEvent> implements ISubscription<T> {
       private readonly _listeners: { [K in SubscriptionEvent]: ((data?: any) => void)[] } = {
         ['data']: [],
         ['subscribed']: [],
@@ -251,7 +257,7 @@ export class ProviderRpcClient {
       };
 
       constructor(
-        private readonly _subscribe: (s: Subscription) => Promise<void>,
+        private readonly _subscribe: (s: Subscription<T>) => Promise<void>,
         private readonly _unsubscribe: () => Promise<void>) {
       }
 
@@ -293,7 +299,7 @@ export class ProviderRpcClient {
       case 'networkChanged':
       case 'permissionsChanged':
       case 'loggedOut': {
-        const subscription = new Subscription(async (subscription) => {
+        const subscription = new Subscription<T>(async (subscription) => {
           if (existingSubscriptions[id] != null) {
             return;
           }
@@ -310,15 +316,15 @@ export class ProviderRpcClient {
       case 'contractStateChanged': {
         const address = params!.address.toString();
 
-        const subscription = new Subscription(async (subscription) => {
+        const subscription = new Subscription<T>(async (subscription) => {
           if (existingSubscriptions[id] != null) {
             return;
           }
-          existingSubscriptions[id] = (data: any) => {
-            if (data.address == address) {
-              subscription.notify(data);
+          existingSubscriptions[id] = ((data: ProviderEventData<'transactionsFound' | 'contractStateChanged'>) => {
+            if (data.address.toString() == address) {
+              subscription.notify(data as ProviderEventData<T>);
             }
-          };
+          }) as (data: ProviderEventData<T>) => void;
 
           let contractSubscriptions = this._contractSubscriptions[address];
           if (contractSubscriptions == null) {
@@ -338,7 +344,7 @@ export class ProviderRpcClient {
 
           try {
             if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
-              await this.api.subscribe({ address, subscriptions: total });
+              await this.rawApi.subscribe({ address, subscriptions: total });
             }
           } catch (e) {
             delete existingSubscriptions[id];
@@ -358,9 +364,9 @@ export class ProviderRpcClient {
           delete contractSubscriptions[id];
 
           if (!withoutExcluded.transactions && !withoutExcluded.state) {
-            await this.api.unsubscribe({ address });
+            await this.rawApi.unsubscribe({ address });
           } else if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
-            await this.api.subscribe({ address, subscriptions: withoutExcluded });
+            await this.rawApi.subscribe({ address, subscriptions: withoutExcluded });
           }
         });
         await subscription.subscribe();
@@ -370,6 +376,63 @@ export class ProviderRpcClient {
         throw new Error(`Unknown event ${eventName}`);
       }
     }
+  }
+
+  /**
+   * Returns provider api state
+   *
+   * ---
+   * Required permissions: none
+   */
+  public async getProviderState(): Promise<ProviderApiResponse<'getProviderState'>> {
+    const state = await this._api.getProviderState();
+    return {
+      ...state,
+      permissions: parsePermissions(state.permissions)
+    };
+  }
+
+  /**
+   * Requests contract data
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
+    return await this._api.getFullContractState({
+      address: args.address.toString()
+    });
+  }
+
+  /**
+   * Requests contract transactions
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
+    const { transactions, continuation } = await this._api.getTransactions({
+      ...args,
+      address: args.address.toString()
+    });
+    return {
+      transactions: transactions.map(parseTransaction),
+      continuation
+    };
+  }
+
+  /**
+   * Calculates contract address from code and init params
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async getExpectedAddress(args: ProviderApiRequestParams<'getExpectedAddress'>): Promise<ProviderApiResponse<'getExpectedAddress'>> {
+    const { address } = await this._api.getExpectedAddress({
+      ...args,
+      initParams: serializeTokensObject(args.initParams)
+    });
+    return { address: new Address(address) };
   }
 
   private _getEventSubscriptions<T extends ProviderEvent>(
@@ -383,6 +446,58 @@ export class ProviderRpcClient {
 
     return existingSubscriptions as { [id: number]: (data: ProviderEventData<T>) => void };
   }
+}
+
+export interface ISubscription<T extends ProviderEvent> {
+  /**
+   * Fires on each incoming event with the event object as argument.
+   *
+   * @param eventName 'data'
+   * @param listener
+   */
+  on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
+
+  /**
+   * Fires on successful re-subscription
+   *
+   * @param eventName 'subscribed'
+   * @param listener
+   */
+  on(eventName: 'subscribed', listener: () => void): this;
+
+  /**
+   * Fires on unsubscription
+   *
+   * @param eventName 'unsubscribed'
+   * @param listener
+   */
+  on(eventName: 'unsubscribed', listener: () => void): this;
+
+  /**
+   * Can be used to re-subscribe with the same parameters.
+   */
+  subscribe(): Promise<void>;
+
+  /**
+   * Unsubscribes the subscription.
+   */
+  unsubscribe(): Promise<void>
+}
+
+type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
+
+export class ProviderNotFoundException extends Error {
+  constructor() {
+    super('TON provider was not found');
+  }
+}
+
+export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends {}
+  ? (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
+  : () => Promise<RawProviderApiResponse<P>>
+
+type RawProviderApiMethods = {
+  [P in ProviderMethod]: RawRpcMethod<P>
 }
 
 function foldSubscriptions(

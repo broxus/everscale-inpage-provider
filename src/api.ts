@@ -1,54 +1,60 @@
-import { Permission, Permissions } from './permissions';
 import {
   ContractState,
   ContractUpdatesSubscription,
   FullContractState,
+  Transaction,
+  TransactionId,
+  TransactionsBatchInfo,
+  Permissions,
+  Permission,
   FunctionCall,
-  TokensObject,
-  Transaction, TransactionId, TransactionsBatchInfo
+  TokensObject
 } from './models';
-import { UniqueArray } from './utils';
 
-export interface ProviderState {
+import { UniqueArray, Address } from './utils';
+
+export interface ProviderState<Addr = Address> {
   /**
    * Selected connection name (Mainnet / Testnet)
    */
-  selectedConnection: string
+  selectedConnection: string;
   /**
    * Object with active permissions attached data
    */
-  permissions: Partial<Permissions>
+  permissions: Partial<Permissions<Addr>>;
   /**
    * Current subscription states
    */
   subscriptions: {
-    [address: string]: ContractUpdatesSubscription
-  },
+    [address: string]: ContractUpdatesSubscription;
+  };
 }
 
-export type ProviderEvents = {
+export type RawProviderState = ProviderState<string>
+
+export type ProviderEvents<Addr = Address> = {
   /**
    * Called when inpage provider disconnects from extension
    */
-  disconnected: Error,
+  disconnected: Error;
 
   /**
-   * Called on each new transaction, received on subscription
+   * Called on each new transactions batch, received on subscription
    */
   transactionsFound: {
     /**
      * Contract address
      */
-    address: string
+    address: Addr;
     /**
      * Guaranteed to be non-empty and ordered by descending lt
      */
-    transactions: Transaction[]
+    transactions: Transaction<Addr>[];
     /**
      * Describes transactions lt rage
      */
-    info: TransactionsBatchInfo,
-  }
+    info: TransactionsBatchInfo;
+  };
 
   /**
    * Called every time contract state changes
@@ -57,7 +63,7 @@ export type ProviderEvents = {
     /**
      * Contract address
      */
-    address: string
+    address: Addr
     /**
      * New contract state
      */
@@ -68,7 +74,7 @@ export type ProviderEvents = {
    * Called each time the user changes network
    */
   networkChanged: {
-    selectedConnection: string
+    selectedConnection: string;
   }
 
   /**
@@ -77,7 +83,7 @@ export type ProviderEvents = {
    * or disconnect method was called
    */
   permissionsChanged: {
-    permissions: Partial<Permissions>
+    permissions: Partial<Permissions<Addr>>
   }
 
   /**
@@ -86,7 +92,9 @@ export type ProviderEvents = {
   loggedOut: {}
 }
 
-export type ProviderApi = {
+export type RawProviderEvents = ProviderEvents<string>;
+
+export type ProviderApi<Addr = Address> = {
   /**
    * Requests new permissions for current origin.
    * Shows an approval window to the user.
@@ -97,9 +105,9 @@ export type ProviderApi = {
    */
   requestPermissions: {
     input: {
-      permissions: UniqueArray<Permission>[]
+      permissions: UniqueArray<Permission[]>
     }
-    output: Partial<Permissions>
+    output: Partial<Permissions<Addr>>
   }
 
   /**
@@ -122,7 +130,7 @@ export type ProviderApi = {
       /**
        * Contract address
        */
-      address: string,
+      address: Addr,
       /**
        * Subscription changes
        */
@@ -142,7 +150,7 @@ export type ProviderApi = {
       /**
        * Contract address
        */
-      address: string
+      address: Addr
     }
   }
 
@@ -177,7 +185,7 @@ export type ProviderApi = {
       /**
        * Object with active permissions attached data
        */
-      permissions: Partial<Permissions>
+      permissions: Partial<Permissions<Addr>>
       /**
        * Current subscription states
        */
@@ -198,7 +206,7 @@ export type ProviderApi = {
       /**
        * Contract address
        */
-      address: string
+      address: Addr
     }
     output: {
       /**
@@ -219,7 +227,7 @@ export type ProviderApi = {
       /**
        * Contract address
        */
-      address: string
+      address: Addr
       /**
        * Id of the transaction from which to request the next batch
        */
@@ -233,7 +241,7 @@ export type ProviderApi = {
       /**
        * Transactions list in descending order (from latest lt to the oldest)
        */
-      transactions: Transaction[]
+      transactions: Transaction<Addr>[]
       /**
        * Previous transaction id of the last transaction in result. Can be used to continue transactions batch
        */
@@ -252,7 +260,7 @@ export type ProviderApi = {
       /**
        * Contract address
        */
-      address: string
+      address: Addr
       /**
        * Cached contract state
        */
@@ -260,13 +268,13 @@ export type ProviderApi = {
       /**
        * Function call params
        */
-      functionCall: FunctionCall
+      functionCall: FunctionCall<Addr>
     }
     output: {
       /**
        * Execution output
        */
-      output?: TokensObject
+      output?: TokensObject<Addr>
       /**
        * TVM execution code
        */
@@ -301,13 +309,13 @@ export type ProviderApi = {
       /**
        * State init params
        */
-      initParams: TokensObject
+      initParams: TokensObject<Addr>
     }
     output: {
       /**
        * Contract address
        */
-      address: string
+      address: Addr
     }
   }
 
@@ -318,7 +326,7 @@ export type ProviderApi = {
    * Required permissions: `tonClient`
    */
   encodeInternalInput: {
-    input: FunctionCall
+    input: FunctionCall<Addr>
     output: {
       /**
        * Base64 encoded message body BOC
@@ -366,7 +374,7 @@ export type ProviderApi = {
       /**
        * Decoded function arguments
        */
-      input: TokensObject
+      input: TokensObject<Addr>
     } | null
   }
 
@@ -405,7 +413,7 @@ export type ProviderApi = {
       /**
        * Decoded function returned value
        */
-      output: TokensObject
+      output: TokensObject<Addr>
     } | null
   }
 
@@ -420,11 +428,11 @@ export type ProviderApi = {
       /**
        * Base64 encoded message body BOC
        */
-      body: string
+      body: string;
       /**
        * Contract ABI
        */
-      abi: string
+      abi: string;
       /**
        * Specific event from specified contract ABI.
        * When an array of event names is passed it will try to decode until first successful
@@ -434,19 +442,19 @@ export type ProviderApi = {
        * > to **_try_** to decode specified event, use **`['event']`**, in that case it will return null
        * > if message body doesn't contain requested event.
        */
-      event: string | string[]
-    }
+      event: string | string[];
+    };
     output: {
       /**
        * Decoded event name
        */
-      event: string
+      event: string;
       /**
        * Decoded event data
        */
-      data: TokensObject
-    } | null
-  }
+      data: TokensObject<Addr>;
+    } | null;
+  };
 
   /**
    * Decodes function call
@@ -459,11 +467,11 @@ export type ProviderApi = {
       /**
        * Transaction with the function call
        */
-      transaction: Transaction
+      transaction: Transaction<Addr>;
       /**
        * Contract ABI
        */
-      abi: string
+      abi: string;
       /**
        * Specific method from specified contract ABI.
        * When an array of method names is passed it will try to decode until first successful.
@@ -473,23 +481,23 @@ export type ProviderApi = {
        * > to **_try_** to decode specified method, use **`['method']`**, in that case it will return null
        * > if transaction doesn't contain requested method.
        */
-      method: string | string[]
-    }
+      method: string | string[];
+    };
     output: {
       /**
        * Decoded method name
        */
-      method: string
+      method: string;
       /**
        * Decoded function arguments
        */
-      input: TokensObject
+      input: TokensObject<Addr>;
       /**
        * Decoded function returned value
        */
-      output: TokensObject
-    } | null
-  }
+      output: TokensObject<Addr>;
+    } | null;
+  };
 
   /**
    * Decodes transaction events
@@ -502,22 +510,22 @@ export type ProviderApi = {
       /**
        * Transaction with the function call
        */
-      transaction: Transaction
+      transaction: Transaction<Addr>;
       /**
        * Contract ABI
        */
-      abi: string
-    }
+      abi: string;
+    };
     output: {
       /**
        * Successfully decoded events
        */
       events: {
-        event: string,
-        data: TokensObject
-      }[]
-    }
-  }
+        event: string;
+        data: TokensObject<Addr>;
+      }[];
+    };
+  };
 
   /**
    * Calculates transaction fees
@@ -531,27 +539,27 @@ export type ProviderApi = {
        * This wallet will be used to send the message.
        * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
        */
-      sender: string,
+      sender: Addr;
       /**
        * Message destination address
        */
-      recipient: string
+      recipient: Addr;
       /**
        * Amount of nano TON to send
        */
-      amount: string
+      amount: string;
       /**
        * Optional function call
        */
-      payload?: FunctionCall
-    }
+      payload?: FunctionCall<Addr>;
+    };
     output: {
       /**
        * Fees in nano TON
        */
-      fees: string
-    }
-  }
+      fees: string;
+    };
+  };
 
   /**
    * Sends internal message from user account.
@@ -566,31 +574,31 @@ export type ProviderApi = {
        * Preferred wallet address.
        * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
        */
-      sender: string,
+      sender: Addr;
       /**
        * Message destination address
        */
-      recipient: string
+      recipient: Addr;
       /**
        * Amount of nano TON to send
        */
-      amount: string
+      amount: string;
       /**
        * Whether to bounce message back on error
        */
-      bounce: boolean
+      bounce: boolean;
       /**
        * Optional function call
        */
-      payload?: FunctionCall
-    }
+      payload?: FunctionCall<Addr>;
+    };
     output: {
       /**
        * Executed transaction
        */
-      transaction: Transaction
-    }
-  }
+      transaction: Transaction<Addr>;
+    };
+  };
 
   /**
    * Sends an external message to the contract
@@ -605,45 +613,53 @@ export type ProviderApi = {
        * The public key of the preferred account.
        * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
        */
-      publicKey: string
+      publicKey: string;
       /**
        * Message destination address
        */
-      recipient: string
+      recipient: Addr;
       /**
        * Optional base64 encoded `.tvc` file
        */
-      stateInit?: string
+      stateInit?: string;
       /**
        * Function call
        */
-      payload: FunctionCall
-    }
+      payload: FunctionCall<Addr>;
+    };
     output: {
       /**
        * Executed transaction
        */
-      transaction: Transaction
+      transaction: Transaction<Addr>;
       /**
        * Parsed function call output
        */
-      output?: TokensObject
-    }
-  }
+      output?: TokensObject<Addr>;
+    };
+  };
+};
+
+export type ProviderEvent = keyof ProviderEvents;
+
+export type ProviderEventData<T extends ProviderEvent, Addr = Address> = ProviderEvents<Addr>[T];
+export type RawProviderEventData<T extends ProviderEvent> = ProviderEventData<T, string>;
+
+export type ProviderMethod = keyof ProviderApi;
+
+export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> =
+  ProviderApi<Addr>[T] extends { input: infer I } ? I
+    : ProviderApi<Addr>[T] extends {} ? undefined : never;
+
+export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiRequestParams<T, string>;
+
+export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> =
+  ProviderApi<Addr>[T] extends { output: infer O } ? O
+    : ProviderApi<Addr>[T] extends {} ? undefined : never;
+
+export type RawProviderApiResponse<T extends ProviderMethod> = ProviderApiResponse<T, string>;
+
+export interface RawProviderRequest<T extends ProviderMethod> {
+  method: T
+  params: RawProviderApiRequestParams<T>
 }
-
-export type ProviderEvent = keyof ProviderEvents
-
-export type ProviderEventData<T extends ProviderEvent> = ProviderEvents[T]
-
-export type ProviderEventCall<T extends ProviderEvent> = { method: T; params: ProviderEventData<T> }
-
-export type ProviderMethod = keyof ProviderApi
-
-export type ProviderRequestParams<T extends ProviderMethod> =
-  ProviderApi[T] extends { input: infer I } ? I
-    : ProviderApi[T] extends {} ? undefined : never
-
-export type ProviderResponse<T extends ProviderMethod> =
-  ProviderApi[T] extends { output: infer O } ? O
-    : ProviderApi[T] extends {} ? undefined : never
