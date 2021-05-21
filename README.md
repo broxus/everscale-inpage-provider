@@ -25,14 +25,17 @@ async function myApp() {
   }
   await ton.ensureInitialized();
 
-  const { accountInteraction } = await ton.api.requestPermissions({
+  const { accountInteraction } = await ton.rawApi.requestPermissions({
     permissions: ['tonClient', 'accountInteraction']
   });
+  if (accountInteraction == null) {
+    throw new Error('Insufficient permissions')
+  }
 
   const selectedAddress = accountInteraction.address;
   const dePoolAddress = '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
 
-  const { transaction } = await ton.api.sendMessage({
+  const { transaction } = await ton.rawApi.sendMessage({
     sender: selectedAddress,
     recipient: dePoolAddress,
     amount: '10500000000',
@@ -47,7 +50,7 @@ async function myApp() {
   });
   console.log(transaction);
 
-  const { output, code } = await ton.api.runLocal({
+  const { output, code } = await ton.rawApi.runLocal({
     address: dePoolAddress,
     functionCall: {
       abi: DePoolAbi,
