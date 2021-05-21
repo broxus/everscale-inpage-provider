@@ -13,6 +13,7 @@ import {
 import {
   ContractUpdatesSubscription,
   parsePermissions,
+  parseTokensObject,
   parseTransaction,
   serializeTokensObject
 } from './models';
@@ -433,6 +434,32 @@ export class ProviderRpcClient {
       initParams: serializeTokensObject(args.initParams)
     });
     return { address: new Address(address) };
+  }
+
+  /**
+   * Creates base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async packIntoCell(args: ProviderApiRequestParams<'packIntoCell'>): Promise<ProviderApiResponse<'packIntoCell'>> {
+    return await this._api.packIntoCell({
+      ...args,
+      data: serializeTokensObject(args.data)
+    });
+  }
+
+  /**
+   * Decodes base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async unpackFromCell(args: ProviderApiRequestParams<'unpackFromCell'>): Promise<ProviderApiResponse<'unpackFromCell'>> {
+    const { data } = await this._api.unpackFromCell(args);
+    return {
+      data: parseTokensObject(args.structure, data)
+    };
   }
 
   private _getEventSubscriptions<T extends ProviderEvent>(

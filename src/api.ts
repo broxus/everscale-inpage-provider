@@ -8,7 +8,8 @@ import {
   Permissions,
   Permission,
   FunctionCall,
-  TokensObject
+  TokensObject,
+  AbiParam
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -63,19 +64,19 @@ export type ProviderEvents<Addr = Address> = {
     /**
      * Contract address
      */
-    address: Addr
+    address: Addr;
     /**
      * New contract state
      */
-    state: ContractState
-  }
+    state: ContractState;
+  };
 
   /**
    * Called each time the user changes network
    */
   networkChanged: {
     selectedConnection: string;
-  }
+  };
 
   /**
    * Called when permissions are changed.
@@ -83,13 +84,13 @@ export type ProviderEvents<Addr = Address> = {
    * or disconnect method was called
    */
   permissionsChanged: {
-    permissions: Partial<Permissions<Addr>>
-  }
+    permissions: Partial<Permissions<Addr>>;
+  };
 
   /**
    * Called when the user logs out of the extension
    */
-  loggedOut: {}
+  loggedOut: {};
 }
 
 export type RawProviderEvents = ProviderEvents<string>;
@@ -105,10 +106,10 @@ export type ProviderApi<Addr = Address> = {
    */
   requestPermissions: {
     input: {
-      permissions: UniqueArray<Permission[]>
-    }
-    output: Partial<Permissions<Addr>>
-  }
+      permissions: UniqueArray<Permission[]>;
+    };
+    output: Partial<Permissions<Addr>>;
+  };
 
   /**
    * Removes all permissions for current origin and stops all subscriptions
@@ -116,7 +117,7 @@ export type ProviderApi<Addr = Address> = {
    * ---
    * Required permissions: none
    */
-  disconnect: {}
+  disconnect: {};
 
   /**
    * Subscribes to contract updates.
@@ -130,14 +131,14 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract address
        */
-      address: Addr,
+      address: Addr;
       /**
        * Subscription changes
        */
-      subscriptions: Partial<ContractUpdatesSubscription>
+      subscriptions: Partial<ContractUpdatesSubscription>;
     }
-    output: ContractUpdatesSubscription
-  }
+    output: ContractUpdatesSubscription;
+  };
 
   /**
    * Fully unsubscribe from specific contract updates
@@ -150,9 +151,9 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract address
        */
-      address: Addr
-    }
-  }
+      address: Addr;
+    };
+  };
 
   /**
    * Fully unsubscribe from all contracts
@@ -160,7 +161,7 @@ export type ProviderApi<Addr = Address> = {
    * ---
    * Required permissions: none
    */
-  unsubscribeAll: {}
+  unsubscribeAll: {};
 
   /**
    * Returns provider api state
@@ -173,27 +174,27 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Provider api version in semver format (x.y.z)
        */
-      version: string
+      version: string;
       /**
        * Provider api version in uint32 format (xxxyyyzzz)
        */
-      numericVersion: number
+      numericVersion: number;
       /**
        * Selected connection name (Mainnet / Testnet)
        */
-      selectedConnection: string
+      selectedConnection: string;
       /**
        * Object with active permissions attached data
        */
-      permissions: Partial<Permissions<Addr>>
+      permissions: Partial<Permissions<Addr>>;
       /**
        * Current subscription states
        */
       subscriptions: {
-        [address: string]: ContractUpdatesSubscription
-      },
-    }
-  }
+        [address: string]: ContractUpdatesSubscription;
+      };
+    };
+  };
 
   /**
    * Requests contract data
@@ -206,15 +207,15 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract address
        */
-      address: Addr
-    }
+      address: Addr;
+    };
     output: {
       /**
        * Contract state or `undefined` if it doesn't exist
        */
-      state?: FullContractState
-    }
-  }
+      state?: FullContractState;
+    };
+  };
 
   /**
    * Requests contract transactions
@@ -227,27 +228,27 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract address
        */
-      address: Addr
+      address: Addr;
       /**
        * Id of the transaction from which to request the next batch
        */
-      continuation?: TransactionId
+      continuation?: TransactionId;
       /**
        * Optional limit. Values greater than 50 have no effect
        */
-      limit?: number
-    }
+      limit?: number;
+    };
     output: {
       /**
        * Transactions list in descending order (from latest lt to the oldest)
        */
-      transactions: Transaction<Addr>[]
+      transactions: Transaction<Addr>[];
       /**
        * Previous transaction id of the last transaction in result. Can be used to continue transactions batch
        */
-      continuation?: TransactionId
-    }
-  }
+      continuation?: TransactionId;
+    };
+  };
 
   /**
    * Executes external message locally
@@ -260,27 +261,27 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Contract address
        */
-      address: Addr
+      address: Addr;
       /**
        * Cached contract state
        */
-      cachedState?: FullContractState
+      cachedState?: FullContractState;
       /**
        * Function call params
        */
-      functionCall: FunctionCall<Addr>
-    }
+      functionCall: FunctionCall<Addr>;
+    };
     output: {
       /**
        * Execution output
        */
-      output?: TokensObject<Addr>
+      output?: TokensObject<Addr>;
       /**
        * TVM execution code
        */
-      code: number
-    }
-  }
+      code: number;
+    };
+  };
 
   /**
    * Calculates contract address from code and init params
@@ -293,31 +294,85 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded TVC file
        */
-      tvc: string
+      tvc: string;
       /**
        * Contract ABI
        */
-      abi: string
+      abi: string;
       /**
        * Contract workchain. 0 by default
        */
-      workchain?: number
+      workchain?: number;
       /**
        * Public key, which will be injected into the contract. 0 by default
        */
-      publicKey?: string
+      publicKey?: string;
       /**
        * State init params
        */
-      initParams: TokensObject<Addr>
-    }
+      initParams: TokensObject<Addr>;
+    };
     output: {
       /**
        * Contract address
        */
-      address: Addr
-    }
-  }
+      address: Addr;
+    };
+  };
+
+  /**
+   * Creates base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  packIntoCell: {
+    input: {
+      /**
+       * Cell structure
+       */
+      structure: AbiParam[];
+      /**
+       * Cell data
+       */
+      data: TokensObject<Addr>;
+    };
+    output: {
+      /**
+       * Base64 encoded cell BOC
+       */
+      boc: string;
+    };
+  };
+
+  /**
+   * Decodes base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  unpackFromCell: {
+    input: {
+      /**
+       * Cell structure
+       */
+      structure: AbiParam[];
+      /**
+       * Base64 encoded cell BOC
+       */
+      boc: string;
+      /**
+       * Don't fail if something is left in a cell after unpacking
+       */
+      allowPartial: boolean;
+    };
+    output: {
+      /**
+       * Cell data
+       */
+      data: TokensObject<Addr>;
+    };
+  };
 
   /**
    * Creates internal message body
@@ -331,9 +386,9 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded message body BOC
        */
-      boc: string
-    }
-  }
+      boc: string;
+    };
+  };
 
   /**
    * Decodes body of incoming message
@@ -346,11 +401,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded message body BOC
        */
-      body: string
+      body: string;
       /**
        * Contract ABI
        */
-      abi: string
+      abi: string;
       /**
        * Specific method from specified contract ABI.
        * When an array of method names is passed it will try to decode until first successful
@@ -360,23 +415,23 @@ export type ProviderApi<Addr = Address> = {
        * > to **_try_** to decode specified method, use **`['method']`**, in that case it will return null
        * > if message body doesn't contain requested method.
        */
-      method: string | string[]
+      method: string | string[];
       /**
        * Function call type
        */
-      internal: boolean
-    }
+      internal: boolean;
+    };
     output: {
       /**
        * Decoded method name
        */
-      method: string
+      method: string;
       /**
        * Decoded function arguments
        */
-      input: TokensObject<Addr>
-    } | null
-  }
+      input: TokensObject<Addr>;
+    } | null;
+  };
 
   /**
    * Decodes body of outgoing message
@@ -389,11 +444,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded message body BOC
        */
-      body: string
+      body: string;
       /**
        * Contract ABI
        */
-      abi: string
+      abi: string;
       /**
        * Specific method from specified contract ABI.
        * When an array of method names is passed it will try to decode until first successful
@@ -403,19 +458,19 @@ export type ProviderApi<Addr = Address> = {
        * > to **_try_** to decode specified method, use **`['method']`**, in that case it will return null
        * > if message body doesn't contain requested method.
        */
-      method: string | string[]
-    }
+      method: string | string[];
+    };
     output: {
       /**
        * Decoded method name
        */
-      method: string
+      method: string;
       /**
        * Decoded function returned value
        */
-      output: TokensObject<Addr>
-    } | null
-  }
+      output: TokensObject<Addr>;
+    } | null;
+  };
 
   /**
    * Decodes body of event message
@@ -639,6 +694,8 @@ export type ProviderApi<Addr = Address> = {
     };
   };
 };
+
+export type RawProviderApi = ProviderApi<string>;
 
 export type ProviderEvent = keyof ProviderEvents;
 

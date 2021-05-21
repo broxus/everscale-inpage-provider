@@ -59,11 +59,11 @@ type IsHexString<T extends string, L extends readonly number[]> =
  * @param newTransactions
  * @param info
  */
-export function mergeTransactions(
-  knownTransactions: Transaction[],
-  newTransactions: Transaction[],
+export function mergeTransactions<Addr>(
+  knownTransactions: Transaction<Addr>[],
+  newTransactions: Transaction<Addr>[],
   info: TransactionsBatchInfo
-): Transaction[] {
+): Transaction<Addr>[] {
   if (info.batchType == 'old') {
     knownTransactions.push(...newTransactions);
     return knownTransactions;
