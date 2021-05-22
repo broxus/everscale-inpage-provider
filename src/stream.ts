@@ -1,5 +1,6 @@
 import { ProviderEvent, ProviderEventData } from './api';
 import { Address, getUniqueId } from './utils';
+import { TransactionId, TransactionsBatchInfo } from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
@@ -16,17 +17,143 @@ type SubscriptionsWithAddress = {
   }
 };
 
+type UnorderedTransactionsScannerParams = {
+  address: Address;
+  onData: (data: ProviderEventData<'transactionsFound'>) => void;
+  onEnd: () => void;
+  fromLt?: string;
+  fromUtime?: number;
+};
+
+class UnorderedTransactionsScanner {
+  private readonly address: Address;
+  private readonly onData: (data: ProviderEventData<'transactionsFound'>) => void;
+  private readonly onEnd: () => void;
+  private readonly fromLt?: string;
+  private readonly fromUtime?: number;
+  private continuation?: TransactionId;
+  private promise?: Promise<void>;
+  private isRunning: boolean = false;
+
+  constructor(private readonly ton: ProviderRpcClient, {
+    address,
+    onData,
+    onEnd,
+    fromLt,
+    fromUtime
+  }: UnorderedTransactionsScannerParams) {
+    this.address = address;
+    this.onData = onData;
+    this.onEnd = onEnd;
+    this.fromLt = fromLt;
+    this.fromUtime = fromUtime;
+  }
+
+  public async start() {
+    if (this.isRunning || this.promise != null) {
+      return;
+    }
+
+    this.isRunning = true;
+    this.promise = (async () => {
+      while (this.isRunning) {
+        try {
+          const { transactions, continuation } = await this.ton.getTransactions({
+            address: this.address,
+            continuation: this.continuation
+          });
+
+          if (!this.isRunning || transactions.length == null) {
+            break;
+          }
+
+          const filteredTransactions = transactions.filter((item) => (
+            (this.fromLt == null || item.id.lt > this.fromLt) && (
+              (this.fromUtime == null || item.createdAt > this.fromUtime)
+            )
+          ));
+
+          if (filteredTransactions == null) {
+            break;
+          }
+
+          const info = {
+            maxLt: filteredTransactions[0].id.lt,
+            minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
+            batchType: 'old'
+          } as TransactionsBatchInfo;
+
+          this.onData({
+            address: this.address,
+            transactions: filteredTransactions,
+            info
+          });
+
+          if (continuation != null) {
+            this.continuation = continuation;
+          } else {
+            break;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      this.onEnd();
+      this.isRunning = false;
+      this.continuation = undefined;
+    })();
+  }
+
+  public async stop() {
+    this.isRunning = false;
+    if (this.promise != null) {
+      await this.promise;
+    } else {
+      this.onEnd();
+    }
+  }
+}
+
 /**
  * @category Stream
  */
 export class Subscriber {
   private readonly subscriptions: { [address: string]: SubscriptionsWithAddress } = {};
+  private readonly scanners: { [id: number]: UnorderedTransactionsScanner } = {};
 
   constructor(private readonly ton: ProviderRpcClient) {
   }
 
+  /**
+   * Returns stream of new transactions
+   */
   public transactions(address: Address): Stream<ProviderEventData<'transactionsFound'>> {
     return this._addSubscription('transactionsFound', address);
+  }
+
+  /**
+   * Returns stream of old transactions
+   */
+  public oldTransactions(address: Address, filter?: { fromLt?: string, fromUtime?: number }): Stream<ProviderEventData<'transactionsFound'>> {
+    const id = getUniqueId();
+
+    return new StreamImpl(async (onData, onEnd) => {
+      const scanner = new UnorderedTransactionsScanner(this.ton, {
+        address,
+        onData,
+        onEnd,
+        ...filter
+      });
+      this.scanners[id] = scanner;
+      await scanner.start();
+    }, async () => {
+      const scanner = this.scanners[id];
+      delete this.scanners[id];
+      if (scanner != null) {
+        await scanner.stop();
+      }
+    }, identity);
   }
 
   public states(address: Address): Stream<ProviderEventData<'contractStateChanged'>> {
@@ -39,15 +166,20 @@ export class Subscriber {
       delete this.subscriptions[address];
     }
 
+    const scanners = Object.assign({}, this.scanners);
+    for (const id of Object.keys(this.scanners)) {
+      delete this.scanners[id as any];
+    }
+
     await Promise.all(
       Object.values(subscriptions)
-        .map((item: SubscriptionsWithAddress) => {
+        .map(async (item: SubscriptionsWithAddress) => {
           const events = Object.assign({}, item);
           for (const event of Object.keys(events)) {
             delete item[event as unknown as SubscriptionWithAddress];
           }
 
-          return Promise.all(
+          await Promise.all(
             Object.values(events).map((eventData) => {
               if (eventData == null) {
                 return;
@@ -60,7 +192,7 @@ export class Subscriber {
               });
             })
           );
-        })
+        }).concat(Object.values(scanners).map((item) => item.stop()))
     );
   }
 
@@ -173,7 +305,7 @@ export interface Stream<P, T = P> {
 
 class StreamImpl<P, T> implements Stream<P, T> {
   constructor(
-    readonly makeProducer: (onEvent: (event: P) => void, onEnd: () => void) => void,
+    readonly makeProducer: (onData: (event: P) => void, onEnd: () => void) => void,
     readonly stopProducer: () => void,
     readonly extractor: (event: P, handler: (item: T) => void) => void) {
   }
