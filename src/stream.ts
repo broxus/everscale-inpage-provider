@@ -73,7 +73,7 @@ class UnorderedTransactionsScanner {
             )
           ));
 
-          if (filteredTransactions == null) {
+          if (filteredTransactions.length == 0) {
             break;
           }
 
