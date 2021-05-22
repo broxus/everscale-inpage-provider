@@ -479,6 +479,29 @@ export class ProviderRpcClient {
     };
   }
 
+  /**
+   * Sends internal message from user account.
+   * Shows an approval window to the user.
+   *
+   * ---
+   * Required permissions: `accountInteraction`
+   */
+  public async sendMessage(args: ProviderApiRequestParams<'sendMessage'>): Promise<ProviderApiResponse<'sendMessage'>> {
+    const { transaction } = await this._api.sendMessage({
+      ...args,
+      sender: args.sender.toString(),
+      recipient: args.recipient.toString(),
+      payload: args.payload ? ({
+        abi: args.payload.abi,
+        method: args.payload.method,
+        params: serializeTokensObject(args.payload.params)
+      }) : undefined
+    });
+    return {
+      transaction: parseTransaction(transaction)
+    };
+  }
+
   private _getEventSubscriptions<T extends ProviderEvent>(
     eventName: T
   ): ({ [id: number]: (data: ProviderEventData<T>) => void }) {
