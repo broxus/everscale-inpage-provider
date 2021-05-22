@@ -15,8 +15,6 @@ import {
   ContractUpdatesSubscription,
   MergeInputObjectsArray,
   MergeOutputObjectsArray,
-  Transaction,
-  TransactionId,
   parsePermissions,
   parseTokensObject,
   parseTransaction,
@@ -442,12 +440,12 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `tonClient`
    */
-  public async getExpectedAddress(args: ProviderApiRequestParams<'getExpectedAddress'>): Promise<ProviderApiResponse<'getExpectedAddress'>> {
+  public async getExpectedAddress<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<Address> {
     const { address } = await this._api.getExpectedAddress({
-      ...args,
-      initParams: serializeTokensObject(args.initParams)
+      abi: JSON.stringify(abi),
+      ...args
     });
-    return { address: new Address(address) } as ProviderApiResponse<'getExpectedAddress'>;
+    return new Address(address);
   }
 
   /**
@@ -575,6 +573,29 @@ export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams
 type RawProviderApiMethods = {
   [P in ProviderMethod]: RawRpcMethod<P>
 }
+
+/**
+ * @category Provider
+ */
+export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D } ?
+  {
+    /**
+     * Base64 encoded TVC file
+     */
+    tvc: string,
+    /**
+     * Contract workchain. 0 by default
+     */
+    workchain?: number,
+    /**
+     * Public key, which will be injected into the contract. 0 by default
+     */
+    publicKey?: string;
+    /**
+     * State init params
+     */
+    initParams: MergeInputObjectsArray<D>;
+  } : never;
 
 function foldSubscriptions(
   subscriptions: Iterable<ContractUpdatesSubscription>,

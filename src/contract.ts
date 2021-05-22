@@ -128,6 +128,10 @@ export class Contract<Abi> {
     return this._address;
   }
 
+  public get abi(): string {
+    return this._abi;
+  }
+
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
       const result = await provider.rawApi.decodeTransaction({
