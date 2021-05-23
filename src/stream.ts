@@ -10,110 +10,13 @@ type SubscriptionsWithAddress = {
     subscription: Promise<Subscription<K>>
     handlers: {
       [id: number]: {
-        onData: (event: ProviderEventData<K>) => void,
-        onEnd: () => void
+        onData: (event: ProviderEventData<K>) => Promise<void>,
+        onEnd: () => void,
+        queue: PromiseQueue
       }
     }
   }
 };
-
-type UnorderedTransactionsScannerParams = {
-  address: Address;
-  onData: (data: ProviderEventData<'transactionsFound'>) => void;
-  onEnd: () => void;
-  fromLt?: string;
-  fromUtime?: number;
-};
-
-class UnorderedTransactionsScanner {
-  private readonly address: Address;
-  private readonly onData: (data: ProviderEventData<'transactionsFound'>) => void;
-  private readonly onEnd: () => void;
-  private readonly fromLt?: string;
-  private readonly fromUtime?: number;
-  private continuation?: TransactionId;
-  private promise?: Promise<void>;
-  private isRunning: boolean = false;
-
-  constructor(private readonly ton: ProviderRpcClient, {
-    address,
-    onData,
-    onEnd,
-    fromLt,
-    fromUtime
-  }: UnorderedTransactionsScannerParams) {
-    this.address = address;
-    this.onData = onData;
-    this.onEnd = onEnd;
-    this.fromLt = fromLt;
-    this.fromUtime = fromUtime;
-  }
-
-  public async start() {
-    if (this.isRunning || this.promise != null) {
-      return;
-    }
-
-    this.isRunning = true;
-    this.promise = (async () => {
-      while (this.isRunning) {
-        try {
-          const { transactions, continuation } = await this.ton.getTransactions({
-            address: this.address,
-            continuation: this.continuation
-          });
-
-          if (!this.isRunning || transactions.length == null) {
-            break;
-          }
-
-          const filteredTransactions = transactions.filter((item) => (
-            (this.fromLt == null || item.id.lt > this.fromLt) && (
-              (this.fromUtime == null || item.createdAt > this.fromUtime)
-            )
-          ));
-
-          if (filteredTransactions.length == 0) {
-            break;
-          }
-
-          const info = {
-            maxLt: filteredTransactions[0].id.lt,
-            minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
-            batchType: 'old'
-          } as TransactionsBatchInfo;
-
-          this.onData({
-            address: this.address,
-            transactions: filteredTransactions,
-            info
-          });
-
-          if (continuation != null) {
-            this.continuation = continuation;
-          } else {
-            break;
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      this.onEnd();
-      this.isRunning = false;
-      this.continuation = undefined;
-    })();
-  }
-
-  public async stop() {
-    this.isRunning = false;
-    if (this.promise != null) {
-      await this.promise;
-    } else {
-      this.onEnd();
-    }
-  }
-}
 
 /**
  * @category Stream
@@ -206,7 +109,7 @@ export class Subscriber {
       let eventData = subscriptions?.[event] as EventData | undefined;
       if (eventData == null) {
         const handlers = {
-          [id]: { onData, onEnd }
+          [id]: { onData, onEnd, queue: new PromiseQueue() }
         } as EventData['handlers'];
 
         eventData = {
@@ -214,22 +117,24 @@ export class Subscriber {
             address
           }).then((subscription: Subscription<T>) => {
             subscription.on('data', (data) => {
-              Object.values(handlers).forEach(({ onData }) => {
-                onData(data);
+              Object.values(handlers).forEach(({ onData, queue }) => {
+                queue.enqueue(() => onData(data));
               });
             });
             subscription.on('unsubscribed', () => {
-              Object.values(handlers).forEach(({ onEnd }) => {
+              Object.values(handlers).forEach(({ onEnd, queue }) => {
                 delete handlers[id];
-                onEnd();
+                queue.clear();
+                queue.enqueue(async () => onEnd());
               });
             });
             return subscription;
           }).catch((e: Error) => {
             console.error(e);
-            Object.values(handlers).forEach(({ onEnd }) => {
+            Object.values(handlers).forEach(({ onEnd, queue }) => {
               delete handlers[id];
-              onEnd();
+              queue.clear();
+              queue.enqueue(() => onEnd());
             });
             throw e;
           }),
@@ -245,7 +150,7 @@ export class Subscriber {
           subscriptions[event] = eventData;
         }
       } else {
-        eventData.handlers[id] = { onData, onEnd } as EventData['handlers'][number];
+        eventData.handlers[id] = { onData, onEnd, queue: new PromiseQueue() } as EventData['handlers'][number];
       }
     }, () => {
       const subscriptions = this.subscriptions[address.toString()] as SubscriptionsWithAddress | undefined;
@@ -273,15 +178,15 @@ export class Subscriber {
   }
 }
 
-function identity<P>(event: P, handler: (item: P) => void): void {
-  handler(event);
+async function identity<P>(event: P, handler: (item: P) => (Promise<void> | void)) {
+  await handler(event);
 }
 
 /**
  * @category Stream
  */
 export interface Stream<P, T = P> {
-  readonly makeProducer: (onData: (event: P) => void, onEnd: () => void) => void;
+  readonly makeProducer: (onData: (event: P) => Promise<void>, onEnd: () => void) => void;
   readonly stopProducer: () => void;
 
   first(): Promise<T>
@@ -290,30 +195,30 @@ export interface Stream<P, T = P> {
 
   merge(other: Stream<P, T>): Stream<P, T>;
 
-  map<U>(f: (item: T) => U): Stream<P, U>;
+  filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T>;
 
-  flatMap<U>(f: (item: T) => U[]): Stream<P, U>;
+  filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U>;
 
-  filter(f: (item: T) => boolean): Stream<P, T>;
+  map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U>;
 
-  filterMap<U>(f: (item: T) => (U | undefined)): Stream<P, U>;
+  flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U>;
 
   skip(n: number): Stream<P, T>;
 
-  skipWhile(f: (item: T) => boolean): Stream<P, T>;
+  skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T>;
 }
 
 class StreamImpl<P, T> implements Stream<P, T> {
   constructor(
-    readonly makeProducer: (onData: (event: P) => void, onEnd: () => void) => void,
+    readonly makeProducer: (onData: (event: P) => Promise<void>, onEnd: () => void) => void,
     readonly stopProducer: () => void,
-    readonly extractor: (event: P, handler: (item: T) => void) => void) {
+    readonly extractor: (event: P, handler: (item: T) => (Promise<void> | void)) => Promise<void>) {
   }
 
   public first(): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      this.makeProducer((event) => {
-        this.extractor(event, (item) => {
+    return new Promise<T>(async (resolve, reject) => {
+      this.makeProducer(async (event) => {
+        await this.extractor(event, (item) => {
           this.stopProducer();
           resolve(item);
         });
@@ -322,14 +227,14 @@ class StreamImpl<P, T> implements Stream<P, T> {
   }
 
   public on(handler: (item: T) => void): void {
-    this.makeProducer((event) => {
-      this.extractor(event, handler);
+    this.makeProducer(async (event) => {
+      await this.extractor(event, handler);
     }, () => {
     });
   }
 
   public merge(other: Stream<P, T>): Stream<P, T> {
-    return new StreamImpl<P, T>((onEvent, onEnd) => {
+    return new StreamImpl<P, T>(async (onEvent, onEnd) => {
       const state = {
         counter: 0
       };
@@ -347,40 +252,40 @@ class StreamImpl<P, T> implements Stream<P, T> {
     }, this.extractor) as Stream<P, T>;
   }
 
-  public filter(f: (item: T) => boolean): Stream<P, T> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
-      this.extractor(event, (item) => {
+  public filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
+      this.extractor(event, async (item) => {
         if (f(item)) {
-          handler(item);
+          await handler(item);
         }
-      });
-    });
+      })
+    );
   }
 
-  public filterMap<U>(f: (item: T) => (U | undefined)): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
-      this.extractor(event, (item) => {
-        const newItem = f(item);
+  public filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U> {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
+      this.extractor(event, async (item: T) => {
+        const newItem = await f(item);
         if (newItem !== undefined) {
-          handler(newItem);
+          await handler(newItem);
         }
-      });
-    });
+      })
+    );
   }
 
-  public map<U>(f: (item: T) => U): Stream<P, U> {
+  public map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U> {
     return this.filterMap(f);
   }
 
-  public flatMap<U>(f: (item: T) => U[]): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
-      this.extractor(event, (item) => {
-        const items = f(item);
+  public flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U> {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
+      this.extractor(event, async (item: T) => {
+        const items = await f(item);
         for (const newItem of items) {
-          handler(newItem);
+          await handler(newItem);
         }
-      });
-    });
+      })
+    );
   }
 
   public skip(n: number): Stream<P, T> {
@@ -388,29 +293,168 @@ class StreamImpl<P, T> implements Stream<P, T> {
       index: 0
     };
 
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
-      this.extractor(event, (item) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
+      this.extractor(event, async (item) => {
         if (state.index >= n) {
-          handler(item);
+          await handler(item);
         } else {
           ++state.index;
         }
-      });
-    });
+      })
+    );
   }
 
-  public skipWhile(f: (item: T) => boolean): Stream<P, T> {
+  public skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
     const state = {
       shouldSkip: true
     };
 
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) => {
-      this.extractor(event, (item) => {
+    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
+      this.extractor(event, async (item) => {
         if (!state.shouldSkip || !f(item)) {
           state.shouldSkip = false;
-          handler(item);
+          await handler(item);
         }
-      });
+      })
+    );
+  }
+}
+
+type UnorderedTransactionsScannerParams = {
+  address: Address;
+  onData: (data: ProviderEventData<'transactionsFound'>) => Promise<void>;
+  onEnd: () => void;
+  fromLt?: string;
+  fromUtime?: number;
+};
+
+class UnorderedTransactionsScanner {
+  private readonly address: Address;
+  private readonly onData: (data: ProviderEventData<'transactionsFound'>) => Promise<void>;
+  private readonly onEnd: () => void;
+  private readonly queue: PromiseQueue = new PromiseQueue();
+  private readonly fromLt?: string;
+  private readonly fromUtime?: number;
+  private continuation?: TransactionId;
+  private promise?: Promise<void>;
+  private isRunning: boolean = false;
+
+  constructor(private readonly ton: ProviderRpcClient, {
+    address,
+    onData,
+    onEnd,
+    fromLt,
+    fromUtime
+  }: UnorderedTransactionsScannerParams) {
+    this.address = address;
+    this.onData = onData;
+    this.onEnd = onEnd;
+    this.fromLt = fromLt;
+    this.fromUtime = fromUtime;
+  }
+
+  public async start() {
+    if (this.isRunning || this.promise != null) {
+      return;
+    }
+
+    this.isRunning = true;
+    this.promise = (async () => {
+      while (this.isRunning) {
+        try {
+          const { transactions, continuation } = await this.ton.getTransactions({
+            address: this.address,
+            continuation: this.continuation
+          });
+
+          if (!this.isRunning || transactions.length == null) {
+            break;
+          }
+
+          const filteredTransactions = transactions.filter((item) => (
+            (this.fromLt == null || item.id.lt > this.fromLt) && (
+              (this.fromUtime == null || item.createdAt > this.fromUtime)
+            )
+          ));
+
+          console.log('Got transactions', filteredTransactions);
+
+          if (filteredTransactions.length == 0) {
+            break;
+          }
+
+          const info = {
+            maxLt: filteredTransactions[0].id.lt,
+            minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
+            batchType: 'old'
+          } as TransactionsBatchInfo;
+
+          this.queue.enqueue(() => this.onData({
+            address: this.address,
+            transactions: filteredTransactions,
+            info
+          }));
+
+          if (continuation != null) {
+            this.continuation = continuation;
+          } else {
+            break;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      this.queue.enqueue(async () => this.onEnd());
+      this.isRunning = false;
+      this.continuation = undefined;
+    })();
+  }
+
+  public async stop() {
+    this.isRunning = false;
+    this.queue.clear();
+    if (this.promise != null) {
+      await this.promise;
+    } else {
+      this.onEnd();
+    }
+  }
+}
+
+class PromiseQueue {
+  private readonly queue: (() => Promise<void>)[] = [];
+  private workingOnPromise: boolean = false;
+
+  public enqueue(promise: () => Promise<void>) {
+    this.queue.push(promise);
+    this._dequeue().catch(() => {
     });
+  }
+
+  public clear() {
+    this.queue.length = 0;
+  }
+
+  private async _dequeue() {
+    if (this.workingOnPromise) {
+      return;
+    }
+
+    const item = this.queue.shift();
+    if (!item) {
+      return;
+    }
+
+    this.workingOnPromise = true;
+    item()
+      .then(() => {
+        this.workingOnPromise = false;
+        this._dequeue();
+      })
+      .catch(() => {
+        this.workingOnPromise = false;
+        this._dequeue();
+      });
   }
 }

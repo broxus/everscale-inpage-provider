@@ -443,7 +443,8 @@ export class ProviderRpcClient {
   public async getExpectedAddress<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<Address> {
     const { address } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
-      ...args
+      ...args,
+      initParams: serializeTokensObject(args.initParams)
     });
     return new Address(address);
   }
