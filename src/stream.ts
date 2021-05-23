@@ -311,7 +311,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
 
     return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
       this.extractor(event, async (item) => {
-        if (!state.shouldSkip || !f(item)) {
+        if (!state.shouldSkip || !(await f(item))) {
           state.shouldSkip = false;
           await handler(item);
         }
