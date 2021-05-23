@@ -255,7 +255,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
   public filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
     return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
       this.extractor(event, async (item) => {
-        if (f(item)) {
+        if (await f(item)) {
           await handler(item);
         }
       })
