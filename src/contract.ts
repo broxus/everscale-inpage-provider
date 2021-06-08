@@ -75,6 +75,20 @@ export class Contract<Abi> {
         return parseTransaction(transaction);
       }
 
+      async estimateFees(args: SendInternalParams): Promise<string> {
+        const { fees } = await provider.rawApi.estimateFees({
+          sender: args.from.toString(),
+          recipient: this.address.toString(),
+          amount: args.amount,
+          payload: {
+            abi: this.abi,
+            method: this.method,
+            params: this.params
+          }
+        });
+        return fees;
+      }
+
       async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
         let { transaction, output } = await provider.rawApi.sendExternalMessage({
           publicKey: args.publicKey,
@@ -247,36 +261,41 @@ export interface ContractMethod<I, O> {
   /**
    * Target contract address
    */
-  readonly address: Address
-  readonly abi: string
-  readonly method: string
-  readonly params: I
+  readonly address: Address;
+  readonly abi: string;
+  readonly method: string;
+  readonly params: I;
 
   /**
    * Sends internal message and returns wallet transactions
    *
    * @param args
    */
-  send(args: SendInternalParams): Promise<Transaction>
+  send(args: SendInternalParams): Promise<Transaction>;
+
+  /**
+   * Estimates wallet fee for calling this method as an internal message
+   */
+  estimateFees(args: SendInternalParams): Promise<string>;
 
   /**
    * Sends external message and returns contract transaction with parsed output
    *
    * @param args
    */
-  sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: O }>
+  sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: O }>;
 
   /**
    * Runs message locally
    */
-  call(args?: CallParams): Promise<O>
+  call(args?: CallParams): Promise<O>;
 }
 
 type ContractMethods<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>
+  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
 }
 
-type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] }
+type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] };
 
 export type SendInternalParams = {
   from: Address;
