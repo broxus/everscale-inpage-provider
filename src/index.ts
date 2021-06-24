@@ -479,6 +479,46 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Extracts public key from raw account state
+   *
+   * NOTE: can only be used on contracts which are deployed and has `pubkey` header
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async extractPublicKey(boc: string): Promise<string> {
+    const { publicKey } = await this._api.extractPublicKey({
+      boc
+    });
+    return publicKey;
+  }
+
+  /**
+   * Converts base64 encoded contract code into tvc with default init data
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async codeToTvc(code: string): Promise<string> {
+    const { tvc } = await this._api.codeToTvc({
+      code
+    });
+    return tvc;
+  }
+
+  /**
+   * Splits base64 encoded state init into code and data
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async splitTvc(tvc: string): Promise<ProviderApiResponse<'splitTvc'>> {
+    return await this._api.splitTvc({
+      tvc
+    });
+  }
+
+  /**
    * Sends internal message from user account.
    * Shows an approval window to the user.
    *

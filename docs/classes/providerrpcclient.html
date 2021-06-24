@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ProviderRpcClient | ton-inpage-provider - v0.1.16</title>
-	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.16">
+	<title>ProviderRpcClient | ton-inpage-provider - v0.1.17</title>
+	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.17">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 	<script async src="../assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">ton-inpage-provider - v0.1.16</a>
+					<a href="../index.html" class="title">ton-inpage-provider - v0.1.17</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -52,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../index.html">ton-inpage-provider - v0.1.16</a>
+					<a href="../index.html">ton-inpage-provider - v0.1.17</a>
 				</li>
 				<li>
 					<a href="providerrpcclient.html">ProviderRpcClient</a>
@@ -94,10 +94,12 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#codetotvc" class="tsd-kind-icon">code<wbr>ToTvc</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="providerrpcclient.html#createcontract" class="tsd-kind-icon">create<wbr>Contract</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#createsubscriber" class="tsd-kind-icon">create<wbr>Subscriber</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#disconnect" class="tsd-kind-icon">disconnect</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#ensureinitialized" class="tsd-kind-icon">ensure<wbr>Initialized</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#extractpublickey" class="tsd-kind-icon">extract<wbr>Public<wbr>Key</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="providerrpcclient.html#getexpectedaddress" class="tsd-kind-icon">get<wbr>Expected<wbr>Address</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#getfullcontractstate" class="tsd-kind-icon">get<wbr>Full<wbr>Contract<wbr>State</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#getproviderstate" class="tsd-kind-icon">get<wbr>Provider<wbr>State</a></li>
@@ -106,6 +108,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="providerrpcclient.html#packintocell" class="tsd-kind-icon">pack<wbr>Into<wbr>Cell</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#requestpermissions" class="tsd-kind-icon">request<wbr>Permissions</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#sendmessage" class="tsd-kind-icon">send<wbr>Message</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#splittvc" class="tsd-kind-icon">split<wbr>Tvc</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="providerrpcclient.html#subscribe" class="tsd-kind-icon">subscribe</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="providerrpcclient.html#unpackfromcell" class="tsd-kind-icon">unpack<wbr>From<wbr>Cell</a></li>
 							</ul>
@@ -204,6 +207,36 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="codetotvc" class="tsd-anchor"></a>
+					<h3>code<wbr>ToTvc</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">code<wbr>ToTvc<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/index.ts:502</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Converts base64 encoded contract code into tvc with default init data</p>
+								</div>
+								<hr>
+								<p>Required permissions: <code>tonClient</code></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>code: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 					<a name="createcontract" class="tsd-anchor"></a>
 					<h3>create<wbr>Contract</h3>
@@ -315,6 +348,37 @@
 								</dl>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="extractpublickey" class="tsd-anchor"></a>
+					<h3>extract<wbr>Public<wbr>Key</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">extract<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/index.ts:489</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Extracts public key from raw account state</p>
+								</div>
+								<p>NOTE: can only be used on contracts which are deployed and has <code>pubkey</code> header</p>
+								<hr>
+								<p>Required permissions: <code>tonClient</code></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>boc: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -590,7 +654,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in src/index.ts:488</li>
+									<li>Defined in src/index.ts:528</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -651,6 +715,36 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>transaction<span class="tsd-signature-symbol">: </span><a href="../index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><a href="address.html" class="tsd-signature-type" data-tsd-kind="Class">Address</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="splittvc" class="tsd-anchor"></a>
+					<h3>split<wbr>Tvc</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">split<wbr>Tvc<span class="tsd-signature-symbol">(</span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/index.ts:515</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Splits base64 encoded state init into code and data</p>
+								</div>
+								<hr>
+								<p>Required permissions: <code>tonClient</code></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tvc: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -876,6 +970,9 @@
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="providerrpcclient.html#rawapi" class="tsd-kind-icon">raw<wbr>Api</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="providerrpcclient.html#codetotvc" class="tsd-kind-icon">code<wbr>ToTvc</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="providerrpcclient.html#createcontract" class="tsd-kind-icon">create<wbr>Contract</a>
 							</li>
@@ -887,6 +984,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="providerrpcclient.html#ensureinitialized" class="tsd-kind-icon">ensure<wbr>Initialized</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="providerrpcclient.html#extractpublickey" class="tsd-kind-icon">extract<wbr>Public<wbr>Key</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="providerrpcclient.html#getexpectedaddress" class="tsd-kind-icon">get<wbr>Expected<wbr>Address</a>
@@ -911,6 +1011,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="providerrpcclient.html#sendmessage" class="tsd-kind-icon">send<wbr>Message</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="providerrpcclient.html#splittvc" class="tsd-kind-icon">split<wbr>Tvc</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="providerrpcclient.html#subscribe" class="tsd-kind-icon">subscribe</a>
