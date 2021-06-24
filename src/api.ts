@@ -390,6 +390,77 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Extracts public key from raw account state
+   *
+   * NOTE: can only be used on contracts which are deployed and has `pubkey` header
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  extractPublicKey: {
+    input: {
+      /**
+       * Base64 encoded account state
+       *
+       * @see FullContractState
+       */
+      boc: string;
+    };
+    output: {
+      /**
+       * Hex encoded public key
+       */
+      publicKey: string;
+    };
+  }
+
+  /**
+   * Converts base64 encoded contract code into tvc with default init data
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  codeToTvc: {
+    input: {
+      /**
+       * Base64 encoded contract code
+       */
+      code: string;
+    };
+    output: {
+      /**
+       * Base64 encoded state init
+       */
+      tvc: string;
+    };
+  }
+
+  /**
+   * Splits base64 encoded state init into code and data
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  splitTvc: {
+    input: {
+      /**
+       * Base64 encoded state init
+       */
+      tvc: string;
+    };
+    output: {
+      /**
+       * Base64 encoded init data
+       */
+      data: string;
+      /**
+       * Base64 encoded contract code
+       */
+      code: string;
+    };
+  }
+
+  /**
    * Creates internal message body
    *
    * ---
