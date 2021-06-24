@@ -452,11 +452,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded init data
        */
-      data: string;
+      data: string | undefined;
       /**
        * Base64 encoded contract code
        */
-      code: string;
+      code: string | undefined;
     };
   }
 
