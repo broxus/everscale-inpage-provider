@@ -286,6 +286,7 @@ type AbiParamKindBool = 'bool';
 type AbiParamKindCell = 'cell';
 type AbiParamKindAddress = 'address';
 type AbiParamKindBytes = 'bytes';
+type AbiParamKindString = 'string';
 type AbiParamKindGram = 'gram';
 type AbiParamKindTime = 'time';
 type AbiParamKindExpire = 'expire';
@@ -305,6 +306,7 @@ export type AbiParamKind =
   | AbiParamKindCell
   | AbiParamKindAddress
   | AbiParamKindBytes
+  | AbiParamKindString
   | AbiParamKindGram
   | AbiParamKindTime
   | AbiParamKindExpire
@@ -429,22 +431,22 @@ export type HeadersObject = {
 type InputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
     : T extends AbiParamKindBool ? boolean
-    : T extends AbiParamKindCell | AbiParamKindBytes | AbiParamKindPublicKey ? string
-      : T extends AbiParamKindAddress ? Address
-        : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
-          : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
-            : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
-              : never;
+      : T extends AbiParamKindCell | AbiParamKindBytes | AbiParamKindString | AbiParamKindPublicKey ? string
+        : T extends AbiParamKindAddress ? Address
+          : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
+            : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
+              : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
+                : never;
 
 type OutputTokenValue<T, C> =
-  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindPublicKey ? string
+  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindString | AbiParamKindPublicKey ? string
     : T extends AbiParamKindExpire ? number
-    : T extends AbiParamKindBool ? boolean
-      : T extends AbiParamKindAddress ? Address
-        : T extends AbiParamKindTuple ? MergeOutputObjectsArray<C>
-          : T extends `${infer K}[]` ? OutputTokenValue<K, C>[]
-            : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
-              : never;
+      : T extends AbiParamKindBool ? boolean
+        : T extends AbiParamKindAddress ? Address
+          : T extends AbiParamKindTuple ? MergeOutputObjectsArray<C>
+            : T extends `${infer K}[]` ? OutputTokenValue<K, C>[]
+              : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
+                : never;
 
 /**
  * @category Models
