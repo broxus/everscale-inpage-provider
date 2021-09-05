@@ -767,6 +767,11 @@ export type ProviderApi<Addr = Address> = {
        * Function call
        */
       payload: FunctionCall<Addr>;
+      /**
+       * Whether to only run it locally (false by default)
+       * Can be used as alternative `runLocal` method but with user signature
+       */
+      local?: boolean
     };
     output: {
       /**
