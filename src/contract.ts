@@ -98,7 +98,8 @@ export class Contract<Abi> {
             abi: this.abi,
             method: this.method,
             params: this.params
-          }
+          },
+          local: args.local
         });
 
         return {
@@ -309,6 +310,7 @@ export type SendInternalParams = {
 export type SendExternalParams = {
   publicKey: string;
   stateInit?: string;
+  local?: boolean;
 };
 
 export type CallParams = {

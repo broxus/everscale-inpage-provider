@@ -424,13 +424,14 @@ export class ProviderRpcClient {
    * Required permissions: `tonClient`
    */
   public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
-    const { transactions, continuation } = await this._api.getTransactions({
+    const { transactions, continuation, info } = await this._api.getTransactions({
       ...args,
       address: args.address.toString()
     });
     return {
       transactions: transactions.map(parseTransaction),
-      continuation
+      continuation,
+      info
     } as ProviderApiResponse<'getTransactions'>;
   }
 

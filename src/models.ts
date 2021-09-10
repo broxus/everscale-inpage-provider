@@ -73,6 +73,7 @@ export type Transaction<Addr = Address> = {
   prevTransactionId?: TransactionId;
   createdAt: number;
   aborted: boolean;
+  exitCode?: number;
   origStatus: AccountStatus;
   endStatus: AccountStatus;
   totalFees: string;

@@ -191,7 +191,7 @@ export interface Stream<P, T = P> {
 
   first(): Promise<T>
 
-  on(handler: (item: T) => void): void
+  on(handler: (item: T) => (Promise<void> | void)): void
 
   merge(other: Stream<P, T>): Stream<P, T>;
 
@@ -226,7 +226,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
     });
   }
 
-  public on(handler: (item: T) => void): void {
+  public on(handler: (item: T) => (Promise<void> | void)): void {
     this.makeProducer(async (event) => {
       await this.extractor(event, handler);
     }, () => {
@@ -376,8 +376,6 @@ class UnorderedTransactionsScanner {
               (this.fromUtime == null || item.createdAt > this.fromUtime)
             )
           ));
-
-          console.log('Got transactions', filteredTransactions);
 
           if (filteredTransactions.length == 0) {
             break;

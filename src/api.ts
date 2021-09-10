@@ -262,6 +262,10 @@ export type ProviderApi<Addr = Address> = {
        * Previous transaction id of the last transaction in result. Can be used to continue transactions batch
        */
       continuation: TransactionId | undefined;
+      /**
+       * Describes transactions lt rage (none if empty `transactions` array)
+       */
+      info?: TransactionsBatchInfo;
     };
   };
 
