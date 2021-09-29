@@ -94,7 +94,7 @@ export function serializeTransaction(transaction: Transaction): RawTransaction {
   return {
     ...transaction,
     inMessage: serializeMessage(transaction.inMessage),
-    outMessages: transaction.outMessages.map(serializeMessage)
+    outMessages: transaction.outMessages.map(serializeMessage),
   };
 }
 
@@ -105,7 +105,7 @@ export function parseTransaction(transaction: RawTransaction): Transaction {
   return {
     ...transaction,
     inMessage: parseMessage(transaction.inMessage),
-    outMessages: transaction.outMessages.map(parseMessage)
+    outMessages: transaction.outMessages.map(parseMessage),
   };
 }
 
@@ -134,7 +134,7 @@ export function serializeMessage(message: Message): RawMessage {
   return {
     ...message,
     src: message.src ? message.src.toString() : undefined,
-    dst: message.dst ? message.dst.toString() : undefined
+    dst: message.dst ? message.dst.toString() : undefined,
   };
 }
 
@@ -145,7 +145,7 @@ export function parseMessage(message: RawMessage): Message {
   return {
     ...message,
     src: message.src ? new Address(message.src) : undefined,
-    dst: message.dst ? new Address(message.dst) : undefined
+    dst: message.dst ? new Address(message.dst) : undefined,
   };
 }
 
@@ -196,7 +196,7 @@ export type RawPermissions = Permissions<string>;
 export function parsePermissions(permissions: Partial<RawPermissions>): Partial<Permissions> {
   return {
     ...permissions,
-    accountInteraction: permissions.accountInteraction ? parseAccountInteraction(permissions.accountInteraction) : undefined
+    accountInteraction: permissions.accountInteraction ? parseAccountInteraction(permissions.accountInteraction) : undefined,
   };
 }
 
@@ -206,7 +206,7 @@ export function parsePermissions(permissions: Partial<RawPermissions>): Partial<
 export function parseAccountInteraction(accountInteraction: Required<RawPermissions>['accountInteraction']): Required<Permissions>['accountInteraction'] {
   return {
     ...accountInteraction,
-    address: new Address(accountInteraction.address)
+    address: new Address(accountInteraction.address),
   };
 }
 
@@ -219,6 +219,23 @@ export type Permission = keyof Permissions;
  * @category Models
  */
 export type PermissionData<T extends Permission, Addr = Address> = Permissions<Addr>[T];
+
+/* Assets stuff */
+
+/**
+ * @category Models
+ */
+export enum AssetType {
+  Tip3Token,
+}
+
+/**
+ * @category Models
+ */
+export type AssetTypeParams<T extends AssetType> =
+  T extends AssetType.Tip3Token ? {
+    rootContract: Address,
+  } : never;
 
 /* ABI stuff */
 
@@ -411,10 +428,10 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
     for (const [key, value] of token as unknown as TokenValueMap<string>) {
       result.push([parseTokenValue({
         name: '',
-        type: keyType as AbiParamKind
+        type: keyType as AbiParamKind,
       }, key), parseTokenValue({
         name: '',
-        type: valueType as AbiParamKind
+        type: valueType as AbiParamKind,
       }, value)]);
     }
     return result;

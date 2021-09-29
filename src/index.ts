@@ -7,7 +7,7 @@ import {
   RawProviderRequest,
   RawProviderApiRequestParams,
   RawProviderApiResponse,
-  ProviderApiRequestParams
+  ProviderApiRequestParams,
 } from './api';
 
 import {
@@ -15,16 +15,19 @@ import {
   ContractUpdatesSubscription,
   MergeInputObjectsArray,
   MergeOutputObjectsArray,
+  ReadonlyAbiParam,
+  AssetType,
+  AssetTypeParams,
   parsePermissions,
   parseTokensObject,
   parseTransaction,
-  serializeTokensObject, ReadonlyAbiParam
+  serializeTokensObject,
 } from './models';
 
 import {
   Address,
   AddressLiteral,
-  getUniqueId
+  getUniqueId,
 } from './utils';
 
 import { Subscriber } from './stream';
@@ -41,19 +44,19 @@ export { Address, AddressLiteral, mergeTransactions } from './utils';
  * @category Provider
  */
 export interface Provider {
-  request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>
+  request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>;
 
-  addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 
-  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 
-  on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 
-  once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 
-  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 
-  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void
+  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 }
 
 let ensurePageLoaded: Promise<void>;
@@ -89,8 +92,8 @@ export class ProviderRpcClient {
     this._api = new Proxy({}, {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
-        method: K
-      ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! })
+        method: K,
+      ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! }),
     }) as unknown as RawProviderApiMethods;
 
     this._ton = (window as any).ton;
@@ -125,17 +128,17 @@ export class ProviderRpcClient {
         'transactionsFound': (data) => ({
           address: new Address(data.address),
           transactions: data.transactions.map(parseTransaction),
-          info: data.info
+          info: data.info,
         }),
         'contractStateChanged': (data) => ({
           address: new Address(data.address),
-          state: data.state
+          state: data.state,
         }),
         'networkChanged': data => data,
         'permissionsChanged': (data) => ({
-          permissions: parsePermissions(data.permissions)
+          permissions: parsePermissions(data.permissions),
         }),
-        'loggedOut': data => data
+        'loggedOut': data => data,
       };
 
       for (const [eventName, extractor] of Object.entries(knownEvents)) {
@@ -217,7 +220,7 @@ export class ProviderRpcClient {
    */
   public async requestPermissions(args: ProviderApiRequestParams<'requestPermissions'>): Promise<ProviderApiResponse<'requestPermissions'>> {
     const result = await this._api.requestPermissions({
-      permissions: args.permissions
+      permissions: args.permissions,
     });
     return parsePermissions(result);
   }
@@ -266,7 +269,7 @@ export class ProviderRpcClient {
       private readonly _listeners: { [K in SubscriptionEvent]: ((data?: any) => void)[] } = {
         ['data']: [],
         ['subscribed']: [],
-        ['unsubscribed']: []
+        ['unsubscribed']: [],
       };
 
       constructor(
@@ -347,12 +350,12 @@ export class ProviderRpcClient {
 
           contractSubscriptions[id] = {
             state: eventName == 'contractStateChanged',
-            transactions: eventName == 'transactionsFound'
+            transactions: eventName == 'transactionsFound',
           };
 
           const {
             total,
-            withoutExcluded
+            withoutExcluded,
           } = foldSubscriptions(Object.values(contractSubscriptions), contractSubscriptions[id]);
 
           try {
@@ -401,7 +404,7 @@ export class ProviderRpcClient {
     const state = await this._api.getProviderState();
     return {
       ...state,
-      permissions: parsePermissions(state.permissions)
+      permissions: parsePermissions(state.permissions),
     } as ProviderApiResponse<'getProviderState'>;
   }
 
@@ -413,7 +416,7 @@ export class ProviderRpcClient {
    */
   public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
     return await this._api.getFullContractState({
-      address: args.address.toString()
+      address: args.address.toString(),
     }) as ProviderApiResponse<'getFullContractState'>;
   }
 
@@ -426,12 +429,12 @@ export class ProviderRpcClient {
   public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
     const { transactions, continuation, info } = await this._api.getTransactions({
       ...args,
-      address: args.address.toString()
+      address: args.address.toString(),
     });
     return {
       transactions: transactions.map(parseTransaction),
       continuation,
-      info
+      info,
     } as ProviderApiResponse<'getTransactions'>;
   }
 
@@ -445,7 +448,7 @@ export class ProviderRpcClient {
     const { address } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
       ...args,
-      initParams: serializeTokensObject(args.initParams)
+      initParams: serializeTokensObject(args.initParams),
     });
     return new Address(address);
   }
@@ -459,7 +462,7 @@ export class ProviderRpcClient {
   public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, data: MergeInputObjectsArray<P> }): Promise<ProviderApiResponse<'packIntoCell'>> {
     return await this._api.packIntoCell({
       structure: args.structure as unknown as AbiParam[],
-      data: serializeTokensObject(args.data)
+      data: serializeTokensObject(args.data),
     }) as ProviderApiResponse<'packIntoCell'>;
   }
 
@@ -472,10 +475,10 @@ export class ProviderRpcClient {
   public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, boc: string, allowPartial: boolean }): Promise<{ data: MergeOutputObjectsArray<P> }> {
     const { data } = await this._api.unpackFromCell({
       ...args,
-      structure: args.structure as unknown as AbiParam[]
+      structure: args.structure as unknown as AbiParam[],
     });
     return {
-      data: parseTokensObject(args.structure as unknown as AbiParam[], data) as MergeOutputObjectsArray<P>
+      data: parseTokensObject(args.structure as unknown as AbiParam[], data) as MergeOutputObjectsArray<P>,
     };
   }
 
@@ -489,7 +492,7 @@ export class ProviderRpcClient {
    */
   public async extractPublicKey(boc: string): Promise<string> {
     const { publicKey } = await this._api.extractPublicKey({
-      boc
+      boc,
     });
     return publicKey;
   }
@@ -502,7 +505,7 @@ export class ProviderRpcClient {
    */
   public async codeToTvc(code: string): Promise<string> {
     const { tvc } = await this._api.codeToTvc({
-      code
+      code,
     });
     return tvc;
   }
@@ -515,8 +518,32 @@ export class ProviderRpcClient {
    */
   public async splitTvc(tvc: string): Promise<ProviderApiResponse<'splitTvc'>> {
     return await this._api.splitTvc({
-      tvc
+      tvc,
     });
+  }
+
+  /**
+   * Adds asset to the selected account
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async addAsset<T extends AssetType>(args: AddAssetParams<T>): Promise<ProviderApiResponse<'addAsset'>> {
+    return await this._api.addAsset({
+      account: args.account.toString(),
+      type: args.type,
+      params: args.params,
+    });
+  }
+
+  /**
+   * Signs arbitrary data
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async signData(args: ProviderApiRequestParams<'signData'>): Promise<ProviderApiResponse<'signData'>> {
+    return await this._api.signData(args);
   }
 
   /**
@@ -534,16 +561,16 @@ export class ProviderRpcClient {
       payload: args.payload ? ({
         abi: args.payload.abi,
         method: args.payload.method,
-        params: serializeTokensObject(args.payload.params)
-      }) : undefined
+        params: serializeTokensObject(args.payload.params),
+      }) : undefined,
     });
     return {
-      transaction: parseTransaction(transaction)
+      transaction: parseTransaction(transaction),
     };
   }
 
   private _getEventSubscriptions<T extends ProviderEvent>(
-    eventName: T
+    eventName: T,
   ): ({ [id: number]: (data: ProviderEventData<T>) => void }) {
     let existingSubscriptions = this._subscriptions[eventName];
     if (existingSubscriptions == null) {
@@ -591,7 +618,7 @@ export interface Subscription<T extends ProviderEvent> {
   /**
    * Unsubscribes the subscription.
    */
-  unsubscribe(): Promise<void>
+  unsubscribe(): Promise<void>;
 }
 
 type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
@@ -639,9 +666,28 @@ export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D } ?
     initParams: MergeInputObjectsArray<D>;
   } : never;
 
+/**
+ * @category Provider
+ */
+export type AddAssetParams<T extends AssetType> = {
+  /**
+   * Owner's TON wallet address.
+   * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+   */
+  account: Address,
+  /**
+   * Which asset to add
+   */
+  type: T,
+  /**
+   * Asset parameters
+   */
+  params: AssetTypeParams<T>,
+};
+
 function foldSubscriptions(
   subscriptions: Iterable<ContractUpdatesSubscription>,
-  except: ContractUpdatesSubscription
+  except: ContractUpdatesSubscription,
 ): { total: ContractUpdatesSubscription, withoutExcluded: ContractUpdatesSubscription } {
   const total = { state: false, transactions: false };
   const withoutExcluded = Object.assign({}, total);

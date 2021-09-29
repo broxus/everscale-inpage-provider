@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ton-inpage-provider - v0.1.21</title>
-	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.21">
+	<title>ton-inpage-provider - v0.1.22</title>
+	<meta name="description" content="Documentation for ton-inpage-provider - v0.1.22">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script async src="assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">ton-inpage-provider - v0.1.21</a>
+					<a href="index.html" class="title">ton-inpage-provider - v0.1.22</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -50,7 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<h1>ton-inpage-provider - v0.1.21</h1>
+			<h1>ton-inpage-provider - v0.1.22</h1>
 		</div>
 	</div>
 </header>
@@ -68,6 +68,7 @@
 								<li class="tsd-kind-class"><a href="classes/providerrpcclient.html" class="tsd-kind-icon">Provider<wbr>Rpc<wbr>Client</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/provider.html" class="tsd-kind-icon">Provider</a></li>
 								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/subscription.html" class="tsd-kind-icon">Subscription</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#addassetparams" class="tsd-kind-icon">Add<wbr>Asset<wbr>Params</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#getexpectedaddressparams" class="tsd-kind-icon">Get<wbr>Expected<wbr>Address<wbr>Params</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#rawrpcmethod" class="tsd-kind-icon">Raw<wbr>Rpc<wbr>Method</a></li>
 								<li class="tsd-kind-variable"><a href="index.html#default" class="tsd-kind-icon">default</a></li>
@@ -92,6 +93,7 @@
 						<section class="tsd-index-section">
 							<h3>Models</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-enum"><a href="enums/assettype.html" class="tsd-kind-icon">Asset<wbr>Type</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/contractstate.html" class="tsd-kind-icon">Contract<wbr>State</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/fullcontractstate.html" class="tsd-kind-icon">Full<wbr>Contract<wbr>State</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#abieventname" class="tsd-kind-icon">Abi<wbr>Event<wbr>Name</a></li>
@@ -100,6 +102,7 @@
 								<li class="tsd-kind-type-alias"><a href="index.html#abiparam" class="tsd-kind-icon">Abi<wbr>Param</a></li>
 								<li class="tsd-kind-type-alias"><a href="index.html#abiparamkind" class="tsd-kind-icon">Abi<wbr>Param<wbr>Kind</a></li>
 								<li class="tsd-kind-type-alias"><a href="index.html#accountstatus" class="tsd-kind-icon">Account<wbr>Status</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#assettypeparams" class="tsd-kind-icon">Asset<wbr>Type<wbr>Params</a></li>
 								<li class="tsd-kind-type-alias"><a href="index.html#contractupdatessubscription" class="tsd-kind-icon">Contract<wbr>Updates<wbr>Subscription</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#decodedabieventdata" class="tsd-kind-icon">Decoded<wbr>Abi<wbr>Event<wbr>Data</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="index.html#decodedabifunctioninputs" class="tsd-kind-icon">Decoded<wbr>Abi<wbr>Function<wbr>Inputs</a></li>
@@ -175,12 +178,58 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Provider</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="addassetparams" class="tsd-anchor"></a>
+					<h3>Add<wbr>Asset<wbr>Params</h3>
+					<div class="tsd-signature tsd-kind-icon">Add<wbr>Asset<wbr>Params&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>account<span class="tsd-signature-symbol">: </span><a href="classes/address.html" class="tsd-signature-type" data-tsd-kind="Class">Address</a><span class="tsd-signature-symbol">; </span>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/index.ts#L672">src/index.ts:672</a></li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a></h4>
+						</li>
+					</ul>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>account<span class="tsd-signature-symbol">: </span><a href="classes/address.html" class="tsd-signature-type" data-tsd-kind="Class">Address</a></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Owner&#39;s TON wallet address.
+										It is the same address as the <code>accountInteraction.address</code>, but it must be explicitly provided</p>
+									</div>
+								</div>
+							</li>
+							<li class="tsd-parameter">
+								<h5>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Asset parameters</p>
+									</div>
+								</div>
+							</li>
+							<li class="tsd-parameter">
+								<h5>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Which asset to add</p>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
 					<a name="getexpectedaddressparams" class="tsd-anchor"></a>
 					<h3>Get<wbr>Expected<wbr>Address<wbr>Params</h3>
 					<div class="tsd-signature tsd-kind-icon">Get<wbr>Expected<wbr>Address<wbr>Params&lt;Abi&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Abi</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> D<span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{ </span>initParams<span class="tsd-signature-symbol">: </span><a href="index.html#mergeinputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeInputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">D</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>workchain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/index.ts#L622">src/index.ts:622</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/index.ts#L649">src/index.ts:649</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -196,7 +245,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Rpc<wbr>Method&lt;P&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#rawproviderapirequestparams" class="tsd-signature-type" data-tsd-kind="Type alias">RawProviderApiRequestParams</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><a href="index.html#rawproviderapirequestparams" class="tsd-signature-type" data-tsd-kind="Type alias">RawProviderApiRequestParams</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#rawproviderapiresponse" class="tsd-signature-type" data-tsd-kind="Type alias">RawProviderApiResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#rawproviderapiresponse" class="tsd-signature-type" data-tsd-kind="Type alias">RawProviderApiResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/index.ts#L611">src/index.ts:611</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/index.ts#L638">src/index.ts:638</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -212,7 +261,7 @@
 					<div class="tsd-signature tsd-kind-icon">default<span class="tsd-signature-symbol">:</span> <a href="classes/providerrpcclient.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderRpcClient</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/index.ts#L665">src/index.ts:665</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/index.ts#L711">src/index.ts:711</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -226,7 +275,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/index.ts#L73">src/index.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/index.ts#L76">src/index.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -242,7 +291,7 @@
 					<div class="tsd-signature tsd-kind-icon">Abi<wbr>Event<wbr>Name&lt;C&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AbiEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;name&quot;</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L491">src/models.ts:491</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L508">src/models.ts:508</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -258,7 +307,7 @@
 					<div class="tsd-signature tsd-kind-icon">Abi<wbr>Function<wbr>Inputs&lt;C, T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#mergeinputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeInputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PickFunction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;inputs&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L499">src/models.ts:499</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L516">src/models.ts:516</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -277,7 +326,7 @@
 					<div class="tsd-signature tsd-kind-icon">Abi<wbr>Function<wbr>Name&lt;C&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AbiFunction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;name&quot;</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L487">src/models.ts:487</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L504">src/models.ts:504</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -293,7 +342,7 @@
 					<div class="tsd-signature tsd-kind-icon">Abi<wbr>Param<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>components<span class="tsd-signature-symbol">?: </span><a href="index.html#abiparam" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="index.html#abiparamkind" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParamKind</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindMap</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindArray</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L320">src/models.ts:320</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L337">src/models.ts:337</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -317,7 +366,7 @@
 					<div class="tsd-signature tsd-kind-icon">Abi<wbr>Param<wbr>Kind<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AbiParamKindUint</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindInt</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindTuple</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindBool</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindCell</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindAddress</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindBytes</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindString</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindGram</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindTime</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindExpire</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindPublicKey</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L303">src/models.ts:303</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L320">src/models.ts:320</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -327,9 +376,25 @@
 					<div class="tsd-signature tsd-kind-icon">Account<wbr>Status<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;uninit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;frozen&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;active&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;nonexist&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L155">src/models.ts:155</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L155">src/models.ts:155</a></li>
 						</ul>
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="assettypeparams" class="tsd-anchor"></a>
+					<h3>Asset<wbr>Type<wbr>Params</h3>
+					<div class="tsd-signature tsd-kind-icon">Asset<wbr>Type<wbr>Params&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><a href="enums/assettype.html#tip3token" class="tsd-signature-type" data-tsd-kind="Enumeration member">Tip3Token</a><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{ </span>rootContract<span class="tsd-signature-symbol">: </span><a href="classes/address.html" class="tsd-signature-type" data-tsd-kind="Class">Address</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L235">src/models.ts:235</a></li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a></h4>
+						</li>
+					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias">
 					<a name="contractupdatessubscription" class="tsd-anchor"></a>
@@ -337,7 +402,7 @@
 					<div class="tsd-signature tsd-kind-icon">Contract<wbr>Updates<wbr>Subscription<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>state<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>transactions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L44">src/models.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L44">src/models.ts:44</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -368,7 +433,7 @@
 					<div class="tsd-signature tsd-kind-icon">Decoded<wbr>Abi<wbr>Event<wbr>Data&lt;C, T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#mergeoutputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeOutputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PickEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;inputs&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L512">src/models.ts:512</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L529">src/models.ts:529</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -387,7 +452,7 @@
 					<div class="tsd-signature tsd-kind-icon">Decoded<wbr>Abi<wbr>Function<wbr>Inputs&lt;C, T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#mergeoutputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeOutputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PickFunction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;inputs&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L504">src/models.ts:504</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L521">src/models.ts:521</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -406,7 +471,7 @@
 					<div class="tsd-signature tsd-kind-icon">Decoded<wbr>Abi<wbr>Function<wbr>Outputs&lt;C, T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#mergeoutputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeOutputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PickFunction</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;outputs&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L508">src/models.ts:508</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L525">src/models.ts:525</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -425,7 +490,7 @@
 					<div class="tsd-signature tsd-kind-icon">Function<wbr>Call&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>params<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L264">src/models.ts:264</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L281">src/models.ts:281</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -470,7 +535,7 @@
 					<div class="tsd-signature tsd-kind-icon">Gen<wbr>Timings<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>genLt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>genUtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L25">src/models.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L25">src/models.ts:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -491,7 +556,7 @@
 					<div class="tsd-signature tsd-kind-icon">Headers<wbr>Object<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>expire<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>pubkey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>time<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L427">src/models.ts:427</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L444">src/models.ts:444</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -515,7 +580,7 @@
 					<div class="tsd-signature tsd-kind-icon">Input<wbr>Token<wbr>Object&lt;O&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">O</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{ </span>components<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">infer </span> C<span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> K<span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InputTokenValue</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L456">src/models.ts:456</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L473">src/models.ts:473</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -531,7 +596,7 @@
 					<div class="tsd-signature tsd-kind-icon">Last<wbr>Transaction<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>hash<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>isExact<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>lt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L160">src/models.ts:160</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L160">src/models.ts:160</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -555,7 +620,7 @@
 					<div class="tsd-signature tsd-kind-icon">Merge<wbr>Input<wbr>Objects<wbr>Array&lt;A&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">...</span><span class="tsd-signature-symbol">infer </span> Ts<span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><a href="index.html#inputtokenobject" class="tsd-signature-type" data-tsd-kind="Type alias">InputTokenObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><a href="index.html#mergeinputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeInputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">...</span><span class="tsd-signature-type">Ts</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><a href="index.html#inputtokenobject" class="tsd-signature-type" data-tsd-kind="Type alias">InputTokenObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L468">src/models.ts:468</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L485">src/models.ts:485</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -571,7 +636,7 @@
 					<div class="tsd-signature tsd-kind-icon">Merge<wbr>Output<wbr>Objects<wbr>Array&lt;A&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">...</span><span class="tsd-signature-symbol">infer </span> Ts<span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><a href="index.html#outputtokenobject" class="tsd-signature-type" data-tsd-kind="Type alias">OutputTokenObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><a href="index.html#mergeoutputobjectsarray" class="tsd-signature-type" data-tsd-kind="Type alias">MergeOutputObjectsArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">...</span><span class="tsd-signature-type">Ts</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><a href="index.html#outputtokenobject" class="tsd-signature-type" data-tsd-kind="Type alias">OutputTokenObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L476">src/models.ts:476</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L493">src/models.ts:493</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -587,7 +652,7 @@
 					<div class="tsd-signature tsd-kind-icon">Message&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>bodyHash<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>bounce<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>bounced<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>dst<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>src<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L115">src/models.ts:115</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L115">src/models.ts:115</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -629,7 +694,7 @@
 					<div class="tsd-signature tsd-kind-icon">Output<wbr>Token<wbr>Object&lt;O&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">O</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{ </span>components<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">infer </span> C<span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> K<span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> T<span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">OutputTokenValue</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L462">src/models.ts:462</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L479">src/models.ts:479</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -645,7 +710,7 @@
 					<div class="tsd-signature tsd-kind-icon">Permission<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">keyof </span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L216">src/models.ts:216</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L216">src/models.ts:216</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -655,7 +720,7 @@
 					<div class="tsd-signature tsd-kind-icon">Permission<wbr>Data&lt;T, Addr&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L221">src/models.ts:221</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L221">src/models.ts:221</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -674,7 +739,7 @@
 					<div class="tsd-signature tsd-kind-icon">Permissions&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>accountInteraction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>contractType<span class="tsd-signature-symbol">: </span><a href="index.html#walletcontracttype" class="tsd-signature-type" data-tsd-kind="Type alias">WalletContractType</a><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>tonClient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L179">src/models.ts:179</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L179">src/models.ts:179</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -712,7 +777,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Function<wbr>Call<span class="tsd-signature-symbol">:</span> <a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L282">src/models.ts:282</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L299">src/models.ts:299</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -722,7 +787,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Message<span class="tsd-signature-symbol">:</span> <a href="index.html#message" class="tsd-signature-type" data-tsd-kind="Type alias">Message</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L128">src/models.ts:128</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L128">src/models.ts:128</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -732,7 +797,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Permissions<span class="tsd-signature-symbol">:</span> <a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L191">src/models.ts:191</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L191">src/models.ts:191</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -742,7 +807,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Token<wbr>Value<span class="tsd-signature-symbol">:</span> <a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L249">src/models.ts:249</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L266">src/models.ts:266</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -752,7 +817,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Tokens<wbr>Object<span class="tsd-signature-symbol">:</span> <a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L259">src/models.ts:259</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L276">src/models.ts:276</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -762,7 +827,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Transaction<span class="tsd-signature-symbol">:</span> <a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L88">src/models.ts:88</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L88">src/models.ts:88</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -772,7 +837,7 @@
 					<div class="tsd-signature tsd-kind-icon">Readonly<wbr>Abi<wbr>Param<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>components<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">readonly </span><a href="index.html#readonlyabiparam" class="tsd-signature-type" data-tsd-kind="Type alias">ReadonlyAbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="index.html#abiparamkind" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParamKind</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindMap</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AbiParamKindArray</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L329">src/models.ts:329</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L346">src/models.ts:346</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -796,7 +861,7 @@
 					<div class="tsd-signature tsd-kind-icon">Signed<wbr>Message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>bodyHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>expireAt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L228">src/models.ts:228</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L245">src/models.ts:245</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -820,7 +885,7 @@
 					<div class="tsd-signature tsd-kind-icon">Token<wbr>Value&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L237">src/models.ts:237</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L254">src/models.ts:254</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -836,7 +901,7 @@
 					<div class="tsd-signature tsd-kind-icon">Tokens<wbr>Object&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><a href="index.html#tokenvalue" class="tsd-signature-type" data-tsd-kind="Type alias">TokenValue</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L254">src/models.ts:254</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L271">src/models.ts:271</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -852,7 +917,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transaction&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>aborted<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>createdAt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>endStatus<span class="tsd-signature-symbol">: </span><a href="index.html#accountstatus" class="tsd-signature-type" data-tsd-kind="Type alias">AccountStatus</a><span class="tsd-signature-symbol">; </span>exitCode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol">; </span>inMessage<span class="tsd-signature-symbol">: </span><a href="index.html#message" class="tsd-signature-type" data-tsd-kind="Type alias">Message</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>origStatus<span class="tsd-signature-symbol">: </span><a href="index.html#accountstatus" class="tsd-signature-type" data-tsd-kind="Type alias">AccountStatus</a><span class="tsd-signature-symbol">; </span>outMessages<span class="tsd-signature-symbol">: </span><a href="index.html#message" class="tsd-signature-type" data-tsd-kind="Type alias">Message</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>prevTransactionId<span class="tsd-signature-symbol">?: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol">; </span>totalFees<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L72">src/models.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L72">src/models.ts:72</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -903,7 +968,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transaction<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>lt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L169">src/models.ts:169</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L169">src/models.ts:169</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -924,7 +989,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transactions<wbr>Batch<wbr>Info<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>batchType<span class="tsd-signature-symbol">: </span><a href="index.html#transactionsbatchtype" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionsBatchType</a><span class="tsd-signature-symbol">; </span>maxLt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>minLt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L58">src/models.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L58">src/models.ts:58</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -948,7 +1013,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transactions<wbr>Batch<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;old&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;new&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L67">src/models.ts:67</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L67">src/models.ts:67</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -958,7 +1023,7 @@
 					<div class="tsd-signature tsd-kind-icon">Wallet<wbr>Contract<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;SafeMultisigWallet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;SafeMultisigWallet24h&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;SetcodeMultisigWallet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;BridgeMultisigWallet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;SurfWallet&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;WalletV3&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L33">src/models.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L33">src/models.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -972,7 +1037,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L206">src/models.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L206">src/models.ts:206</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -995,7 +1060,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L144">src/models.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L144">src/models.ts:144</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1018,7 +1083,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L196">src/models.ts:196</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L196">src/models.ts:196</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1041,7 +1106,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L367">src/models.ts:367</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L384">src/models.ts:384</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1067,7 +1132,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L104">src/models.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L104">src/models.ts:104</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1090,7 +1155,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L133">src/models.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L133">src/models.ts:133</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1113,7 +1178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L338">src/models.ts:338</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L355">src/models.ts:355</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1136,7 +1201,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/models.ts#L93">src/models.ts:93</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/models.ts#L93">src/models.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1155,10 +1220,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
 					<a name="providerapi" class="tsd-anchor"></a>
 					<h3>Provider<wbr>Api</h3>
-					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Api&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>codeToTvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeEvent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeInput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>internal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeOutput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeTransaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeTransactionEvents<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>events<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>disconnect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>encodeInternalInput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>estimateFees<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">?: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>sender<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>fees<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>extractPublicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getExpectedAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>initParams<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>workchain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getFullContractState<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>state<span class="tsd-signature-symbol">: </span><a href="interfaces/fullcontractstate.html" class="tsd-signature-type" data-tsd-kind="Interface">FullContractState</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getProviderState<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>numericVersion<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>permissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>selectedConnection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>subscriptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getTransactions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>continuation<span class="tsd-signature-symbol">?: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol">; </span>limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>continuation<span class="tsd-signature-symbol">: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>info<span class="tsd-signature-symbol">?: </span><a href="index.html#transactionsbatchinfo" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionsBatchInfo</a><span class="tsd-signature-symbol">; </span>transactions<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>packIntoCell<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>structure<span class="tsd-signature-symbol">: </span><a href="index.html#abiparam" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>requestPermissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>permissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UniqueArray</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permission" class="tsd-signature-type" data-tsd-kind="Type alias">Permission</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>runLocal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>cachedState<span class="tsd-signature-symbol">?: </span><a href="interfaces/fullcontractstate.html" class="tsd-signature-type" data-tsd-kind="Interface">FullContractState</a><span class="tsd-signature-symbol">; </span>functionCall<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sendExternalMessage<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>stateInit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sendMessage<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>bounce<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">?: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>sender<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>splitTvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>subscribe<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>subscriptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#contractupdatessubscription" class="tsd-signature-type" data-tsd-kind="Type alias">ContractUpdatesSubscription</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#contractupdatessubscription" class="tsd-signature-type" data-tsd-kind="Type alias">ContractUpdatesSubscription</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unpackFromCell<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>allowPartial<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>structure<span class="tsd-signature-symbol">: </span><a href="index.html#abiparam" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unsubscribe<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unsubscribeAll<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Api&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>addAsset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>account<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>newAsset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>codeToTvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeEvent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeInput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>internal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeOutput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeTransaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>decodeTransactionEvents<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>events<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>disconnect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>encodeInternalInput<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>estimateFees<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">?: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>sender<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>fees<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>extractPublicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getExpectedAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>abi<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>initParams<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>workchain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getFullContractState<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>state<span class="tsd-signature-symbol">: </span><a href="interfaces/fullcontractstate.html" class="tsd-signature-type" data-tsd-kind="Interface">FullContractState</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getProviderState<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>numericVersion<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>permissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>selectedConnection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>subscriptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>getTransactions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>continuation<span class="tsd-signature-symbol">?: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol">; </span>limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>continuation<span class="tsd-signature-symbol">: </span><a href="index.html#transactionid" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionId</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>info<span class="tsd-signature-symbol">?: </span><a href="index.html#transactionsbatchinfo" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionsBatchInfo</a><span class="tsd-signature-symbol">; </span>transactions<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>packIntoCell<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>structure<span class="tsd-signature-symbol">: </span><a href="index.html#abiparam" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>requestPermissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>permissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UniqueArray</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permission" class="tsd-signature-type" data-tsd-kind="Type alias">Permission</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>runLocal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>cachedState<span class="tsd-signature-symbol">?: </span><a href="interfaces/fullcontractstate.html" class="tsd-signature-type" data-tsd-kind="Interface">FullContractState</a><span class="tsd-signature-symbol">; </span>functionCall<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sendExternalMessage<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>stateInit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sendMessage<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>bounce<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">?: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>sender<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>sendUnsignedExternalMessage<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>stateInit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>signData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>dataHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signatureParts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>high<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>low<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>splitTvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>subscribe<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>subscriptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#contractupdatessubscription" class="tsd-signature-type" data-tsd-kind="Type alias">ContractUpdatesSubscription</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#contractupdatessubscription" class="tsd-signature-type" data-tsd-kind="Type alias">ContractUpdatesSubscription</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unpackFromCell<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>allowPartial<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>boc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>structure<span class="tsd-signature-symbol">: </span><a href="index.html#abiparam" class="tsd-signature-type" data-tsd-kind="Type alias">AbiParam</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unsubscribe<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>unsubscribeAll<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L113">src/api.ts:113</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L115">src/api.ts:115</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -1170,6 +1235,61 @@
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>add<wbr>Asset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>account<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>newAsset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Adds asset to the selected account</p>
+									</div>
+									<hr>
+									<p>Requires permissions: <code>accountInteraction</code></p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter">
+										<h5>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>account<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5>account<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Owner&#39;s TON wallet address.
+														It is the same address as the <code>accountInteraction.address</code>, but it must be explicitly provided</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>params<span class="tsd-signature-symbol">: </span><a href="index.html#assettypeparams" class="tsd-signature-type" data-tsd-kind="Type alias">AssetTypeParams</a><span class="tsd-signature-symbol">&lt;</span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a><span class="tsd-signature-symbol">&gt;</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Asset parameters</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>type<span class="tsd-signature-symbol">: </span><a href="enums/assettype.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AssetType</a></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Which asset to add</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="tsd-parameter">
+										<h5>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>newAsset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5>new<wbr>Asset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Returns true if the account did not have this asset before</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
 							<li class="tsd-parameter">
 								<h5>code<wbr>ToTvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
 								<div class="tsd-comment tsd-typography">
@@ -2140,6 +2260,158 @@
 								</ul>
 							</li>
 							<li class="tsd-parameter">
+								<h5>send<wbr>Unsigned<wbr>External<wbr>Message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>stateInit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Sends an unsigned external message to the contract</p>
+									</div>
+									<hr>
+									<p>Required permissions: <code>tonClient</code></p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter">
+										<h5>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>stateInit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> local<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Whether to only run it locally (false by default)
+														Can be used as alternative <code>runLocal</code> method</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>payload<span class="tsd-signature-symbol">: </span><a href="index.html#functioncall" class="tsd-signature-type" data-tsd-kind="Type alias">FunctionCall</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Function call</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>recipient<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Message destination address</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> state<wbr>Init<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Optional base64 encoded <code>.tvc</code> file</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="tsd-parameter">
+										<h5>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5>output<span class="tsd-signature-symbol">: </span><a href="index.html#tokensobject" class="tsd-signature-type" data-tsd-kind="Type alias">TokensObject</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Parsed function call output</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>transaction<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Executed transaction</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li class="tsd-parameter">
+								<h5>sign<wbr>Data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>dataHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signatureParts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>high<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>low<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<div class="lead">
+										<p>Signs arbitrary data</p>
+									</div>
+									<hr>
+									<p>Requires permissions: <code>accountInteraction</code></p>
+								</div>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter">
+										<h5>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>publicKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Base64 encoded arbitrary bytes</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>public<wbr>Key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>The public key of the preferred account.
+														It is the same publicKey as the <code>accountInteraction.publicKey</code>, but it must be explicitly provided</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="tsd-parameter">
+										<h5>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>dataHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>signatureParts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>high<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>low<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter">
+												<h5>data<wbr>Hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Hex encoded data hash</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>signature<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)</p>
+													</div>
+												</div>
+											</li>
+											<li class="tsd-parameter">
+												<h5>signature<wbr>Parts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>high<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>low<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>Same signature, but split into two uint256 parts</p>
+													</div>
+												</div>
+												<ul class="tsd-parameters">
+													<li class="tsd-parameter">
+														<h5>high<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+														<div class="tsd-comment tsd-typography">
+															<div class="lead">
+																<p>High 32 bytes of the signature as uint256</p>
+															</div>
+														</div>
+													</li>
+													<li class="tsd-parameter">
+														<h5>low<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+														<div class="tsd-comment tsd-typography">
+															<div class="lead">
+																<p>Low 32 bytes of the signature as uint256</p>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li class="tsd-parameter">
 								<h5>split<wbr>Tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>tvc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">; </span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
@@ -2322,7 +2594,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Api<wbr>Request<wbr>Params&lt;T, Addr&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{ </span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> I<span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">I</span><span class="tsd-signature-symbol"> : </span><a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L821">src/api.ts:821</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L934">src/api.ts:934</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2341,7 +2613,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Api<wbr>Response&lt;T, Addr&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{ </span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">infer </span> O<span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">O</span><span class="tsd-signature-symbol"> : </span><a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">never</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L833">src/api.ts:833</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L946">src/api.ts:946</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2360,7 +2632,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Event<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">keyof </span><a href="index.html#providerevents" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderEvents</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L801">src/api.ts:801</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L914">src/api.ts:914</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -2370,7 +2642,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Event<wbr>Data&lt;T, Addr&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providerevents" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderEvents</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L806">src/api.ts:806</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L919">src/api.ts:919</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2389,7 +2661,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Events&lt;Addr&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>contractStateChanged<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>state<span class="tsd-signature-symbol">: </span><a href="interfaces/contractstate.html" class="tsd-signature-type" data-tsd-kind="Interface">ContractState</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>disconnected<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">; </span>loggedOut<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>networkChanged<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>selectedConnection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>permissionsChanged<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>permissions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="index.html#permissions" class="tsd-signature-type" data-tsd-kind="Type alias">Permissions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>transactionsFound<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">; </span>info<span class="tsd-signature-symbol">: </span><a href="index.html#transactionsbatchinfo" class="tsd-signature-type" data-tsd-kind="Type alias">TransactionsBatchInfo</a><span class="tsd-signature-symbol">; </span>transactions<span class="tsd-signature-symbol">: </span><a href="index.html#transaction" class="tsd-signature-type" data-tsd-kind="Type alias">Transaction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Addr</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L45">src/api.ts:45</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L47">src/api.ts:47</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2516,7 +2788,7 @@
 					<div class="tsd-signature tsd-kind-icon">Provider<wbr>Method<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">keyof </span><a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L816">src/api.ts:816</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L929">src/api.ts:929</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -2526,7 +2798,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="index.html#providerapi" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApi</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L796">src/api.ts:796</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L909">src/api.ts:909</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -2536,7 +2808,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>Api<wbr>Request<wbr>Params&lt;T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providerapirequestparams" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApiRequestParams</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L828">src/api.ts:828</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L941">src/api.ts:941</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2552,7 +2824,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>Api<wbr>Response&lt;T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providerapiresponse" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderApiResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L840">src/api.ts:840</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L953">src/api.ts:953</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2568,7 +2840,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>Event<wbr>Data&lt;T&gt;<span class="tsd-signature-symbol">:</span> <a href="index.html#providereventdata" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderEventData</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L811">src/api.ts:811</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L924">src/api.ts:924</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -2584,7 +2856,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>Events<span class="tsd-signature-symbol">:</span> <a href="index.html#providerevents" class="tsd-signature-type" data-tsd-kind="Type alias">ProviderEvents</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L108">src/api.ts:108</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L110">src/api.ts:110</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -2594,7 +2866,7 @@
 					<div class="tsd-signature tsd-kind-icon">Raw<wbr>Provider<wbr>State<span class="tsd-signature-symbol">:</span> <a href="interfaces/providerstate.html" class="tsd-signature-type" data-tsd-kind="Interface">ProviderState</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/api.ts#L40">src/api.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/api.ts#L42">src/api.ts:42</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -2611,7 +2883,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/ea608ba/src/utils.ts#L87">src/utils.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/broxus/ton-inpage-provider/blob/da8169e/src/utils.ts#L87">src/utils.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2659,6 +2931,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/assettype.html" class="tsd-kind-icon">Asset<wbr>Type</a>
+					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/address.html" class="tsd-kind-icon">Address</a>
 					</li>
@@ -2721,6 +2996,12 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="index.html#accountstatus" class="tsd-kind-icon">Account<wbr>Status</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="index.html#addassetparams" class="tsd-kind-icon">Add<wbr>Asset<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="index.html#assettypeparams" class="tsd-kind-icon">Asset<wbr>Type<wbr>Params</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="index.html#contractupdatessubscription" class="tsd-kind-icon">Contract<wbr>Updates<wbr>Subscription</a>

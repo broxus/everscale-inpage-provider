@@ -292,12 +292,21 @@ export interface ContractMethod<I, O> {
   call(args?: CallParams): Promise<O>;
 }
 
+/**
+ * @category Contract
+ */
 type ContractMethods<C> = {
   [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
 }
 
+/**
+ * @category Contract
+ */
 type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] };
 
+/**
+ * @category Contract
+ */
 export type SendInternalParams = {
   from: Address;
   amount: string;
@@ -307,41 +316,71 @@ export type SendInternalParams = {
   bounce?: boolean;
 };
 
+/**
+ * @category Contract
+ */
 export type SendExternalParams = {
   publicKey: string;
   stateInit?: string;
   local?: boolean;
 };
 
+/**
+ * @category Contract
+ */
 export type CallParams = {
   cachedState?: FullContractState;
 };
 
+/**
+ * @category Contract
+ */
 export type DecodeTransactionParams<Abi> = {
   transaction: Transaction;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 };
 
+/**
+ * @category Contract
+ */
 export type DecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi> ?
   { method: T, input: DecodedAbiFunctionInputs<Abi, T>, output: DecodedAbiFunctionOutputs<Abi, T> } : never;
 
+/**
+ * @category Contract
+ */
 export type DecodeInputParams<Abi> = {
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
   internal: boolean;
 };
 
+/**
+ * @category Contract
+ */
 export type DecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: DecodedAbiFunctionInputs<Abi, T> } : never;
 
+/**
+ * @category Contract
+ */
 export type DecodeOutputParams<Abi> = {
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 };
 
+/**
+ * @category Contract
+ */
 export type DecodedOutput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, output: DecodedAbiFunctionOutputs<Abi, T> } : never;
 
+/**
+ * @category Contract
+ */
 export type DecodeTransactionEventsParams = {
   transaction: Transaction;
 };
 
+/**
+ * @category Contract
+ */
 export type DecodedEvent<Abi, T> = T extends AbiEventName<Abi> ? { event: T, data: DecodedAbiEventData<Abi, T> } : never;

@@ -1,4 +1,7 @@
 import {
+  AbiParam,
+  AssetType,
+  AssetTypeParams,
   ContractState,
   ContractUpdatesSubscription,
   FullContractState,
@@ -9,7 +12,6 @@ import {
   Permission,
   FunctionCall,
   TokensObject,
-  AbiParam
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -673,6 +675,117 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Sends an unsigned external message to the contract
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  sendUnsignedExternalMessage: {
+    input: {
+      /**
+       * Message destination address
+       */
+      recipient: Addr;
+      /**
+       * Optional base64 encoded `.tvc` file
+       */
+      stateInit?: string;
+      /**
+       * Function call
+       */
+      payload: FunctionCall<Addr>;
+      /**
+       * Whether to only run it locally (false by default)
+       * Can be used as alternative `runLocal` method
+       */
+      local?: boolean
+    };
+    output: {
+      /**
+       * Executed transaction
+       */
+      transaction: Transaction<Addr>;
+      /**
+       * Parsed function call output
+       */
+      output: TokensObject<Addr> | undefined;
+    };
+  };
+
+  /**
+   * Adds asset to the selected account
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  addAsset: {
+    input: {
+      /**
+       * Owner's TON wallet address.
+       * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+       */
+      account: Addr;
+      /**
+       * Which asset to add
+       */
+      type: AssetType,
+      /**
+       * Asset parameters
+       */
+      params: AssetTypeParams<AssetType>,
+    };
+    output: {
+      /**
+       * Returns true if the account did not have this asset before
+       */
+      newAsset: boolean;
+    }
+  }
+
+  /**
+   * Signs arbitrary data
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  signData: {
+    input: {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Base64 encoded arbitrary bytes
+       */
+      data: string;
+    };
+    output: {
+      /**
+       * Hex encoded data hash
+       */
+      dataHash: string;
+      /**
+       * Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)
+       */
+      signature: string,
+      /**
+       * Same signature, but split into two uint256 parts
+       */
+      signatureParts: {
+        /**
+         * High 32 bytes of the signature as uint256
+         */
+        high: string;
+        /**
+         * Low 32 bytes of the signature as uint256
+         */
+        low: string;
+      }
+    }
+  };
+
+  /**
    * Calculates transaction fees
    *
    * ---
@@ -843,6 +956,6 @@ export type RawProviderApiResponse<T extends ProviderMethod> = ProviderApiRespon
  * @category Provider Api
  */
 export interface RawProviderRequest<T extends ProviderMethod> {
-  method: T
-  params: RawProviderApiRequestParams<T>
+  method: T;
+  params: RawProviderApiRequestParams<T>;
 }
