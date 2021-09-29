@@ -225,15 +225,14 @@ export type PermissionData<T extends Permission, Addr = Address> = Permissions<A
 /**
  * @category Models
  */
-export enum AssetType {
-  Tip3Token,
-}
+export type AssetType =
+  | 'tip3_token';
 
 /**
  * @category Models
  */
 export type AssetTypeParams<T extends AssetType> =
-  T extends AssetType.Tip3Token ? {
+  T extends 'tip3_token' ? {
     rootContract: Address,
   } : never;
 
