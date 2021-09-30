@@ -529,10 +529,21 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async addAsset<T extends AssetType>(args: AddAssetParams<T>): Promise<ProviderApiResponse<'addAsset'>> {
+    let params: AssetTypeParams<T, string>
+    switch (args.type) {
+      case 'tip3_token': {
+        params = {
+          rootContract: args.params.rootContract.toString()
+        } as AssetTypeParams<T, string>
+        break
+      }
+      default: throw new Error("Unknown asset type")
+    }
+
     return await this._api.addAsset({
       account: args.account.toString(),
       type: args.type,
-      params: args.params,
+      params,
     });
   }
 

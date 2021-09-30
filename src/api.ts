@@ -732,7 +732,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Asset parameters
        */
-      params: AssetTypeParams<AssetType>,
+      params: AssetTypeParams<AssetType, Addr>,
     };
     output: {
       /**

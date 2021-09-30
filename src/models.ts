@@ -231,9 +231,9 @@ export type AssetType =
 /**
  * @category Models
  */
-export type AssetTypeParams<T extends AssetType> =
+export type AssetTypeParams<T extends AssetType, Addr = Address> =
   T extends 'tip3_token' ? {
-    rootContract: Address,
+    rootContract: Addr,
   } : never;
 
 /* ABI stuff */
