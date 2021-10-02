@@ -770,6 +770,10 @@ export type ProviderApi<Addr = Address> = {
        */
       signature: string,
       /**
+       * Hex encoded signature bytes (data is guaranteed to be 64 bytes long)
+       */
+      signatureHex: string,
+      /**
        * Same signature, but split into two uint256 parts
        */
       signatureParts: {
