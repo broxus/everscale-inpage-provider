@@ -688,9 +688,13 @@ export type ProviderApi<Addr = Address> = {
        */
       publicKey: string;
       /**
-       * Hex encoded arbitrary bytes hash
+       * Base64 or hex encoded arbitrary bytes hash (data must be 32 bytes long)
        */
       dataHash: string;
+      /**
+       * Base64 or hex encoded signature bytes (data must be 64 bytes long)
+       */
+      signature: string;
     };
     output: {
       /**
