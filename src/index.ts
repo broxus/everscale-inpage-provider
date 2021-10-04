@@ -547,6 +547,10 @@ export class ProviderRpcClient {
     });
   }
 
+  public async verifySignature(args: ProviderApiRequestParams<'verifySignature'>): Promise<ProviderApiResponse<'verifySignature'>> {
+    return await this._api.verifySignature(args)
+  }
+
   /**
    * Signs arbitrary data
    *

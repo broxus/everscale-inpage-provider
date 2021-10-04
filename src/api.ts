@@ -675,6 +675,32 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Checks if a specific data hash was signed with the specified key
+   *
+   * ---
+   * Requires permissions: `tonClient`
+   */
+  verifySignature: {
+    input: {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Hex encoded arbitrary bytes hash
+       */
+      dataHash: string;
+    };
+    output: {
+      /**
+       * Returns true if message was signed with this key
+       */
+      isValid: boolean,
+    }
+  };
+
+  /**
    * Sends an unsigned external message to the contract
    *
    * ---

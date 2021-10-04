@@ -90,7 +90,9 @@ export class Contract<Abi> {
       }
 
       async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
-        let { transaction, output } = await provider.rawApi.sendExternalMessage({
+        let method = args.withoutSignature === true ? provider.rawApi.sendUnsignedExternalMessage : provider.rawApi.sendExternalMessage
+
+        let { transaction, output } = await method({
           publicKey: args.publicKey,
           recipient: this.address.toString(),
           stateInit: args.stateInit,
@@ -322,7 +324,14 @@ export type SendInternalParams = {
 export type SendExternalParams = {
   publicKey: string;
   stateInit?: string;
+  /**
+   * Whether to run this message locally. Default: false
+   */
   local?: boolean;
+  /**
+   * Whether to prepare this message without signature. Default: false
+   */
+  withoutSignature?: boolean;
 };
 
 /**
