@@ -36,7 +36,7 @@ import { Contract } from './contract';
 
 export * from './api';
 export * from './models';
-export { Contract, TvmException, ContractMethod } from './contract';
+export * from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
 

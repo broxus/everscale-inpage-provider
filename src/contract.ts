@@ -297,14 +297,14 @@ export interface ContractMethod<I, O> {
 /**
  * @category Contract
  */
-type ContractMethods<C> = {
+export type ContractMethods<C> = {
   [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
 }
 
 /**
  * @category Contract
  */
-type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] };
+export type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] };
 
 /**
  * @category Contract
