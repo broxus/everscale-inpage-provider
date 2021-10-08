@@ -1,0 +1,58 @@
+[package]
+name = "ton-web-client"
+version = "0.1.0"
+edition = "2018"
+authors = ["Ivan Kalinin <i.kalinin@dexpa.io>"]
+description = "Nekoton bindings for WASM"
+license-file = "../LICENSE"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Oz", "--enable-mutable-globals"]
+
+[dependencies]
+anyhow = "1.0"
+hex = "0.4"
+base64 = "0.13"
+chrono = "0.4"
+console_error_panic_hook = "0.1"
+dyn-clone = "1.0"
+futures = "0.3"
+js-sys = "0.3"
+log = "0.4"
+num-bigint = "0.3"
+num-traits = "0.2"
+rand = { version = "0.8", features = ["getrandom"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.9"
+syn = "=1.0.72"
+thiserror = "1.0"
+wasm-bindgen = { version = "=0.2.76", features = ["serde-serialize"] }
+wasm-bindgen-futures = "0.4"
+getrandom = { version = "0.2", features = ["js"] }
+wasm-logger = "0.2"
+
+ed25519-dalek = { git = "https://github.com/broxus/ed25519-dalek.git" }
+
+ton_abi = { git = "https://github.com/broxus/ton-labs-abi.git" }
+ton_block = { git = "https://github.com/broxus/ton-labs-block.git" }
+ton_types = { git = "https://github.com/broxus/ton-labs-types.git" }
+
+[dependencies.nt]
+package = "nekoton"
+git = "https://github.com/broxus/nekoton.git"
+branch = "master"
+features = ["web", "gql_transport", "jrpc_transport"]
+
+[dependencies.nt_utils]
+package = "nekoton-utils"
+git = "https://github.com/broxus/nekoton.git"
+branch = "master"
+
+[dependencies.nt_abi]
+package = "nekoton-abi"
+git = "https://github.com/broxus/nekoton.git"
+branch = "master"
