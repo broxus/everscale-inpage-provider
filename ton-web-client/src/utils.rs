@@ -1,28 +1,10 @@
 use std::str::FromStr;
 
-use anyhow::Error;
-use futures::channel::oneshot;
 use ton_block::{Deserializable, MsgAddressInt};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
 
 use nt_utils::TrustMe;
-
-pub struct QueryHandler<T> {
-    tx: oneshot::Sender<T>,
-}
-
-impl<T> QueryHandler<T> {
-    pub fn new(tx: oneshot::Sender<T>) -> Self {
-        Self { tx }
-    }
-
-    pub fn send(self, value: T) {
-        let _ = self.tx.send(value);
-    }
-}
-
-pub type QueryResultHandler<T> = QueryHandler<Result<T, Error>>;
 
 impl<T, E> HandleError for Result<T, E>
 where
@@ -120,4 +102,50 @@ extern "C" {
 
     #[wasm_bindgen(typescript_type = "Array<string>")]
     pub type StringArray;
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum TokensJsonError {
+    #[error("Parameter count mismatch")]
+    ParameterCountMismatch,
+    #[error("Object expected")]
+    ObjectExpected,
+    #[error("Message expected")]
+    MessageExpected,
+    #[error("Message body expected")]
+    MessageBodyExpected,
+    #[error("Array expected")]
+    ArrayExpected,
+    #[error("Parameter not found: {}", .0)]
+    ParameterNotFound(String),
+    #[error("Invalid number: {}", .0)]
+    InvalidNumber(String),
+    #[error("Expected integer value: {}", .0)]
+    IntegerValueExpected(f64),
+    #[error("Expected unsigned value: {}", .0)]
+    UnsignedValueExpected(f64),
+    #[error("Expected integer as string or number")]
+    NumberExpected,
+    #[error("Expected boolean")]
+    BoolExpected,
+    #[error("Invalid array length: {}", .0)]
+    InvalidArrayLength(u32),
+    #[error("Invalid cell")]
+    InvalidCell,
+    #[error("Expected string")]
+    StringExpected,
+    #[error("Expected map item as array of key and value")]
+    MapItemExpected,
+    #[error("Invalid address")]
+    InvalidAddress,
+    #[error("Invalid bytes")]
+    InvalidBytes,
+    #[error("Invalid bytes length")]
+    InvalidBytesLength(usize),
+    #[error("Invalid public key")]
+    InvalidPublicKey,
+    #[error("Expected param type")]
+    ParamTypeExpected,
+    #[error("Invalid components")]
+    InvalidComponents,
 }

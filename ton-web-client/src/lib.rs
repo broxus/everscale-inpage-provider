@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::convert::TryFrom;
 
 use ed25519_dalek::Verifier;
+use nt_abi::FunctionExt;
 use nt_utils::TrustMe;
 use ton_block::{Deserializable, GetRepresentationHash, MsgAddressInt, Serializable};
 use wasm_bindgen::prelude::*;
@@ -10,9 +12,35 @@ use crate::models::*;
 use crate::tokens_object::*;
 use crate::utils::*;
 
+mod external;
+mod generic_contract;
 mod models;
 mod tokens_object;
+mod transport;
 mod utils;
+
+#[wasm_bindgen(js_name = "runLocal")]
+pub fn run_local(
+    gen_timings: GenTimings,
+    last_transaction_id: LastTransactionId,
+    account_stuff_boc: &str,
+    contract_abi: &str,
+    method: &str,
+    input: TokensObject,
+) -> Result<ExecutionOutput, JsValue> {
+    let gen_timings = parse_gen_timings(gen_timings)?;
+    let last_transaction_id = parse_last_transaction_id(last_transaction_id)?;
+    let account_stuff = parse_account_stuff(account_stuff_boc)?;
+    let contract_abi = parse_contract_abi(contract_abi)?;
+    let method = contract_abi.function(method).handle_error()?;
+    let input = parse_tokens_object(&method.inputs, input).handle_error()?;
+
+    let output = method
+        .run_local(account_stuff, gen_timings, &last_transaction_id, &input)
+        .handle_error()?;
+
+    make_execution_output(output)
+}
 
 #[wasm_bindgen(js_name = "getExpectedAddress")]
 pub fn get_expected_address(
@@ -370,7 +398,59 @@ pub fn verify_signature(
     Ok(public_key.verify(&data_hash, &signature).is_ok())
 }
 
-#[wasm_bindgen(js_name = "sendUnsignedExternalMessage")]
-pub fn send_unsigned_external_message() {
-    todo!()
+#[wasm_bindgen(js_name = "createExternalMessageWithoutSignature")]
+pub fn create_unsigned_message_without_signature(
+    dst: &str,
+    contract_abi: &str,
+    method: &str,
+    state_init: Option<String>,
+    input: TokensObject,
+    timeout: u32,
+) -> Result<SignedMessage, JsValue> {
+    use nt::core::models::{Expiration, ExpireAt};
+
+    // Parse params
+    let dst = parse_address(dst)?;
+    let contract_abi = parse_contract_abi(contract_abi)?;
+    let method = contract_abi.function(method).handle_error()?;
+    let state_init = state_init
+        .as_deref()
+        .map(ton_block::StateInit::construct_from_base64)
+        .transpose()
+        .handle_error()?;
+    let input = parse_tokens_object(&method.inputs, input).handle_error()?;
+
+    // Prepare headers
+    let time = chrono::Utc::now().timestamp_millis() as u64;
+    let expire_at = ExpireAt::new_from_millis(Expiration::Timeout(timeout), time);
+
+    let mut header = HashMap::with_capacity(3);
+    header.insert("time".to_string(), ton_abi::TokenValue::Time(time));
+    header.insert(
+        "expire".to_string(),
+        ton_abi::TokenValue::Expire(expire_at.timestamp),
+    );
+    header.insert("pubkey".to_string(), ton_abi::TokenValue::PublicKey(None));
+
+    // Encode body
+    let body = method
+        .encode_input(&header, &input, false, None)
+        .handle_error()?;
+
+    // Build message
+    let mut message =
+        ton_block::Message::with_ext_in_header(ton_block::ExternalInboundMessageHeader {
+            dst,
+            ..Default::default()
+        });
+    if let Some(state_init) = state_init {
+        message.set_state_init(state_init);
+    }
+    message.set_body(body.into());
+
+    // Serialize message
+    make_signed_message(nt::crypto::SignedMessage {
+        message,
+        expire_at: expire_at.timestamp,
+    })
 }
