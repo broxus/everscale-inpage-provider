@@ -43,6 +43,13 @@ export { Address, AddressLiteral, mergeTransactions } from './utils';
 /**
  * @category Provider
  */
+export type ProviderProperties = {
+  fallbackToStandaloneClient: boolean
+};
+
+/**
+ * @category Provider
+ */
 export interface Provider {
   request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>;
 
@@ -529,15 +536,16 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async addAsset<T extends AssetType>(args: AddAssetParams<T>): Promise<ProviderApiResponse<'addAsset'>> {
-    let params: AssetTypeParams<T, string>
+    let params: AssetTypeParams<T, string>;
     switch (args.type) {
       case 'tip3_token': {
         params = {
-          rootContract: args.params.rootContract.toString()
-        } as AssetTypeParams<T, string>
-        break
+          rootContract: args.params.rootContract.toString(),
+        } as AssetTypeParams<T, string>;
+        break;
       }
-      default: throw new Error("Unknown asset type")
+      default:
+        throw new Error('Unknown asset type');
     }
 
     return await this._api.addAsset({
@@ -548,7 +556,7 @@ export class ProviderRpcClient {
   }
 
   public async verifySignature(args: ProviderApiRequestParams<'verifySignature'>): Promise<ProviderApiResponse<'verifySignature'>> {
-    return await this._api.verifySignature(args)
+    return await this._api.verifySignature(args);
   }
 
   /**

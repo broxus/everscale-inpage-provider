@@ -12,13 +12,19 @@
   "author": "",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/events": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^4.24.0",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
+    "events": "^3.3.0",
+    "nekoton-wasm": "^0.1.0",
     "typedoc": "^0.20.36",
     "typescript": "^4.2.4"
   },
   "files": [
     "/dist"
-  ]
+  ],
+  "dependencies": {
+    "fast-safe-stringify": "^2.1.1"
+  }
 }
