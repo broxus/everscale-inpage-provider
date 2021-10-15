@@ -201,6 +201,10 @@ export type ProviderApi<Addr = Address> = {
        */
       selectedConnection: string;
       /**
+       * List of supported permissions
+       */
+      supportedPermissions: UniqueArray<Permission[]>;
+      /**
        * Object with active permissions attached data
        */
       permissions: Partial<Permissions<Addr>>;
