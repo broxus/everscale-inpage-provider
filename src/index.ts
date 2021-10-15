@@ -23,16 +23,19 @@ import {
   parseTransaction,
   serializeTokensObject,
 } from './models';
-
 import {
   Address,
   AddressLiteral,
   getUniqueId,
 } from './utils';
-
 import { Subscriber } from './stream';
-
 import { Contract } from './contract';
+import {
+  ensureClientInitialized,
+  StandaloneTonClient,
+  StandaloneTonClientProperties,
+  DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES,
+} from './client';
 
 export * from './api';
 export * from './models';
@@ -44,7 +47,13 @@ export { Address, AddressLiteral, mergeTransactions } from './utils';
  * @category Provider
  */
 export type ProviderProperties = {
-  fallbackToStandaloneClient: boolean
+  requireFullProvider: boolean
+  standaloneClientProperties: StandaloneTonClientProperties,
+};
+
+export const DEFAULT_PROVIDER_PROPERTIES: ProviderProperties = {
+  requireFullProvider: true,
+  standaloneClientProperties: DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES,
 };
 
 /**
@@ -80,9 +89,9 @@ if (document.readyState == 'complete') {
 /**
  * @category Provider
  */
-export async function hasTonProvider(): Promise<boolean> {
+export async function hasTonProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
   await ensurePageLoaded;
-  return (window as Record<string, any>).hasTonProvider === true;
+  return !properties.requireFullProvider || (window as Record<string, any>).hasTonProvider === true;
 }
 
 /**
@@ -90,12 +99,14 @@ export async function hasTonProvider(): Promise<boolean> {
  */
 export class ProviderRpcClient {
   private readonly _api: RawProviderApiMethods;
-  private readonly _initializationPromise: Promise<void>;
+  private readonly _mainInitializationPromise: Promise<void>;
+  private _additionalInitializationPromise?: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _ton?: Provider;
 
   constructor() {
+    // Wrap provider requests
     this._api = new Proxy({}, {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
@@ -103,16 +114,24 @@ export class ProviderRpcClient {
       ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! }),
     }) as unknown as RawProviderApiMethods;
 
+    // Initialize provider with injected object by default
     this._ton = (window as any).ton;
     if (this._ton != null) {
-      this._initializationPromise = Promise.resolve();
+      // Provider as already injected
+      this._mainInitializationPromise = Promise.resolve();
     } else {
-      this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
+      // Wait until page is loaded initialization complete
+      this._mainInitializationPromise = hasTonProvider({
+        ...DEFAULT_PROVIDER_PROPERTIES,
+        requireFullProvider: true,
+      }).then((hasTonProvider) => new Promise((resolve, reject) => {
         if (!hasTonProvider) {
+          // Fully loaded page doesn't even contain provider flag
           reject(new ProviderNotFoundException());
           return;
         }
 
+        // Wait injected provider initialization otherwise
         this._ton = (window as any).ton;
         if (this._ton != null) {
           resolve();
@@ -125,40 +144,10 @@ export class ProviderRpcClient {
       }));
     }
 
-    this._initializationPromise.then(() => {
-      if (this._ton == null) {
-        return;
-      }
-
-      const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
-        'disconnected': (data) => data,
-        'transactionsFound': (data) => ({
-          address: new Address(data.address),
-          transactions: data.transactions.map(parseTransaction),
-          info: data.info,
-        }),
-        'contractStateChanged': (data) => ({
-          address: new Address(data.address),
-          state: data.state,
-        }),
-        'networkChanged': data => data,
-        'permissionsChanged': (data) => ({
-          permissions: parsePermissions(data.permissions),
-        }),
-        'loggedOut': data => data,
-      };
-
-      for (const [eventName, extractor] of Object.entries(knownEvents)) {
-        this._ton.addListener(eventName as ProviderEvent, (data) => {
-          const handlers = this._subscriptions[eventName as ProviderEvent];
-          if (handlers == null) {
-            return;
-          }
-          const parsed = (extractor as any)(data);
-          for (const handler of Object.values(handlers)) {
-            handler(parsed);
-          }
-        });
+    // Will only register handlers for successfully loaded injected provider
+    this._mainInitializationPromise.then(() => {
+      if (this._ton != null) {
+        this._registerEventHandlers(this._ton);
       }
     });
   }
@@ -166,8 +155,8 @@ export class ProviderRpcClient {
   /**
    * Checks whether ton provider exists.
    */
-  public async hasProvider(): Promise<boolean> {
-    return hasTonProvider();
+  public async hasProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
+    return hasTonProvider(properties);
   }
 
   /**
@@ -175,8 +164,23 @@ export class ProviderRpcClient {
    *
    * @throws ProviderNotFoundException when no provider found
    */
-  public async ensureInitialized(): Promise<void> {
-    await this._initializationPromise;
+  public async ensureInitialized(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<void> {
+    try {
+      await this._mainInitializationPromise;
+    } catch (e) {
+      if (properties.requireFullProvider) {
+        throw e;
+      }
+
+      if (this._additionalInitializationPromise != null) {
+        this._additionalInitializationPromise = ensureClientInitialized().then(() => {
+          this._ton = new StandaloneTonClient(properties.standaloneClientProperties);
+          this._registerEventHandlers(this._ton);
+        });
+      }
+
+      await this._additionalInitializationPromise;
+    }
   }
 
   /**
@@ -590,6 +594,39 @@ export class ProviderRpcClient {
     return {
       transaction: parseTransaction(transaction),
     };
+  }
+
+  private _registerEventHandlers(provider: Provider) {
+    const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
+      'disconnected': (data) => data,
+      'transactionsFound': (data) => ({
+        address: new Address(data.address),
+        transactions: data.transactions.map(parseTransaction),
+        info: data.info,
+      }),
+      'contractStateChanged': (data) => ({
+        address: new Address(data.address),
+        state: data.state,
+      }),
+      'networkChanged': data => data,
+      'permissionsChanged': (data) => ({
+        permissions: parsePermissions(data.permissions),
+      }),
+      'loggedOut': data => data,
+    };
+
+    for (const [eventName, extractor] of Object.entries(knownEvents)) {
+      provider.addListener(eventName as ProviderEvent, (data) => {
+        const handlers = this._subscriptions[eventName as ProviderEvent];
+        if (handlers == null) {
+          return;
+        }
+        const parsed = (extractor as any)(data);
+        for (const handler of Object.values(handlers)) {
+          handler(parsed);
+        }
+      });
+    }
   }
 
   private _getEventSubscriptions<T extends ProviderEvent>(

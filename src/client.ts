@@ -7,7 +7,6 @@ import {
   GenTimings,
   Provider,
   ProviderMethod,
-  RawProviderApi,
   RawFunctionCall,
   RawProviderApiResponse,
   RawProviderRequest,
@@ -29,7 +28,9 @@ export function ensureClientInitialized(): Promise<void> {
 
 export type StandaloneTonClientProperties = {};
 
-class StandaloneTonClient extends SafeEventEmitter implements Provider {
+export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProperties = {};
+
+export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _params: StandaloneTonClientProperties;
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
     getExpectedAddress,
@@ -386,7 +387,7 @@ function requireMethodOrArray<O, P extends keyof O>(req: RawProviderRequest<Prov
 const invalidRequest = (req: RawProviderRequest<ProviderMethod>, message: string, data?: unknown) =>
   new NekotonRpcError(2, `${req.method}: ${message}`, data);
 
-export class NekotonRpcError<T> extends Error {
+class NekotonRpcError<T> extends Error {
   code: number;
   data?: T;
 
