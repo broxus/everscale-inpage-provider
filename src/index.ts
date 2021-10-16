@@ -172,7 +172,7 @@ export class ProviderRpcClient {
         throw e;
       }
 
-      if (this._additionalInitializationPromise != null) {
+      if (this._additionalInitializationPromise == null) {
         this._additionalInitializationPromise = ensureClientInitialized().then(() => {
           this._ton = new StandaloneTonClient(properties.standaloneClientProperties);
           this._registerEventHandlers(this._ton);

@@ -1,7 +1,7 @@
 import init, * as nt from 'nekoton-wasm';
 import safeStringify from 'fast-safe-stringify';
 
-import { SafeEventEmitter } from './utils';
+import { SafeEventEmitter } from '../utils';
 import {
   FullContractState,
   GenTimings,
@@ -10,7 +10,7 @@ import {
   RawFunctionCall,
   RawProviderApiResponse,
   RawProviderRequest,
-} from './index';
+} from '../index';
 
 let clientInitializationStarted: boolean = false;
 let notifyClientInitialized: { resolve: () => void, reject: () => void };
@@ -31,7 +31,7 @@ export type StandaloneTonClientProperties = {};
 export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProperties = {};
 
 export class StandaloneTonClient extends SafeEventEmitter implements Provider {
-  private _params: StandaloneTonClientProperties;
+  private _context: Context;
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
     getExpectedAddress,
     packIntoCell,
@@ -50,7 +50,7 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
 
   constructor(params: StandaloneTonClientProperties) {
     super();
-    this._params = params;
+    this._context = new Context(params);
   }
 
   request<T extends ProviderMethod>(req: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>> {
@@ -58,13 +58,18 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
     if (handler == null) {
       throw invalidRequest(req, 'Method is not supported by standalone transport');
     }
-    return handler(req);
+    return handler(this._context, req);
   }
 }
 
-type ProviderHandler<T extends ProviderMethod> = (req: RawProviderRequest<T>) => Promise<RawProviderApiResponse<T>>;
+class Context {
+  constructor(public params: StandaloneTonClientProperties) {
+  }
+}
 
-const getExpectedAddress: ProviderHandler<'getExpectedAddress'> = async (req) => {
+type ProviderHandler<T extends ProviderMethod> = (ctx: Context, req: RawProviderRequest<T>) => Promise<RawProviderApiResponse<T>>;
+
+const getExpectedAddress: ProviderHandler<'getExpectedAddress'> = async (_ctx, req) => {
   requireParams(req);
 
   const { tvc, abi, workchain, publicKey, initParams } = req.params;
@@ -80,7 +85,7 @@ const getExpectedAddress: ProviderHandler<'getExpectedAddress'> = async (req) =>
   }
 };
 
-const packIntoCell: ProviderHandler<'packIntoCell'> = async (req) => {
+const packIntoCell: ProviderHandler<'packIntoCell'> = async (_ctx, req) => {
   requireParams(req);
 
   const { structure, data } = req.params;
@@ -93,7 +98,7 @@ const packIntoCell: ProviderHandler<'packIntoCell'> = async (req) => {
   }
 };
 
-const unpackFromCell: ProviderHandler<'unpackFromCell'> = async (req) => {
+const unpackFromCell: ProviderHandler<'unpackFromCell'> = async (_ctx, req) => {
   requireParams(req);
 
   const { structure, boc, allowPartial } = req.params;
@@ -108,7 +113,7 @@ const unpackFromCell: ProviderHandler<'unpackFromCell'> = async (req) => {
   }
 };
 
-const extractPublicKey: ProviderHandler<'extractPublicKey'> = async (req) => {
+const extractPublicKey: ProviderHandler<'extractPublicKey'> = async (_ctx, req) => {
   requireParams(req);
 
   const { boc } = req.params;
@@ -121,7 +126,7 @@ const extractPublicKey: ProviderHandler<'extractPublicKey'> = async (req) => {
   }
 };
 
-const codeToTvc: ProviderHandler<'codeToTvc'> = async (req) => {
+const codeToTvc: ProviderHandler<'codeToTvc'> = async (_ctx, req) => {
   requireParams(req);
 
   const { code } = req.params;
@@ -134,7 +139,7 @@ const codeToTvc: ProviderHandler<'codeToTvc'> = async (req) => {
   }
 };
 
-const splitTvc: ProviderHandler<'splitTvc'> = async (req) => {
+const splitTvc: ProviderHandler<'splitTvc'> = async (_ctx, req) => {
   requireParams(req);
 
   const { tvc } = req.params;
@@ -147,7 +152,7 @@ const splitTvc: ProviderHandler<'splitTvc'> = async (req) => {
   }
 };
 
-const encodeInternalInput: ProviderHandler<'encodeInternalInput'> = async (req) => {
+const encodeInternalInput: ProviderHandler<'encodeInternalInput'> = async (_ctx, req) => {
   requireParams(req);
 
   requireFunctionCall(req, req, 'params');
@@ -160,7 +165,7 @@ const encodeInternalInput: ProviderHandler<'encodeInternalInput'> = async (req) 
   }
 };
 
-const decodeInput: ProviderHandler<'decodeInput'> = async (req) => {
+const decodeInput: ProviderHandler<'decodeInput'> = async (_ctx, req) => {
   requireParams(req);
 
   const { body, abi, method, internal } = req.params;
@@ -176,7 +181,7 @@ const decodeInput: ProviderHandler<'decodeInput'> = async (req) => {
   }
 };
 
-const decodeEvent: ProviderHandler<'decodeEvent'> = async (req) => {
+const decodeEvent: ProviderHandler<'decodeEvent'> = async (_ctx, req) => {
   requireParams(req);
 
   const { body, abi, event } = req.params;
@@ -191,7 +196,7 @@ const decodeEvent: ProviderHandler<'decodeEvent'> = async (req) => {
   }
 };
 
-const decodeOutput: ProviderHandler<'decodeOutput'> = async (req) => {
+const decodeOutput: ProviderHandler<'decodeOutput'> = async (_ctx, req) => {
   requireParams(req);
 
   const { body, abi, method } = req.params;
@@ -206,7 +211,7 @@ const decodeOutput: ProviderHandler<'decodeOutput'> = async (req) => {
   }
 };
 
-const decodeTransaction: ProviderHandler<'decodeTransaction'> = async (req) => {
+const decodeTransaction: ProviderHandler<'decodeTransaction'> = async (_ctx, req) => {
   requireParams(req);
 
   const { transaction, abi, method } = req.params;
@@ -220,7 +225,7 @@ const decodeTransaction: ProviderHandler<'decodeTransaction'> = async (req) => {
   }
 };
 
-const decodeTransactionEvents: ProviderHandler<'decodeTransactionEvents'> = async (req) => {
+const decodeTransactionEvents: ProviderHandler<'decodeTransactionEvents'> = async (_ctx, req) => {
   requireParams(req);
 
   const { transaction, abi } = req.params;
@@ -233,7 +238,7 @@ const decodeTransactionEvents: ProviderHandler<'decodeTransactionEvents'> = asyn
   }
 };
 
-const verifySignature: ProviderHandler<'verifySignature'> = async (req) => {
+const verifySignature: ProviderHandler<'verifySignature'> = async (_ctx, req) => {
   requireParams(req);
 
   const { publicKey, dataHash, signature } = req.params;
