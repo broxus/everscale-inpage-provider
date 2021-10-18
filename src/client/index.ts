@@ -11,6 +11,7 @@ import {
   RawProviderApiResponse,
   RawProviderRequest,
 } from '../index';
+import { ConnectionControllerProperties, ConnectionController, DEFAULT_NETWORK_GROUP } from './connectionController';
 
 let clientInitializationStarted: boolean = false;
 let notifyClientInitialized: { resolve: () => void, reject: () => void };
@@ -26,9 +27,16 @@ export function ensureClientInitialized(): Promise<void> {
   return initializationPromise;
 }
 
-export type StandaloneTonClientProperties = {};
+export type StandaloneTonClientProperties = {
+  connection: ConnectionControllerProperties
+};
 
-export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProperties = {};
+export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProperties = {
+  connection: {
+    networkGroup: DEFAULT_NETWORK_GROUP,
+    additionalPresets: {},
+  },
+};
 
 export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _context: Context;
@@ -51,9 +59,17 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
     verifySignature,
   };
 
-  constructor(params: StandaloneTonClientProperties) {
+  public static async create(params: StandaloneTonClientProperties): Promise<StandaloneTonClient> {
+    let connectionController = await ConnectionController.create(params.connection);
+
+    return new StandaloneTonClient({
+      connectionController,
+    });
+  }
+
+  private constructor(ctx: Context) {
     super();
-    this._context = new Context(params);
+    this._context = ctx;
   }
 
   request<T extends ProviderMethod>(req: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>> {
@@ -65,13 +81,8 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   }
 }
 
-class Context {
-  constructor(public params: StandaloneTonClientProperties) {
-  }
-
-  public get transport(): nt.GqlTransport {
-    return null!;
-  }
+type Context = {
+  connectionController: ConnectionController
 }
 
 type ProviderHandler<T extends ProviderMethod> = (ctx: Context, req: RawProviderRequest<T>) => Promise<RawProviderApiResponse<T>>;
@@ -82,7 +93,15 @@ const getFullContractState: ProviderHandler<'getFullContractState'> = async (ctx
   const { address } = req.params;
   requireString(req, req.params, 'address');
 
-  return { state: await ctx.transport.getFullContractState(address) };
+  const { connectionController } = ctx;
+
+  try {
+    return connectionController.use(async ({ data: { transport } }) => ({
+      state: await transport.getFullContractState(address),
+    }));
+  } catch (e: any) {
+    throw invalidRequest(req, e.toString());
+  }
 };
 
 const getTransactions: ProviderHandler<'getTransactions'> = async (ctx, req) => {
@@ -93,8 +112,11 @@ const getTransactions: ProviderHandler<'getTransactions'> = async (ctx, req) => 
   requireOptional(req, req.params, 'continuation', requireTransactionId);
   requireOptionalNumber(req, req.params, 'limit');
 
+  const { connectionController } = ctx;
+
   try {
-    return ctx.transport.getTransactions(address, continuation, limit || 50);
+    return connectionController.use(async ({ data: { transport } }) =>
+      transport.getTransactions(address, continuation, limit || 50));
   } catch (e: any) {
     throw invalidRequest(req, e.toString());
   }
@@ -108,9 +130,12 @@ const runLocal: ProviderHandler<'runLocal'> = async (ctx, req) => {
   requireOptional(req, req.params, 'cachedState', requireContractState);
   requireFunctionCall(req, req.params, 'functionCall');
 
+  const { connectionController } = ctx;
+
   let contractState = cachedState;
   if (contractState == null) {
-    contractState = await ctx.transport.getFullContractState(address);
+    contractState = await connectionController.use(async ({ data: { transport } }) =>
+      transport.getFullContractState(address));
   }
 
   if (contractState == null) {

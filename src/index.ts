@@ -173,8 +173,8 @@ export class ProviderRpcClient {
       }
 
       if (this._additionalInitializationPromise == null) {
-        this._additionalInitializationPromise = ensureClientInitialized().then(() => {
-          this._ton = new StandaloneTonClient(properties.standaloneClientProperties);
+        this._additionalInitializationPromise = ensureClientInitialized().then(async () => {
+          this._ton = await StandaloneTonClient.create(properties.standaloneClientProperties);
           this._registerEventHandlers(this._ton);
         });
       }

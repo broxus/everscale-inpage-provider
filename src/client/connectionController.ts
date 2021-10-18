@@ -3,7 +3,7 @@ import * as nt from 'nekoton-wasm';
 
 import { GqlSocket, GqlSocketParams } from './gql';
 
-const DEFAULT_NETWORK_GROUP = 'mainnet';
+export const DEFAULT_NETWORK_GROUP = 'mainnet';
 
 const NETWORK_PRESETS: { [presetId: number]: ConnectionData } = {
   [0]: {
@@ -97,7 +97,7 @@ export class ConnectionController {
   private _acquiredTransportCounter: number = 0;
   private _cancelTestTransport?: () => void;
 
-  public static async subscribe(params: ConnectionControllerProperties) {
+  public static async create(params: ConnectionControllerProperties) {
     const presets: typeof NETWORK_PRESETS = { ...NETWORK_PRESETS };
 
     // Extend presets with additional presets
