@@ -1,14 +1,18 @@
 import init, * as nt from 'nekoton-wasm';
 import safeStringify from 'fast-safe-stringify';
 
-import { SafeEventEmitter } from '../utils';
+import { convertVersionToInt32, SafeEventEmitter } from '../utils';
 import {
   FullContractState,
   GenTimings,
+  Permission,
   Provider,
+  ProviderEvent,
   ProviderMethod,
   RawFunctionCall,
+  RawPermissions,
   RawProviderApiResponse,
+  RawProviderEventData,
   RawProviderRequest,
 } from '../index';
 import { ConnectionControllerProperties, ConnectionController, DEFAULT_NETWORK_GROUP } from './connectionController';
@@ -38,9 +42,15 @@ export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProper
   },
 };
 
+export const STANDALONE_TON_CLIENT_VERSION = '0.2.17';
+export const SUPPORTED_PERMISSIONS: Permission[] = ['tonClient'];
+
 export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _context: Context;
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
+    requestPermissions,
+    disconnect,
+    getProviderState,
     getFullContractState,
     getTransactions,
     runLocal,
@@ -60,11 +70,22 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   };
 
   public static async create(params: StandaloneTonClientProperties): Promise<StandaloneTonClient> {
+    // NOTE: capture client inside notify using wrapper object
+    let notificationContext: { client?: WeakRef<StandaloneTonClient> } = {};
+
+    const notify = <T extends ProviderEvent>(method: T, params: RawProviderEventData<T>) => {
+      notificationContext.client?.deref()?.emit(method, params);
+    };
+
     let connectionController = await ConnectionController.create(params.connection);
 
-    return new StandaloneTonClient({
+    const client = new StandaloneTonClient({
+      permissions: {},
       connectionController,
+      notify,
     });
+    notificationContext.client = new WeakRef(client);
+    return client;
   }
 
   private constructor(ctx: Context) {
@@ -75,17 +96,72 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   request<T extends ProviderMethod>(req: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>> {
     const handler = this._handlers[req.method] as any as ProviderHandler<T> | undefined;
     if (handler == null) {
-      throw invalidRequest(req, 'Method is not supported by standalone transport');
+      throw invalidRequest(req, `Method '${req.method}' is not supported by standalone provider`);
     }
     return handler(this._context, req);
   }
 }
 
 type Context = {
-  connectionController: ConnectionController
+  permissions: Partial<RawPermissions>,
+  connectionController: ConnectionController,
+  notify: <T extends ProviderEvent>(method: T, params: RawProviderEventData<T>) => void
 }
 
 type ProviderHandler<T extends ProviderMethod> = (ctx: Context, req: RawProviderRequest<T>) => Promise<RawProviderApiResponse<T>>;
+
+const requestPermissions: ProviderHandler<'requestPermissions'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { permissions } = req.params;
+  requireArray(req, req.params, 'permissions');
+
+  const newPermissions = { ...ctx.permissions };
+  let permissionsChanged = false;
+
+  for (const permission of permissions) {
+    if (permission === 'tonClient') {
+      permissionsChanged ||= newPermissions.tonClient == null;
+      newPermissions.tonClient = true;
+    } else {
+      throw invalidRequest(req, `Permission '${permission}' is not supported by standalone provider`);
+    }
+  }
+
+  ctx.permissions = newPermissions;
+
+  // NOTE: be sure to return object copy to prevent adding new permissions
+  if (permissionsChanged) {
+    ctx.notify('permissionsChanged', {
+      permissions: { ...newPermissions },
+    });
+  }
+  return { ...newPermissions };
+};
+
+const disconnect: ProviderHandler<'disconnect'> = async (ctx, _req) => {
+  ctx.permissions = {};
+  ctx.notify('permissionsChanged', { permissions: {} });
+  return undefined;
+};
+
+const getProviderState: ProviderHandler<'getProviderState'> = async (ctx, req) => {
+  const selectedConnection = ctx.connectionController.currentConnectionGroup;
+  if (selectedConnection == null) {
+    throw invalidRequest(req, 'Connection controller was not initialized');
+  }
+
+  const version = STANDALONE_TON_CLIENT_VERSION;
+
+  return {
+    version,
+    numericVersion: convertVersionToInt32(version),
+    selectedConnection,
+    supportedPermissions: [...SUPPORTED_PERMISSIONS],
+    permissions: { ...ctx.permissions },
+    subscriptions: {}, // TODO: add subscriptions
+  };
+};
 
 const getFullContractState: ProviderHandler<'getFullContractState'> = async (ctx, req) => {
   requireParams(req);

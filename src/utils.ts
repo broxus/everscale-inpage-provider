@@ -202,3 +202,27 @@ export class SafeEventEmitter extends EventEmitter {
     return true
   }
 }
+
+/**
+ * @category Utils
+ */
+export const convertVersionToInt32 = (version: string): number => {
+  let parts = version.split('.')
+  if (parts.length !== 3) {
+    throw new Error('Received invalid version string')
+  }
+
+  parts.forEach((part) => {
+    if (~~part > 999) {
+      throw new Error(`Version string invalid, ${part} is too large`)
+    }
+  })
+
+  let multiplier = 1000000
+  let numericVersion = 0
+  for (let i = 0; i < 3; i++) {
+    numericVersion += ~~parts[i] * multiplier
+    multiplier /= 1000
+  }
+  return numericVersion
+}

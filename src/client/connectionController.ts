@@ -203,6 +203,10 @@ export class ConnectionController {
     return new NetworkSwitchHandle(this, release, params);
   }
 
+  public get currentConnectionGroup(): string | undefined {
+    return this._initializedTransport?.group;
+  }
+
   private async _connect(params: ConnectionData) {
     if (this._initializedTransport) {
       this._initializedTransport.data.transport.free();
