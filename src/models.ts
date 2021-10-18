@@ -432,6 +432,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
       }, key), parseTokenValue({
         name: '',
         type: valueType as AbiParamKind,
+        components: param.components,
       }, value)]);
     }
     return result;
