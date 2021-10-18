@@ -33,6 +33,9 @@ export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProper
 export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _context: Context;
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
+    getFullContractState,
+    getTransactions,
+    runLocal,
     getExpectedAddress,
     packIntoCell,
     unpackFromCell,
@@ -65,9 +68,72 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
 class Context {
   constructor(public params: StandaloneTonClientProperties) {
   }
+
+  public get transport(): nt.GqlTransport {
+    return null!;
+  }
 }
 
 type ProviderHandler<T extends ProviderMethod> = (ctx: Context, req: RawProviderRequest<T>) => Promise<RawProviderApiResponse<T>>;
+
+const getFullContractState: ProviderHandler<'getFullContractState'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { address } = req.params;
+  requireString(req, req.params, 'address');
+
+  return { state: await ctx.transport.getFullContractState(address) };
+};
+
+const getTransactions: ProviderHandler<'getTransactions'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { address, continuation, limit } = req.params;
+  requireString(req, req.params, 'address');
+  requireOptional(req, req.params, 'continuation', requireTransactionId);
+  requireOptionalNumber(req, req.params, 'limit');
+
+  try {
+    return ctx.transport.getTransactions(address, continuation, limit || 50);
+  } catch (e: any) {
+    throw invalidRequest(req, e.toString());
+  }
+};
+
+const runLocal: ProviderHandler<'runLocal'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { address, cachedState, functionCall } = req.params;
+  requireString(req, req.params, 'address');
+  requireOptional(req, req.params, 'cachedState', requireContractState);
+  requireFunctionCall(req, req.params, 'functionCall');
+
+  let contractState = cachedState;
+  if (contractState == null) {
+    contractState = await ctx.transport.getFullContractState(address);
+  }
+
+  if (contractState == null) {
+    throw invalidRequest(req, 'Account not found');
+  }
+  if (!contractState.isDeployed || contractState.lastTransactionId == null) {
+    throw invalidRequest(req, 'Account is not deployed');
+  }
+
+  try {
+    const { output, code } = nt.runLocal(
+      contractState.genTimings,
+      contractState.lastTransactionId,
+      contractState.boc,
+      functionCall.abi,
+      functionCall.method,
+      functionCall.params,
+    );
+    return { output, code };
+  } catch (e: any) {
+    throw invalidRequest(req, e.toString());
+  }
+};
 
 const getExpectedAddress: ProviderHandler<'getExpectedAddress'> = async (_ctx, req) => {
   requireParams(req);

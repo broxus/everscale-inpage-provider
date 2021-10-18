@@ -15,6 +15,8 @@ export class ContractSubscription {
   private _currentBlockId?: string;
   private _suggestedBlockId?: string;
 
+
+
   private constructor(transport: Transport, release: () => void, address: string, contract: nt.GenericContract) {
     this._transport = transport;
     this._address = address;

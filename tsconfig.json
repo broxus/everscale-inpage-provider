@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2018",
     "module": "commonjs",
     "outDir": "./dist",
     "strict": true,
@@ -23,6 +23,7 @@
       "es5",
       "es6",
       "es2017.object",
+      "es2018",
       "scripthost",
     ]
   },
