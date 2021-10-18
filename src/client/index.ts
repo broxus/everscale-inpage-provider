@@ -16,6 +16,7 @@ import {
   RawProviderRequest,
 } from '../index';
 import { ConnectionControllerProperties, ConnectionController, DEFAULT_NETWORK_GROUP } from './connectionController';
+import { SubscriptionController } from './subscriptionController';
 
 let clientInitializationStarted: boolean = false;
 let notifyClientInitialized: { resolve: () => void, reject: () => void };
@@ -50,6 +51,9 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
     requestPermissions,
     disconnect,
+    subscribe,
+    unsubscribe,
+    unsubscribeAll,
     getProviderState,
     getFullContractState,
     getTransactions,
@@ -77,11 +81,13 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
       notificationContext.client?.deref()?.emit(method, params);
     };
 
-    let connectionController = await ConnectionController.create(params.connection);
+    const connectionController = await ConnectionController.create(params.connection);
+    const subscriptionController = new SubscriptionController(connectionController, notify);
 
     const client = new StandaloneTonClient({
       permissions: {},
       connectionController,
+      subscriptionController,
       notify,
     });
     notificationContext.client = new WeakRef(client);
@@ -105,6 +111,7 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
 type Context = {
   permissions: Partial<RawPermissions>,
   connectionController: ConnectionController,
+  subscriptionController: SubscriptionController,
   notify: <T extends ProviderEvent>(method: T, params: RawProviderEventData<T>) => void
 }
 
@@ -117,11 +124,9 @@ const requestPermissions: ProviderHandler<'requestPermissions'> = async (ctx, re
   requireArray(req, req.params, 'permissions');
 
   const newPermissions = { ...ctx.permissions };
-  let permissionsChanged = false;
 
   for (const permission of permissions) {
     if (permission === 'tonClient') {
-      permissionsChanged ||= newPermissions.tonClient == null;
       newPermissions.tonClient = true;
     } else {
       throw invalidRequest(req, `Permission '${permission}' is not supported by standalone provider`);
@@ -131,17 +136,53 @@ const requestPermissions: ProviderHandler<'requestPermissions'> = async (ctx, re
   ctx.permissions = newPermissions;
 
   // NOTE: be sure to return object copy to prevent adding new permissions
-  if (permissionsChanged) {
-    ctx.notify('permissionsChanged', {
-      permissions: { ...newPermissions },
-    });
-  }
+  ctx.notify('permissionsChanged', {
+    permissions: { ...newPermissions },
+  });
   return { ...newPermissions };
 };
 
 const disconnect: ProviderHandler<'disconnect'> = async (ctx, _req) => {
   ctx.permissions = {};
+  await ctx.subscriptionController.unsubscribeFromAllContracts();
   ctx.notify('permissionsChanged', { permissions: {} });
+  return undefined;
+};
+
+const subscribe: ProviderHandler<'subscribe'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { address, subscriptions } = req.params;
+  requireString(req, req.params, 'address');
+  requireOptionalObject(req, req.params, 'subscriptions');
+
+  if (!nt.checkAddress(address)) {
+    throw invalidRequest(req, 'Invalid address');
+  }
+
+  try {
+    return await ctx.subscriptionController.subscribeToContract(address, subscriptions);
+  } catch (e: any) {
+    throw invalidRequest(req, e.toString());
+  }
+};
+
+const unsubscribe: ProviderHandler<'unsubscribe'> = async (ctx, req) => {
+  requireParams(req);
+
+  const { address } = req.params;
+  requireString(req, req.params, 'address');
+
+  if (!nt.checkAddress(address)) {
+    throw invalidRequest(req, 'Invalid address');
+  }
+
+  await ctx.subscriptionController.unsubscribeFromContract(address);
+  return undefined;
+};
+
+const unsubscribeAll: ProviderHandler<'unsubscribeAll'> = async (ctx, _req) => {
+  await ctx.subscriptionController.unsubscribeFromAllContracts();
   return undefined;
 };
 
@@ -159,7 +200,7 @@ const getProviderState: ProviderHandler<'getProviderState'> = async (ctx, req) =
     selectedConnection,
     supportedPermissions: [...SUPPORTED_PERMISSIONS],
     permissions: { ...ctx.permissions },
-    subscriptions: {}, // TODO: add subscriptions
+    subscriptions: ctx.subscriptionController.subscriptionStates,
   };
 };
 

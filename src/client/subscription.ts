@@ -1,6 +1,8 @@
 import { Mutex } from '@broxus/await-semaphore';
 import * as nt from 'nekoton-wasm';
 
+import { ConnectionController } from './connectionController';
+
 export class ContractSubscription {
   private readonly _transport: Transport;
   private readonly _address: string;
@@ -15,7 +17,23 @@ export class ContractSubscription {
   private _currentBlockId?: string;
   private _suggestedBlockId?: string;
 
+  public static async subscribe(connectionController: ConnectionController, address: string, handler: IContractHandler<nt.Transaction>) {
+    const {
+      transport: { data: { transport } },
+      release,
+    } = await connectionController.acquire();
 
+    try {
+      const contract = await transport.subscribeToGenericContract(address, handler);
+      if (contract == null) {
+        throw new Error(`Failed to subscribe to contract: ${address}`);
+      }
+      return new ContractSubscription(transport, release, address, contract);
+    } catch (e: any) {
+      release();
+      throw e;
+    }
+  }
 
   private constructor(transport: Transport, release: () => void, address: string, contract: nt.GenericContract) {
     this._transport = transport;
