@@ -15,7 +15,12 @@ import {
   RawProviderEventData,
   RawProviderRequest,
 } from '../index';
-import { ConnectionControllerProperties, ConnectionController, DEFAULT_NETWORK_GROUP } from './connectionController';
+import {
+  ConnectionControllerProperties,
+  ConnectionController,
+  DEFAULT_NETWORK_GROUP,
+  createConnectionController,
+} from './connectionController';
 import { SubscriptionController } from './subscriptionController';
 
 let clientInitializationStarted: boolean = false;
@@ -46,6 +51,27 @@ export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProper
 export const STANDALONE_TON_CLIENT_VERSION = '0.2.17';
 export const SUPPORTED_PERMISSIONS: Permission[] = ['tonClient'];
 
+export async function createStandaloneTonClient(params: StandaloneTonClientProperties): Promise<StandaloneTonClient> {
+  // NOTE: capture client inside notify using wrapper object
+  let notificationContext: { client?: WeakRef<StandaloneTonClient> } = {};
+
+  const notify = <T extends ProviderEvent>(method: T, params: RawProviderEventData<T>) => {
+    notificationContext.client?.deref()?.emit(method, params);
+  };
+
+  const connectionController = await createConnectionController(params.connection);
+  const subscriptionController = new SubscriptionController(connectionController, notify);
+
+  const client = new StandaloneTonClient({
+    permissions: {},
+    connectionController,
+    subscriptionController,
+    notify,
+  });
+  notificationContext.client = new WeakRef(client);
+  return client;
+}
+
 export class StandaloneTonClient extends SafeEventEmitter implements Provider {
   private _context: Context;
   private _handlers: { [K in ProviderMethod]?: ProviderHandler<K> } = {
@@ -73,28 +99,7 @@ export class StandaloneTonClient extends SafeEventEmitter implements Provider {
     verifySignature,
   };
 
-  public static async create(params: StandaloneTonClientProperties): Promise<StandaloneTonClient> {
-    // NOTE: capture client inside notify using wrapper object
-    let notificationContext: { client?: WeakRef<StandaloneTonClient> } = {};
-
-    const notify = <T extends ProviderEvent>(method: T, params: RawProviderEventData<T>) => {
-      notificationContext.client?.deref()?.emit(method, params);
-    };
-
-    const connectionController = await ConnectionController.create(params.connection);
-    const subscriptionController = new SubscriptionController(connectionController, notify);
-
-    const client = new StandaloneTonClient({
-      permissions: {},
-      connectionController,
-      subscriptionController,
-      notify,
-    });
-    notificationContext.client = new WeakRef(client);
-    return client;
-  }
-
-  private constructor(ctx: Context) {
+  constructor(ctx: Context) {
     super();
     this._context = ctx;
   }

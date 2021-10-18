@@ -90,69 +90,66 @@ export type ConnectionControllerProperties = {
   additionalPresets?: { [presetId: number]: ConnectionData }
 };
 
+export async function createConnectionController(params: ConnectionControllerProperties): Promise<ConnectionController> {
+  const presets: typeof NETWORK_PRESETS = { ...NETWORK_PRESETS };
+
+  // Extend presets with additional presets
+  if (params.additionalPresets != null) {
+    for (const [key, value] of Object.entries(params.additionalPresets)) {
+      const mappedPresets = presets as { [key: string]: ConnectionData };
+      if (mappedPresets[key]) {
+        throw new Error(`Connection preset with id ${key} already exists`);
+      }
+      mappedPresets[key] = value;
+    }
+  }
+
+  // Select presets
+  let availablePresets: ConnectionData[];
+  if (params.presetId != null) {
+    const targetPreset = presets[params.presetId] as ConnectionData | undefined;
+    if (targetPreset == null) {
+      throw new Error(`Target preset id not found: ${params.presetId}`);
+    }
+    availablePresets = [targetPreset];
+  } else {
+    availablePresets = selectPresetsByGroup(presets, params.networkGroup || DEFAULT_NETWORK_GROUP);
+  }
+
+  console.debug('Available presets:', availablePresets);
+
+  // Try connect
+  while (true) {
+    try {
+      for (const preset of availablePresets) {
+        console.debug(`Connecting to ${preset.name} ...`);
+
+        try {
+          const controller = new ConnectionController();
+          await controller.startSwitchingNetwork(preset).then((handle) => handle.switch());
+          console.log(`Successfully connected to ${preset.name}`);
+          return controller;
+        } catch (e: any) {
+          console.error('Connection failed:', e);
+        }
+      }
+    } catch (_e) {
+      console.error('Failed to select initial connection. Retrying in 5s');
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 5000);
+    });
+    console.log('Restarting connection process');
+  }
+}
+
 export class ConnectionController {
   private _initializedTransport?: InitializedTransport;
   private _networkMutex: Mutex = new Mutex();
   private _release?: () => void;
   private _acquiredTransportCounter: number = 0;
   private _cancelTestTransport?: () => void;
-
-  public static async create(params: ConnectionControllerProperties) {
-    const presets: typeof NETWORK_PRESETS = { ...NETWORK_PRESETS };
-
-    // Extend presets with additional presets
-    if (params.additionalPresets != null) {
-      for (const [key, value] of Object.entries(params.additionalPresets)) {
-        const mappedPresets = presets as { [key: string]: ConnectionData };
-        if (mappedPresets[key]) {
-          throw new Error(`Connection preset with id ${key} already exists`);
-        }
-        mappedPresets[key] = value;
-      }
-    }
-
-    // Select presets
-    let availablePresets: ConnectionData[];
-    if (params.presetId != null) {
-      const targetPreset = presets[params.presetId] as ConnectionData | undefined;
-      if (targetPreset == null) {
-        throw new Error(`Target preset id not found: ${params.presetId}`);
-      }
-      availablePresets = [targetPreset];
-    } else {
-      availablePresets = selectPresetsByGroup(presets, params.networkGroup || DEFAULT_NETWORK_GROUP);
-    }
-
-    console.debug('Available presets:', availablePresets);
-
-    // Try connect
-    while (true) {
-      try {
-        for (const preset of availablePresets) {
-          console.debug(`Connecting to ${preset.name} ...`);
-
-          try {
-            const controller = new ConnectionController();
-            await controller.startSwitchingNetwork(preset).then((handle) => handle.switch());
-            console.log(`Successfully connected to ${preset.name}`);
-            return controller;
-          } catch (e: any) {
-            console.error('Connection failed:', e);
-          }
-        }
-      } catch (_e) {
-        console.error('Failed to select initial connection. Retrying in 5s');
-      }
-
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 5000);
-      });
-      console.log('Restarting connection process');
-    }
-  }
-
-  private constructor() {
-  }
 
   public async acquire() {
     requireInitializedTransport(this._initializedTransport);

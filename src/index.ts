@@ -32,7 +32,7 @@ import { Subscriber } from './stream';
 import { Contract } from './contract';
 import {
   ensureClientInitialized,
-  StandaloneTonClient,
+  createStandaloneTonClient,
   StandaloneTonClientProperties,
   DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES,
 } from './client';
@@ -42,6 +42,7 @@ export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
+export { StandaloneTonClientProperties } from './client';
 
 /**
  * @category Provider
@@ -174,7 +175,7 @@ export class ProviderRpcClient {
 
       if (this._additionalInitializationPromise == null) {
         this._additionalInitializationPromise = ensureClientInitialized().then(async () => {
-          this._ton = await StandaloneTonClient.create(properties.standaloneClientProperties);
+          this._ton = await createStandaloneTonClient(properties.standaloneClientProperties);
           this._registerEventHandlers(this._ton);
         });
       }
