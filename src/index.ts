@@ -32,9 +32,9 @@ import { Subscriber } from './stream';
 import { Contract } from './contract';
 import {
   ensureClientInitialized,
-  createStandaloneTonClient,
-  StandaloneTonClientProperties,
-  DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES,
+  createTonClient,
+  TonClientProperties,
+  DEFAULT_TON_CLIENT_PROPERTIES,
 } from './client';
 
 export * from './api';
@@ -42,19 +42,32 @@ export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
-export { StandaloneTonClientProperties } from './client';
+export { TonClientProperties, TonClientConnectionProperties, DEFAULT_TON_CLIENT_PROPERTIES } from './client';
 
 /**
  * @category Provider
  */
 export type ProviderProperties = {
+  /**
+   * If this flag is explicitly set to `false`, then in the case when the wallet is not installed,
+   * the standalone provider will be loaded (it supports all methods that **doesn't** require
+   * `accountInteraction` permission)
+   *
+   * Default: `true`
+   */
   requireFullProvider: boolean
-  standaloneClientProperties: StandaloneTonClientProperties,
+  /**
+   * Settings for standalone provider
+   */
+  standaloneClientProperties: TonClientProperties,
 };
 
+/**
+ * @category Provider
+ */
 export const DEFAULT_PROVIDER_PROPERTIES: ProviderProperties = {
   requireFullProvider: true,
-  standaloneClientProperties: DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES,
+  standaloneClientProperties: DEFAULT_TON_CLIENT_PROPERTIES,
 };
 
 /**
@@ -175,7 +188,7 @@ export class ProviderRpcClient {
 
       if (this._additionalInitializationPromise == null) {
         this._additionalInitializationPromise = ensureClientInitialized().then(async () => {
-          this._ton = await createStandaloneTonClient(properties.standaloneClientProperties);
+          this._ton = await createTonClient(properties.standaloneClientProperties);
           this._registerEventHandlers(this._ton);
         });
       }

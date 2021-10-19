@@ -68,7 +68,10 @@ const NETWORK_PRESETS: { [presetId: number]: ConnectionData } = {
   } as ConnectionData,
 };
 
-export type ConnectionControllerProperties = {
+/**
+ * @category Client
+ */
+export type TonClientConnectionProperties = {
   /**
    * Target network group.
    *
@@ -90,7 +93,7 @@ export type ConnectionControllerProperties = {
   additionalPresets?: { [presetId: number]: ConnectionData }
 };
 
-export async function createConnectionController(params: ConnectionControllerProperties): Promise<ConnectionController> {
+export async function createConnectionController(params: TonClientConnectionProperties): Promise<ConnectionController> {
   const presets: typeof NETWORK_PRESETS = { ...NETWORK_PRESETS };
 
   // Extend presets with additional presets

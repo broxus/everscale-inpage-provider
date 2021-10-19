@@ -16,12 +16,14 @@ import {
   RawProviderRequest,
 } from '../index';
 import {
-  ConnectionControllerProperties,
-  ConnectionController,
-  DEFAULT_NETWORK_GROUP,
   createConnectionController,
+  DEFAULT_NETWORK_GROUP,
+  TonClientConnectionProperties,
+  ConnectionController,
 } from './connectionController';
 import { SubscriptionController } from './subscriptionController';
+
+export { TonClientConnectionProperties } from './connectionController';
 
 let clientInitializationStarted: boolean = false;
 let notifyClientInitialized: { resolve: () => void, reject: () => void };
@@ -37,21 +39,29 @@ export function ensureClientInitialized(): Promise<void> {
   return initializationPromise;
 }
 
-export type StandaloneTonClientProperties = {
-  connection: ConnectionControllerProperties
+/**
+ * Standalone provider which is used as a fallback when browser extension is not installed
+ *
+ * @category Client
+ */
+export type TonClientProperties = {
+  connection: TonClientConnectionProperties
 };
 
-export const DEFAULT_STANDALONE_TON_CLIENT_PROPERTIES: StandaloneTonClientProperties = {
+/**
+ * @category Client
+ */
+export const DEFAULT_TON_CLIENT_PROPERTIES: TonClientProperties = {
   connection: {
     networkGroup: DEFAULT_NETWORK_GROUP,
     additionalPresets: {},
   },
 };
 
-export const STANDALONE_TON_CLIENT_VERSION = '0.2.17';
+export const TON_CLIENT_VERSION = '0.2.17';
 export const SUPPORTED_PERMISSIONS: Permission[] = ['tonClient'];
 
-export async function createStandaloneTonClient(params: StandaloneTonClientProperties): Promise<StandaloneTonClient> {
+export async function createTonClient(params: TonClientProperties): Promise<StandaloneTonClient> {
   // NOTE: capture client inside notify using wrapper object
   let notificationContext: { client?: WeakRef<StandaloneTonClient> } = {};
 
@@ -197,7 +207,7 @@ const getProviderState: ProviderHandler<'getProviderState'> = async (ctx, req) =
     throw invalidRequest(req, 'Connection controller was not initialized');
   }
 
-  const version = STANDALONE_TON_CLIENT_VERSION;
+  const version = TON_CLIENT_VERSION;
 
   return {
     version,
