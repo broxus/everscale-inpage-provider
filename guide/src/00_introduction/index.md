@@ -153,9 +153,47 @@ Masterchain is a special case of workchain. It has notable differences:
 
 ### Accounts
 
+TODO: structure (code, data, what is tvc)
+
+TODO: how address is calculated, what is state init
+
+TODO: states and transitions
+
 ...
 
 ### Messages
+
+_Please refer to [the TON Labs docs](https://docs.ton.dev/86757ecb2/p/45e664-basics-of-free-ton-blockchain/t/20b3af)_
+
+> #### Logical time
+> Before considering messages, it is necessary to know what is the _logical time_. It is a non-negative 64-bit integer,
+> assigned to certain events as follows:
+> 
+> > If an event _e_ logically depends on events _e<sub>1</sub> ,... , e<sub>n</sub>_, then logical time of _e_ is the smallest
+> > non-negative integer that is greater than all logical times of _e<sub>i</sub>_
+
+In TON blockchain, messages exist "separately" from transactions as an entity. There are three types of messages in FreeTON:
+
+* _External inbound_ - doesn't contain source address but has the destination address, doesn't have any value. It is used to
+  call contracts from outside or to deploy them.
+  * There are some limitations on their size, and it is also not guaranteed that they will be delivered in order or that they will 
+    be delivered at all.
+
+* _Internal_ - has both source and destination addresses and can have some value. It allows contracts to communicate with each other.
+  There are no reasonable limitations on their size. 
+  * It is important to note that each internal message is unique (because it contains its full source address along with its logical
+    creation time, and all outbound messages created by the same smart contract have strictly increasing logical creation times), 
+    so, by the hash of the internal message, you can definitely find it (but the same message can be presented in two transactions, 
+    as internal outgoing and internal incoming).
+  * Order of internal messages is guaranteed (within a single shard). The order of messages is preserved by their logical time.
+  * Delivery of these messages is also guaranteed.
+  * Internal messages within one shard can reach the destination in almost the same block, however when message is sent to the account
+    which is in the different shard it may take a long time. 
+
+* _External outbound_ - has the source address but doesn't contain source address, doesn't have any value. It is used as the
+  events the contracts produce for the outside world. Use them to implement some off-chain logic.
+
+TODO: body, state init, abi (packing, signatures)
 
 ...
 
