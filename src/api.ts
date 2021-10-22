@@ -402,7 +402,7 @@ export type ProviderApi<Addr = Address> = {
   /**
    * Extracts public key from raw account state
    *
-   * NOTE: can only be used on contracts which are deployed and has `pubkey` header
+   * **NOTE:** can only be used on contracts which are deployed and has `pubkey` header
    *
    * ---
    * Required permissions: `tonClient`

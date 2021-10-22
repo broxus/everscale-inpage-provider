@@ -252,6 +252,7 @@ export type SignedMessage = {
  * @category Models
  */
 export type TokenValue<Addr = Address> =
+  | null
   | boolean
   | string
   | number
@@ -314,6 +315,9 @@ type AbiParamKindArray = `${AbiParamKind}[]`;
 
 type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress},${AbiParamKind | `${AbiParamKind}[]`})`;
 
+type AbiParamOptional = `optional(${AbiParamKind})`
+
+
 /**
  * @category Models
  */
@@ -336,7 +340,7 @@ export type AbiParamKind =
  */
 export type AbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional;
   components?: AbiParam[];
 };
 
@@ -345,7 +349,7 @@ export type AbiParam = {
  */
 export type ReadonlyAbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional;
   components?: readonly ReadonlyAbiParam[];
 }
 
@@ -367,7 +371,7 @@ function serializeTokenValue(token: TokenValue): RawTokenValue {
       result.push(serializeTokenValue(item));
     }
     return result;
-  } else if (typeof token === 'object') {
+  } else if (token != null && typeof token === 'object') {
     const result: { [name: string]: RawTokenValue } = {};
     for (const [key, value] of Object.entries(token)) {
       result[key] = serializeTokenValue(value);
@@ -391,8 +395,16 @@ export function parseTokensObject(params: AbiParam[], object: RawTokensObject): 
 
 function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
   if (!param.type.startsWith('map')) {
-    const rawType = (param.type.endsWith('[]') ? param.type.slice(0, -2) : param.type) as AbiParamKind;
-    const isArray = rawType != param.type;
+    const isArray = param.type.endsWith('[]');
+    const isOptional = !isArray && param.type.startsWith('optional');
+
+    const rawType = (
+      isArray ?
+        param.type.slice(0, -2) :
+        isOptional ?
+          param.type.slice(9, -1) :
+          param.type
+    ) as AbiParamKind;
 
     if (isArray) {
       const rawParam = { name: param.name, type: rawType, components: param.components } as AbiParam;
@@ -402,6 +414,13 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
         result.push(parseTokenValue(rawParam, item));
       }
       return result;
+    } else if (isOptional) {
+      if (token == null) {
+        return null;
+      } else {
+        const rawParam = { name: param.name, type: rawType, components: param.components } as AbiParam;
+        return parseTokenValue(rawParam, token);
+      }
     } else if (rawType == 'tuple') {
       type TokenValueTuple<Addr> = { [K in string]: TokenValue<Addr> };
 
@@ -432,6 +451,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
       }, key), parseTokenValue({
         name: '',
         type: valueType as AbiParamKind,
+        components: param.components,
       }, value)]);
     }
     return result;
@@ -455,7 +475,8 @@ type InputTokenValue<T, C> =
           : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
             : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
-                : never;
+                : T extends `optional(${infer V})` ? (V | null)
+                  : never;
 
 type OutputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindString | AbiParamKindPublicKey ? string
@@ -465,7 +486,8 @@ type OutputTokenValue<T, C> =
           : T extends AbiParamKindTuple ? MergeOutputObjectsArray<C>
             : T extends `${infer K}[]` ? OutputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
-                : never;
+                : T extends `optional(${infer V})` ? (OutputTokenValue<V, C> | null)
+                  : never;
 
 /**
  * @category Models

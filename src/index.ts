@@ -23,22 +23,52 @@ import {
   parseTransaction,
   serializeTokensObject,
 } from './models';
-
 import {
   Address,
   AddressLiteral,
   getUniqueId,
 } from './utils';
-
 import { Subscriber } from './stream';
-
 import { Contract } from './contract';
+import {
+  ensureClientInitialized,
+  createTonClient,
+  TonClientProperties,
+  DEFAULT_TON_CLIENT_PROPERTIES,
+} from './client';
 
 export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
+export { TonClientProperties, TonClientConnectionProperties, DEFAULT_TON_CLIENT_PROPERTIES } from './client';
+
+/**
+ * @category Provider
+ */
+export type ProviderProperties = {
+  /**
+   * If this flag is explicitly set to `false`, then in the case when the wallet is not installed,
+   * the standalone provider will be loaded (it supports all methods that **doesn't** require
+   * `accountInteraction` permission)
+   *
+   * Default: `true`
+   */
+  requireFullProvider: boolean
+  /**
+   * Settings for standalone provider
+   */
+  standaloneClientProperties: TonClientProperties,
+};
+
+/**
+ * @category Provider
+ */
+export const DEFAULT_PROVIDER_PROPERTIES: ProviderProperties = {
+  requireFullProvider: true,
+  standaloneClientProperties: DEFAULT_TON_CLIENT_PROPERTIES,
+};
 
 /**
  * @category Provider
@@ -73,9 +103,9 @@ if (document.readyState == 'complete') {
 /**
  * @category Provider
  */
-export async function hasTonProvider(): Promise<boolean> {
+export async function hasTonProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
   await ensurePageLoaded;
-  return (window as Record<string, any>).hasTonProvider === true;
+  return !properties.requireFullProvider || (window as Record<string, any>).hasTonProvider === true;
 }
 
 /**
@@ -83,12 +113,14 @@ export async function hasTonProvider(): Promise<boolean> {
  */
 export class ProviderRpcClient {
   private readonly _api: RawProviderApiMethods;
-  private readonly _initializationPromise: Promise<void>;
+  private readonly _mainInitializationPromise: Promise<void>;
+  private _additionalInitializationPromise?: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _ton?: Provider;
 
   constructor() {
+    // Wrap provider requests
     this._api = new Proxy({}, {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
@@ -96,16 +128,24 @@ export class ProviderRpcClient {
       ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! }),
     }) as unknown as RawProviderApiMethods;
 
+    // Initialize provider with injected object by default
     this._ton = (window as any).ton;
     if (this._ton != null) {
-      this._initializationPromise = Promise.resolve();
+      // Provider as already injected
+      this._mainInitializationPromise = Promise.resolve();
     } else {
-      this._initializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
+      // Wait until page is loaded initialization complete
+      this._mainInitializationPromise = hasTonProvider({
+        ...DEFAULT_PROVIDER_PROPERTIES,
+        requireFullProvider: true,
+      }).then((hasTonProvider) => new Promise((resolve, reject) => {
         if (!hasTonProvider) {
+          // Fully loaded page doesn't even contain provider flag
           reject(new ProviderNotFoundException());
           return;
         }
 
+        // Wait injected provider initialization otherwise
         this._ton = (window as any).ton;
         if (this._ton != null) {
           resolve();
@@ -118,40 +158,10 @@ export class ProviderRpcClient {
       }));
     }
 
-    this._initializationPromise.then(() => {
-      if (this._ton == null) {
-        return;
-      }
-
-      const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
-        'disconnected': (data) => data,
-        'transactionsFound': (data) => ({
-          address: new Address(data.address),
-          transactions: data.transactions.map(parseTransaction),
-          info: data.info,
-        }),
-        'contractStateChanged': (data) => ({
-          address: new Address(data.address),
-          state: data.state,
-        }),
-        'networkChanged': data => data,
-        'permissionsChanged': (data) => ({
-          permissions: parsePermissions(data.permissions),
-        }),
-        'loggedOut': data => data,
-      };
-
-      for (const [eventName, extractor] of Object.entries(knownEvents)) {
-        this._ton.addListener(eventName as ProviderEvent, (data) => {
-          const handlers = this._subscriptions[eventName as ProviderEvent];
-          if (handlers == null) {
-            return;
-          }
-          const parsed = (extractor as any)(data);
-          for (const handler of Object.values(handlers)) {
-            handler(parsed);
-          }
-        });
+    // Will only register handlers for successfully loaded injected provider
+    this._mainInitializationPromise.then(() => {
+      if (this._ton != null) {
+        this._registerEventHandlers(this._ton);
       }
     });
   }
@@ -159,8 +169,8 @@ export class ProviderRpcClient {
   /**
    * Checks whether ton provider exists.
    */
-  public async hasProvider(): Promise<boolean> {
-    return hasTonProvider();
+  public async hasProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
+    return hasTonProvider(properties);
   }
 
   /**
@@ -168,8 +178,23 @@ export class ProviderRpcClient {
    *
    * @throws ProviderNotFoundException when no provider found
    */
-  public async ensureInitialized(): Promise<void> {
-    await this._initializationPromise;
+  public async ensureInitialized(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<void> {
+    try {
+      await this._mainInitializationPromise;
+    } catch (e) {
+      if (properties.requireFullProvider) {
+        throw e;
+      }
+
+      if (this._additionalInitializationPromise == null) {
+        this._additionalInitializationPromise = ensureClientInitialized().then(async () => {
+          this._ton = await createTonClient(properties.standaloneClientProperties);
+          this._registerEventHandlers(this._ton);
+        });
+      }
+
+      await this._additionalInitializationPromise;
+    }
   }
 
   /**
@@ -485,7 +510,7 @@ export class ProviderRpcClient {
   /**
    * Extracts public key from raw account state
    *
-   * NOTE: can only be used on contracts which are deployed and has `pubkey` header
+   * **NOTE:** can only be used on contracts which are deployed and has `pubkey` header
    *
    * ---
    * Required permissions: `tonClient`
@@ -529,15 +554,16 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async addAsset<T extends AssetType>(args: AddAssetParams<T>): Promise<ProviderApiResponse<'addAsset'>> {
-    let params: AssetTypeParams<T, string>
+    let params: AssetTypeParams<T, string>;
     switch (args.type) {
       case 'tip3_token': {
         params = {
-          rootContract: args.params.rootContract.toString()
-        } as AssetTypeParams<T, string>
-        break
+          rootContract: args.params.rootContract.toString(),
+        } as AssetTypeParams<T, string>;
+        break;
       }
-      default: throw new Error("Unknown asset type")
+      default:
+        throw new Error('Unknown asset type');
     }
 
     return await this._api.addAsset({
@@ -548,7 +574,7 @@ export class ProviderRpcClient {
   }
 
   public async verifySignature(args: ProviderApiRequestParams<'verifySignature'>): Promise<ProviderApiResponse<'verifySignature'>> {
-    return await this._api.verifySignature(args)
+    return await this._api.verifySignature(args);
   }
 
   /**
@@ -582,6 +608,39 @@ export class ProviderRpcClient {
     return {
       transaction: parseTransaction(transaction),
     };
+  }
+
+  private _registerEventHandlers(provider: Provider) {
+    const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
+      'disconnected': (data) => data,
+      'transactionsFound': (data) => ({
+        address: new Address(data.address),
+        transactions: data.transactions.map(parseTransaction),
+        info: data.info,
+      }),
+      'contractStateChanged': (data) => ({
+        address: new Address(data.address),
+        state: data.state,
+      }),
+      'networkChanged': data => data,
+      'permissionsChanged': (data) => ({
+        permissions: parsePermissions(data.permissions),
+      }),
+      'loggedOut': data => data,
+    };
+
+    for (const [eventName, extractor] of Object.entries(knownEvents)) {
+      provider.addListener(eventName as ProviderEvent, (data) => {
+        const handlers = this._subscriptions[eventName as ProviderEvent];
+        if (handlers == null) {
+          return;
+        }
+        const parsed = (extractor as any)(data);
+        for (const handler of Object.values(handlers)) {
+          handler(parsed);
+        }
+      });
+    }
   }
 
   private _getEventSubscriptions<T extends ProviderEvent>(
