@@ -479,6 +479,18 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Computes hash of base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  public async getBocHash(boc: string): Promise<string> {
+    return await this._api.getBocHash({
+      boc,
+    }).then(({ hash }) => hash)
+  }
+
+  /**
    * Creates base64 encoded BOC
    *
    * ---
@@ -578,13 +590,25 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Signs arbitrary data
+   * Signs arbitrary data.
+   *
+   * NOTE: hashes data before signing. Use `signDataRaw` to sign without hash.
    *
    * ---
    * Requires permissions: `accountInteraction`
    */
   public async signData(args: ProviderApiRequestParams<'signData'>): Promise<ProviderApiResponse<'signData'>> {
     return await this._api.signData(args);
+  }
+
+  /**
+   * Signs arbitrary data without hashing it
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async signDataRaw(args: ProviderApiRequestParams<'signDataRaw'>): Promise<ProviderApiResponse<'signDataRaw'>> {
+    return await this._api.signDataRaw(args);
   }
 
   /**

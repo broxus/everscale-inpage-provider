@@ -346,6 +346,27 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Computes hash of base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `tonClient`
+   */
+  getBocHash: {
+    input: {
+      /**
+       * Base64 encoded cell BOC
+       */
+      boc: string
+    };
+    output: {
+      /**
+       * Hex encoded cell hash
+       */
+      hash: string;
+    };
+  };
+
+  /**
    * Creates base64 encoded BOC
    *
    * ---
@@ -777,7 +798,9 @@ export type ProviderApi<Addr = Address> = {
   }
 
   /**
-   * Signs arbitrary data
+   * Signs arbitrary data.
+   *
+   * NOTE: hashes data before signing. Use `signDataRaw` to sign without hash.
    *
    * ---
    * Requires permissions: `accountInteraction`
@@ -799,6 +822,49 @@ export type ProviderApi<Addr = Address> = {
        * Hex encoded data hash
        */
       dataHash: string;
+      /**
+       * Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)
+       */
+      signature: string,
+      /**
+       * Hex encoded signature bytes (data is guaranteed to be 64 bytes long)
+       */
+      signatureHex: string,
+      /**
+       * Same signature, but split into two uint256 parts
+       */
+      signatureParts: {
+        /**
+         * High 32 bytes of the signature as uint256
+         */
+        high: string;
+        /**
+         * Low 32 bytes of the signature as uint256
+         */
+        low: string;
+      }
+    }
+  };
+
+  /**
+   * Signs arbitrary data without hashing it
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  signDataRaw: {
+    input: {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Base64 encoded arbitrary bytes
+       */
+      data: string;
+    };
+    output: {
       /**
        * Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)
        */
