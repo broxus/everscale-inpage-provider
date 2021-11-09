@@ -7,7 +7,7 @@ import {
   RawProviderRequest,
   RawProviderApiRequestParams,
   RawProviderApiResponse,
-  ProviderApiRequestParams, RawProviderApi,
+  ProviderApiRequestParams,
 } from './api';
 
 import {
@@ -35,7 +35,7 @@ export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
-export { Address, AddressLiteral, mergeTransactions } from './utils';
+export { Address, AddressLiteral, UniqueArray, mergeTransactions } from './utils';
 
 /**
  * @category Provider
