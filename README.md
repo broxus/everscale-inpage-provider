@@ -29,81 +29,105 @@ npm install --save ton-inpage-provider
 ### Example
 
 ```typescript
-import ton, { hasTonProvider } from 'ton-inpage-provider';
+import { 
+  Address, 
+  ProviderRpcClient, 
+  TvmException 
+} from 'ton-inpage-provider';
+
+const ton = new ProviderRpcClient();
 
 async function myApp() {
-  if (!(await hasTonProvider())) {
-    throw new Error('Extension is not installed')
+  if (!(await ton.hasProvider())) {
+    throw new Error('Extension is not installed');
   }
   await ton.ensureInitialized();
 
-  const { accountInteraction } = await ton.rawApi.requestPermissions({
-    permissions: ['tonClient', 'accountInteraction']
+  const { accountInteraction } = await ton.requestPermissions({
+    permissions: ['tonClient', 'accountInteraction'],
   });
   if (accountInteraction == null) {
-    throw new Error('Insufficient permissions')
+    throw new Error('Insufficient permissions');
   }
 
   const selectedAddress = accountInteraction.address;
-  const dePoolAddress = '0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9';
+  const dePoolAddress = new Address('0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9');
 
-  const { transaction } = await ton.rawApi.sendMessage({
-    sender: selectedAddress,
-    recipient: dePoolAddress,
-    amount: '10500000000',
-    bounce: true,
-    payload: {
-      abi: DePoolAbi,
-      method: 'addOrdinaryStake',
-      params: {
-        stake: '10000000000'
-      }
-    }
-  });
+  const dePool = ton.createContract(DePoolAbi, dePoolAddress);
+
+  const transaction = await dePool
+    .methods
+    .addOrdinaryStake({
+      stake: '10000000000',
+    }).send({
+      from: selectedAddress,
+      amount: '10500000000',
+      bounce: true,
+    });
   console.log(transaction);
 
-  const { output, code } = await ton.rawApi.runLocal({
-    address: dePoolAddress,
-    functionCall: {
-      abi: DePoolAbi,
-      method: 'getParticipantInfo',
-      params: {
-        addr: selectedAddress
-      }
+  try {
+    const output = await dePool
+      .methods
+      .getParticipantInfo({
+        addr: selectedAddress,
+      })
+      .call();
+    console.log(output);
+  } catch (e) {
+    if (e instanceof TvmException) {
+      console.error(e.code);
     }
-  });
-  console.log(output, code);
+  }
 }
 
-const DePoolAbi = `{
-  "ABI version": 2,
-  "header": ["time", "expire"],
-  "functions": [{
-    "name": "addOrdinaryStake",
-    "inputs": [
-      {"name":"stake","type":"uint64"}
+const DePoolAbi = {
+  'ABI version': 2,
+  'header': ['time', 'expire'],
+  'functions': [{
+    'name': 'addOrdinaryStake',
+    'inputs': [
+      { 'name': 'stake', 'type': 'uint64' },
     ],
-    "outputs": []
+    'outputs': [],
   }, {
-    "name": "getParticipantInfo",
-    "inputs": [
-      {"name":"addr","type":"address"}
+    'name': 'getParticipantInfo',
+    'inputs': [
+      { 'name': 'addr', 'type': 'address' },
     ],
-    "outputs": [
-      {"name":"total","type":"uint64"},
-      {"name":"withdrawValue","type":"uint64"},
-      {"name":"reinvest","type":"bool"},
-      {"name":"reward","type":"uint64"},
-      {"name":"stakes","type":"map(uint64,uint64)"},
-      {"components":[{"name":"remainingAmount","type":"uint64"},{"name":"lastWithdrawalTime","type":"uint64"},{"name":"withdrawalPeriod","type":"uint32"},{"name":"withdrawalValue","type":"uint64"},{"name":"owner","type":"address"}],"name":"vestings","type":"map(uint64,tuple)"},
-      {"components":[{"name":"remainingAmount","type":"uint64"},{"name":"lastWithdrawalTime","type":"uint64"},{"name":"withdrawalPeriod","type":"uint32"},{"name":"withdrawalValue","type":"uint64"},{"name":"owner","type":"address"}],"name":"locks","type":"map(uint64,tuple)"},
-      {"name":"vestingDonor","type":"address"},
-      {"name":"lockDonor","type":"address"}
-    ]
+    'outputs': [
+      { 'name': 'total', 'type': 'uint64' },
+      { 'name': 'withdrawValue', 'type': 'uint64' },
+      { 'name': 'reinvest', 'type': 'bool' },
+      { 'name': 'reward', 'type': 'uint64' },
+      { 'name': 'stakes', 'type': 'map(uint64,uint64)' },
+      {
+        'components': [
+          { 'name': 'remainingAmount', 'type': 'uint64' }, 
+          { 'name': 'lastWithdrawalTime', 'type': 'uint64' }, 
+          { 'name': 'withdrawalPeriod', 'type': 'uint32' }, 
+          { 'name': 'withdrawalValue', 'type': 'uint64' }, 
+          { 'name': 'owner', 'type': 'address',
+        }], 
+        'name': 'vestings', 'type': 'map(uint64,tuple)',
+      },
+      {
+        'components': [
+          { 'name': 'remainingAmount', 'type': 'uint64' }, 
+          { 'name': 'lastWithdrawalTime', 'type': 'uint64' }, 
+          { 'name': 'withdrawalPeriod', 'type': 'uint32' }, 
+          { 'name': 'withdrawalValue', 'type': 'uint64' }, 
+          { 'name': 'owner', 'type': 'address',
+        }], 
+        'name': 'locks', 'type': 'map(uint64,tuple)',
+      },
+      { 'name': 'vestingDonor', 'type': 'address' },
+      { 'name': 'lockDonor', 'type': 'address' },
+    ],
   }],
-  "data": [],
-  "events": []
-}`;
+  'data': [],
+  'events': [],
+} as const;
 
 myApp().catch(console.error);
 ```
