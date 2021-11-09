@@ -1,6 +1,6 @@
 {
   "name": "ton-inpage-provider",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Web3-like interface to TON provided by TON Crystal Wallet browser extension",
   "repository": "https://github.com/broxus/ton-inpage-provider",
   "main": "dist/index.js",
@@ -16,7 +16,6 @@
     "@typescript-eslint/eslint-plugin": "^4.24.0",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
-    "events": "^3.3.0",
     "typedoc": "^0.20.36",
     "typescript": "^4.2.4"
   },
@@ -24,8 +23,6 @@
     "/dist"
   ],
   "dependencies": {
-    "@broxus/await-semaphore": "^0.1.4",
-    "fast-safe-stringify": "^2.1.1",
-    "nekoton-wasm": "^0.1.7"
+    "events": "^3.3.0"
   }
 }

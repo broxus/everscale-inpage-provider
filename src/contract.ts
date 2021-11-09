@@ -1,6 +1,6 @@
 import {
   Address,
-  UniqueArray
+  UniqueArray,
 } from './utils';
 import {
   AbiParam,
@@ -17,22 +17,22 @@ import {
   serializeTokensObject,
   parseTransaction,
   parseTokensObject,
-  serializeTransaction
+  serializeTransaction,
 } from './models';
-
-import provider from './index';
+import { ProviderRpcClient } from './index';
 
 /**
  * @category Contract
  */
 export class Contract<Abi> {
+  private readonly _provider: ProviderRpcClient;
   private readonly _abi: string;
   private readonly _functions: { [name: string]: { inputs: AbiParam[], outputs: AbiParam[] } };
   private readonly _events: { [name: string]: { inputs: AbiParam[] } };
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
 
-  constructor(abi: Abi, address: Address) {
+  constructor(provider: ProviderRpcClient, abi: Abi, address: Address) {
     if (!Array.isArray((abi as any).functions)) {
       throw new Error('Invalid abi. Functions array required');
     }
@@ -40,6 +40,7 @@ export class Contract<Abi> {
       throw new Error('Invalid abi. Events array required');
     }
 
+    this._provider = provider;
     this._abi = JSON.stringify(abi);
     this._functions = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
       functions[item.name] = { inputs: item.inputs || [], outputs: item.outputs || [] };
@@ -56,12 +57,17 @@ export class Contract<Abi> {
     class ContractMethodImpl implements ContractMethod<any, any> {
       readonly params: RawTokensObject;
 
-      constructor(private readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] }, readonly abi: string, readonly address: Address, readonly method: string, params: TokensObject) {
+      constructor(readonly provider: ProviderRpcClient,
+                  readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] },
+                  readonly abi: string,
+                  readonly address: Address,
+                  readonly method: string,
+                  params: TokensObject) {
         this.params = serializeTokensObject(params);
       }
 
       async send(args: SendInternalParams): Promise<Transaction> {
-        const { transaction } = await provider.rawApi.sendMessage({
+        const { transaction } = await this.provider.rawApi.sendMessage({
           sender: args.from.toString(),
           recipient: this.address.toString(),
           amount: args.amount,
@@ -69,28 +75,30 @@ export class Contract<Abi> {
           payload: {
             abi: this.abi,
             method: this.method,
-            params: this.params
-          }
+            params: this.params,
+          },
         });
         return parseTransaction(transaction);
       }
 
       async estimateFees(args: SendInternalParams): Promise<string> {
-        const { fees } = await provider.rawApi.estimateFees({
+        const { fees } = await this.provider.rawApi.estimateFees({
           sender: args.from.toString(),
           recipient: this.address.toString(),
           amount: args.amount,
           payload: {
             abi: this.abi,
             method: this.method,
-            params: this.params
-          }
+            params: this.params,
+          },
         });
         return fees;
       }
 
       async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
-        let method = args.withoutSignature === true ? provider.rawApi.sendUnsignedExternalMessage : provider.rawApi.sendExternalMessage
+        let method = args.withoutSignature === true
+          ? this.provider.rawApi.sendUnsignedExternalMessage
+          : this.provider.rawApi.sendExternalMessage;
 
         let { transaction, output } = await method({
           publicKey: args.publicKey,
@@ -99,26 +107,26 @@ export class Contract<Abi> {
           payload: {
             abi: this.abi,
             method: this.method,
-            params: this.params
+            params: this.params,
           },
-          local: args.local
+          local: args.local,
         });
 
         return {
           transaction: parseTransaction(transaction),
-          output: output != null ? parseTokensObject(this.functionAbi.outputs, output) : undefined
+          output: output != null ? parseTokensObject(this.functionAbi.outputs, output) : undefined,
         };
       }
 
       async call(args: CallParams = {}): Promise<any> {
-        let { output, code } = await provider.rawApi.runLocal({
+        let { output, code } = await this.provider.rawApi.runLocal({
           address: this.address.toString(),
           cachedState: args.cachedState,
           functionCall: {
             abi: this.abi,
             method: this.method,
-            params: this.params
-          }
+            params: this.params,
+          },
         });
 
         if (output == null || code != 0) {
@@ -132,8 +140,10 @@ export class Contract<Abi> {
     this._methods = new Proxy({}, {
       get: <K extends AbiFunctionName<Abi>>(_object: {}, method: K) => {
         const rawAbi = (this._functions as any)[method];
-        return (params: AbiFunctionInputs<Abi, K>) => new ContractMethodImpl(rawAbi, this._abi, this._address, method, params);
-      }
+        return (params: AbiFunctionInputs<Abi, K>) => new ContractMethodImpl(
+          this._provider, rawAbi, this._abi, this._address, method, params,
+        );
+      },
     }) as unknown as ContractMethods<Abi>;
   }
 
@@ -151,10 +161,10 @@ export class Contract<Abi> {
 
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.rawApi.decodeTransaction({
+      const result = await this._provider.rawApi.decodeTransaction({
         transaction: serializeTransaction(args.transaction),
         abi: this._abi,
-        method: args.methods
+        method: args.methods,
       });
       if (result == null) {
         return undefined;
@@ -167,7 +177,7 @@ export class Contract<Abi> {
       return {
         method,
         input: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, input) : {},
-        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {}
+        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {},
       } as DecodedTransaction<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;
@@ -176,9 +186,9 @@ export class Contract<Abi> {
 
   public async decodeTransactionEvents(args: DecodeTransactionEventsParams): Promise<DecodedEvent<Abi, AbiEventName<Abi>>[]> {
     try {
-      const { events } = await provider.rawApi.decodeTransactionEvents({
+      const { events } = await this._provider.rawApi.decodeTransactionEvents({
         transaction: serializeTransaction(args.transaction),
-        abi: this._abi
+        abi: this._abi,
       });
 
       const result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
@@ -188,7 +198,7 @@ export class Contract<Abi> {
 
         result.push({
           event,
-          data: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, data) : {}
+          data: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, data) : {},
         } as DecodedEvent<Abi, AbiEventName<Abi>>);
       }
 
@@ -200,11 +210,11 @@ export class Contract<Abi> {
 
   public async decodeInputMessage(args: DecodeInputParams<Abi>): Promise<DecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.rawApi.decodeInput({
+      const result = await this._provider.rawApi.decodeInput({
         abi: this._abi,
         body: args.body,
         internal: args.internal,
-        method: args.methods
+        method: args.methods,
       });
       if (result == null) {
         return undefined;
@@ -216,7 +226,7 @@ export class Contract<Abi> {
 
       return {
         method,
-        input: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, input) : {}
+        input: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, input) : {},
       } as DecodedInput<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;
@@ -225,10 +235,10 @@ export class Contract<Abi> {
 
   public async decodeOutputMessage(args: DecodeOutputParams<Abi>): Promise<DecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
-      const result = await provider.rawApi.decodeOutput({
+      const result = await this._provider.rawApi.decodeOutput({
         abi: this._abi,
         body: args.body,
-        method: args.methods
+        method: args.methods,
       });
       if (result == null) {
         return undefined;
@@ -240,7 +250,7 @@ export class Contract<Abi> {
 
       return {
         method,
-        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {}
+        output: rawAbi.outputs != null ? parseTokensObject(rawAbi.outputs, output) : {},
       } as DecodedOutput<Abi, AbiFunctionName<Abi>>;
     } catch (_) {
       return undefined;

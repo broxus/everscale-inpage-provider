@@ -7,7 +7,7 @@ import {
   RawProviderRequest,
   RawProviderApiRequestParams,
   RawProviderApiResponse,
-  ProviderApiRequestParams,
+  ProviderApiRequestParams, RawProviderApi,
 } from './api';
 
 import {
@@ -30,45 +30,12 @@ import {
 } from './utils';
 import { Subscriber } from './stream';
 import { Contract } from './contract';
-import {
-  ensureClientInitialized,
-  createTonClient,
-  TonClientProperties,
-  DEFAULT_TON_CLIENT_PROPERTIES,
-} from './client';
 
 export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
 export { Address, AddressLiteral, mergeTransactions } from './utils';
-export { TonClientProperties, TonClientConnectionProperties, DEFAULT_TON_CLIENT_PROPERTIES } from './client';
-
-/**
- * @category Provider
- */
-export type ProviderProperties = {
-  /**
-   * If this flag is explicitly set to `false`, then in the case when the wallet is not installed,
-   * the standalone provider will be loaded (it supports all methods that **doesn't** require
-   * `accountInteraction` permission)
-   *
-   * Default: `true`
-   */
-  requireFullProvider: boolean
-  /**
-   * Settings for standalone provider
-   */
-  standaloneClientProperties: TonClientProperties,
-};
-
-/**
- * @category Provider
- */
-export const DEFAULT_PROVIDER_PROPERTIES: ProviderProperties = {
-  requireFullProvider: true,
-  standaloneClientProperties: DEFAULT_TON_CLIENT_PROPERTIES,
-};
 
 /**
  * @category Provider
@@ -89,6 +56,17 @@ export interface Provider {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 }
 
+/**
+ * @category Provider
+ */
+export type ProviderProperties = {
+  /***
+   * Provider factory which will be called if injected provider was not found.
+   * Can be used for initialization of the standalone ton client
+   */
+  fallback?: () => Promise<Provider>
+};
+
 let ensurePageLoaded: Promise<void>;
 if (document.readyState == 'complete') {
   ensurePageLoaded = Promise.resolve();
@@ -103,15 +81,16 @@ if (document.readyState == 'complete') {
 /**
  * @category Provider
  */
-export async function hasTonProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
+export async function hasTonProvider(): Promise<boolean> {
   await ensurePageLoaded;
-  return !properties.requireFullProvider || (window as Record<string, any>).hasTonProvider === true;
+  return (window as Record<string, any>).hasTonProvider === true;
 }
 
 /**
  * @category Provider
  */
 export class ProviderRpcClient {
+  private readonly _properties: ProviderProperties;
   private readonly _api: RawProviderApiMethods;
   private readonly _mainInitializationPromise: Promise<void>;
   private _additionalInitializationPromise?: Promise<void>;
@@ -119,7 +98,9 @@ export class ProviderRpcClient {
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _ton?: Provider;
 
-  constructor() {
+  constructor(properties: ProviderProperties = {}) {
+    this._properties = properties;
+
     // Wrap provider requests
     this._api = new Proxy({}, {
       get: <K extends ProviderMethod>(
@@ -134,11 +115,8 @@ export class ProviderRpcClient {
       // Provider as already injected
       this._mainInitializationPromise = Promise.resolve();
     } else {
-      // Wait until page is loaded initialization complete
-      this._mainInitializationPromise = hasTonProvider({
-        ...DEFAULT_PROVIDER_PROPERTIES,
-        requireFullProvider: true,
-      }).then((hasTonProvider) => new Promise((resolve, reject) => {
+      // Wait until page is loaded and initialization complete
+      this._mainInitializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
         if (!hasTonProvider) {
           // Fully loaded page doesn't even contain provider flag
           reject(new ProviderNotFoundException());
@@ -167,28 +145,28 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Checks whether ton provider exists.
+   * Checks whether this page has injected ton provider
    */
-  public async hasProvider(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<boolean> {
-    return hasTonProvider(properties);
+  public async hasProvider(): Promise<boolean> {
+    return hasTonProvider();
   }
 
   /**
-   * Waits until provider api will be available.
+   * Waits until provider api will be available. Calls `fallback` if no provider was found
    *
    * @throws ProviderNotFoundException when no provider found
    */
-  public async ensureInitialized(properties: ProviderProperties = DEFAULT_PROVIDER_PROPERTIES): Promise<void> {
+  public async ensureInitialized(): Promise<void> {
     try {
       await this._mainInitializationPromise;
     } catch (e) {
-      if (properties.requireFullProvider) {
+      if (this._properties.fallback == null) {
         throw e;
       }
 
       if (this._additionalInitializationPromise == null) {
-        this._additionalInitializationPromise = ensureClientInitialized().then(async () => {
-          this._ton = await createTonClient(properties.standaloneClientProperties);
+        this._additionalInitializationPromise = this._properties.fallback().then(async (provider) => {
+          this._ton = provider;
           this._registerEventHandlers(this._ton);
         });
       }
@@ -225,7 +203,7 @@ export class ProviderRpcClient {
    * @param address Default contract address
    */
   public createContract<Abi>(abi: Abi, address: Address): Contract<Abi> {
-    return new Contract<Abi>(abi, address);
+    return new Contract<Abi>(this, abi, address);
   }
 
   /**
@@ -487,7 +465,7 @@ export class ProviderRpcClient {
   public async getBocHash(boc: string): Promise<string> {
     return await this._api.getBocHash({
       boc,
-    }).then(({ hash }) => hash)
+    }).then(({ hash }) => hash);
   }
 
   /**
@@ -737,7 +715,10 @@ export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams
   ? (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
   : () => Promise<RawProviderApiResponse<P>>
 
-type RawProviderApiMethods = {
+/**
+ * @category Provider
+ */
+export type RawProviderApiMethods = {
   [P in ProviderMethod]: RawRpcMethod<P>
 }
 
@@ -805,10 +786,3 @@ function foldSubscriptions(
 
   return { total, withoutExcluded };
 }
-
-const provider = new ProviderRpcClient();
-
-/**
- * @category Provider
- */
-export default provider;
