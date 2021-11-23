@@ -114,6 +114,7 @@ export function parseTransaction(transaction: RawTransaction): Transaction {
  * @category Models
  */
 export type Message<Addr = Address> = {
+  hash: string;
   src?: Addr;
   dst?: Addr;
   value: string;

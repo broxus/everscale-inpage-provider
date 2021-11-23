@@ -8,6 +8,7 @@ import {
   RawTokensObject,
   TokensObject,
   Transaction,
+  Message,
   AbiFunctionName,
   AbiEventName,
   AbiFunctionInputs,
@@ -79,6 +80,85 @@ export class Contract<Abi> {
           },
         });
         return parseTransaction(transaction);
+      }
+
+      async sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+        const subscriber = this.provider.createSubscriber();
+        try {
+          // Parent transaction from wallet
+          let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined;
+
+          // Child transaction promise
+          let resolveChildTransactionPromise: ((transaction: Transaction) => void) | undefined;
+          const childTransactionPromise = new Promise<Transaction>((resolve) => {
+            resolveChildTransactionPromise = (tx) => resolve(tx);
+          });
+
+          // Array for collecting transactions on target before parent transaction promise resolution
+          const possibleChildren: Transaction[] = [];
+
+          // Subscribe to this account
+          subscriber.transactions(this.address)
+            .flatMap(batch => batch.transactions)
+            // Listen only messages from sender
+            .filter(item => item.inMessage.src?.equals(args.from) || false)
+            .on((tx) => {
+              if (parentTransaction == null) {
+                // If we don't known whether the message was sent just collect all transactions from the sender
+                possibleChildren.push(tx);
+              } else if (parentTransaction.possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0) {
+                // Resolve promise if transaction was found
+                resolveChildTransactionPromise?.(tx);
+              }
+            });
+
+          // Send message
+          const transaction = await this.send(args);
+          // Extract all outgoing messages from the parent transaction to this contract
+          const possibleMessages = transaction.outMessages.filter(msg => msg.dst?.equals(this.address) || false);
+
+          // Update stream state
+          parentTransaction = {
+            transaction,
+            possibleMessages,
+          };
+
+          // Check whether child transaction was already found
+          const alreadyReceived = possibleChildren.find((tx) => {
+            return possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0;
+          });
+          if (alreadyReceived != null) {
+            resolveChildTransactionPromise?.(alreadyReceived);
+          }
+
+          const childTransaction = await childTransactionPromise;
+
+          // Parse output
+          let output: any = undefined;
+          try {
+            const result = await this.provider.rawApi.decodeTransaction({
+              transaction: serializeTransaction(childTransaction),
+              abi: this.abi,
+              method: this.method,
+            });
+            if (result != null) {
+              output = this.functionAbi.outputs != null
+                ? parseTokensObject(this.functionAbi.outputs, result.output)
+                : {};
+            }
+          } catch (e) {
+            console.error(e);
+          }
+
+          // Done
+          return {
+            parentTransaction: parentTransaction.transaction,
+            childTransaction,
+            output,
+          };
+        } finally {
+          await subscriber.unsubscribe();
+        }
       }
 
       async estimateFees(args: SendInternalParams): Promise<string> {
@@ -285,6 +365,13 @@ export interface ContractMethod<I, O> {
    * @param args
    */
   send(args: SendInternalParams): Promise<Transaction>;
+
+  /**
+   * Sends internal message and waits for the new transaction on target address
+   *
+   * @param args
+   */
+  sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: O }>;
 
   /**
    * Estimates wallet fee for calling this method as an internal message
