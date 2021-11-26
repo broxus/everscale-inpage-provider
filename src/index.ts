@@ -229,6 +229,16 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Updates `accountInteraction` permission value
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async changeAccount(): Promise<void> {
+    await this._api.changeAccount()
+  }
+
+  /**
    * Removes all permissions for current origin and stops all subscriptions
    */
   public async disconnect(): Promise<void> {

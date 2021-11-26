@@ -129,6 +129,16 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Updates `accountInteraction` permission value
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  changeAccount: {
+    output: Partial<Permissions<Addr>>;
+  };
+
+  /**
    * Removes all permissions for current origin and stops all subscriptions
    *
    * ---
