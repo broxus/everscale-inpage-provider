@@ -68,11 +68,11 @@ export type ProviderProperties = {
 };
 
 let ensurePageLoaded: Promise<void>;
-if (document.readyState !== 'loading') {
+if (document.readyState == 'complete') {
   ensurePageLoaded = Promise.resolve();
 } else {
   ensurePageLoaded = new Promise<void>((resolve) => {
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
       resolve();
     });
   });
