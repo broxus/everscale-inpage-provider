@@ -46,6 +46,11 @@ export type RawProviderState = ProviderState<string>
  */
 export type ProviderEvents<Addr = Address> = {
   /**
+   * Called when inpage provider connects to the extension
+   */
+  connected: {};
+
+  /**
    * Called when inpage provider disconnects from extension
    */
   disconnected: Error;
@@ -151,7 +156,7 @@ export type ProviderApi<Addr = Address> = {
    * Can also be used to update subscriptions
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   subscribe: {
     input: {
@@ -231,7 +236,7 @@ export type ProviderApi<Addr = Address> = {
    * Requests contract data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   getFullContractState: {
     input: {
@@ -252,7 +257,7 @@ export type ProviderApi<Addr = Address> = {
    * Requests contract transactions
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   getTransactions: {
     input: {
@@ -289,7 +294,7 @@ export type ProviderApi<Addr = Address> = {
    * Executes external message locally
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   runLocal: {
     input: {
@@ -322,7 +327,7 @@ export type ProviderApi<Addr = Address> = {
    * Calculates contract address from code and init params
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   getExpectedAddress: {
     input: {
@@ -359,7 +364,7 @@ export type ProviderApi<Addr = Address> = {
    * Computes hash of base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   getBocHash: {
     input: {
@@ -380,7 +385,7 @@ export type ProviderApi<Addr = Address> = {
    * Creates base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   packIntoCell: {
     input: {
@@ -405,7 +410,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   unpackFromCell: {
     input: {
@@ -436,7 +441,7 @@ export type ProviderApi<Addr = Address> = {
    * **NOTE:** can only be used on contracts which are deployed and has `pubkey` header
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   extractPublicKey: {
     input: {
@@ -459,7 +464,7 @@ export type ProviderApi<Addr = Address> = {
    * Converts base64 encoded contract code into tvc with default init data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   codeToTvc: {
     input: {
@@ -480,7 +485,7 @@ export type ProviderApi<Addr = Address> = {
    * Splits base64 encoded state init into code and data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   splitTvc: {
     input: {
@@ -505,7 +510,7 @@ export type ProviderApi<Addr = Address> = {
    * Creates internal message body
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   encodeInternalInput: {
     input: FunctionCall<Addr>
@@ -521,7 +526,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes body of incoming message
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   decodeInput: {
     input: {
@@ -564,7 +569,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes body of outgoing message
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   decodeOutput: {
     input: {
@@ -603,7 +608,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes body of event message
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   decodeEvent: {
     input: {
@@ -642,7 +647,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes function call
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   decodeTransaction: {
     input: {
@@ -685,7 +690,7 @@ export type ProviderApi<Addr = Address> = {
    * Decodes transaction events
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   decodeTransactionEvents: {
     input: {
@@ -713,7 +718,7 @@ export type ProviderApi<Addr = Address> = {
    * Checks if a specific data hash was signed with the specified key
    *
    * ---
-   * Requires permissions: `tonClient`
+   * Requires permissions: `basic`
    */
   verifySignature: {
     input: {
@@ -743,7 +748,7 @@ export type ProviderApi<Addr = Address> = {
    * Sends an unsigned external message to the contract
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   sendUnsignedExternalMessage: {
     input: {
@@ -786,7 +791,7 @@ export type ProviderApi<Addr = Address> = {
   addAsset: {
     input: {
       /**
-       * Owner's TON wallet address.
+       * Owner's wallet address.
        * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
        */
       account: Addr;
@@ -917,7 +922,7 @@ export type ProviderApi<Addr = Address> = {
        */
       recipient: Addr;
       /**
-       * Amount of nano TON to send
+       * Amount of nano EVER to send
        */
       amount: string;
       /**
@@ -927,7 +932,7 @@ export type ProviderApi<Addr = Address> = {
     };
     output: {
       /**
-       * Fees in nano TON
+       * Fees in nano EVER
        */
       fees: string;
     };
@@ -952,7 +957,7 @@ export type ProviderApi<Addr = Address> = {
        */
       recipient: Addr;
       /**
-       * Amount of nano TON to send
+       * Amount of nano EVER to send
        */
       amount: string;
       /**

@@ -25,7 +25,7 @@ export class Subscriber {
   private readonly subscriptions: { [address: string]: SubscriptionsWithAddress } = {};
   private readonly scanners: { [id: number]: UnorderedTransactionsScanner } = {};
 
-  constructor(private readonly ton: ProviderRpcClient) {
+  constructor(private readonly provider: ProviderRpcClient) {
   }
 
   /**
@@ -42,11 +42,11 @@ export class Subscriber {
     const id = getUniqueId();
 
     return new StreamImpl(async (onData, onEnd) => {
-      const scanner = new UnorderedTransactionsScanner(this.ton, {
+      const scanner = new UnorderedTransactionsScanner(this.provider, {
         address,
         onData,
         onEnd,
-        ...filter
+        ...filter,
       });
       this.scanners[id] = scanner;
       await scanner.start();
@@ -93,9 +93,9 @@ export class Subscriber {
               }).catch(() => {
                 // ignore
               });
-            })
+            }),
           );
-        }).concat(Object.values(scanners).map((item) => item.stop()))
+        }).concat(Object.values(scanners).map((item) => item.stop())),
     );
   }
 
@@ -109,12 +109,12 @@ export class Subscriber {
       let eventData = subscriptions?.[event] as EventData | undefined;
       if (eventData == null) {
         const handlers = {
-          [id]: { onData, onEnd, queue: new PromiseQueue() }
+          [id]: { onData, onEnd, queue: new PromiseQueue() },
         } as EventData['handlers'];
 
         eventData = {
-          subscription: (this.ton.subscribe as any)(event, {
-            address
+          subscription: (this.provider.subscribe as any)(event, {
+            address,
           }).then((subscription: Subscription<T>) => {
             subscription.on('data', (data) => {
               Object.values(handlers).forEach(({ onData, queue }) => {
@@ -138,12 +138,12 @@ export class Subscriber {
             });
             throw e;
           }),
-          handlers
+          handlers,
         } as EventData;
 
         if (subscriptions == null) {
           subscriptions = {
-            [event]: eventData
+            [event]: eventData,
           };
           this.subscriptions[address.toString()] = subscriptions;
         } else {
@@ -189,9 +189,9 @@ export interface Stream<P, T = P> {
   readonly makeProducer: (onData: (event: P) => Promise<void>, onEnd: () => void) => void;
   readonly stopProducer: () => void;
 
-  first(): Promise<T>
+  first(): Promise<T>;
 
-  on(handler: (item: T) => (Promise<void> | void)): void
+  on(handler: (item: T) => (Promise<void> | void)): void;
 
   merge(other: Stream<P, T>): Stream<P, T>;
 
@@ -236,7 +236,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
   public merge(other: Stream<P, T>): Stream<P, T> {
     return new StreamImpl<P, T>(async (onEvent, onEnd) => {
       const state = {
-        counter: 0
+        counter: 0,
       };
       const checkEnd = () => {
         if (++state.counter == 2) {
@@ -258,7 +258,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
         if (await f(item)) {
           await handler(item);
         }
-      })
+      }),
     );
   }
 
@@ -269,7 +269,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
         if (newItem !== undefined) {
           await handler(newItem);
         }
-      })
+      }),
     );
   }
 
@@ -284,13 +284,13 @@ class StreamImpl<P, T> implements Stream<P, T> {
         for (const newItem of items) {
           await handler(newItem);
         }
-      })
+      }),
     );
   }
 
   public skip(n: number): Stream<P, T> {
     const state = {
-      index: 0
+      index: 0,
     };
 
     return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
@@ -300,13 +300,13 @@ class StreamImpl<P, T> implements Stream<P, T> {
         } else {
           ++state.index;
         }
-      })
+      }),
     );
   }
 
   public skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
     const state = {
-      shouldSkip: true
+      shouldSkip: true,
     };
 
     return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
@@ -315,7 +315,7 @@ class StreamImpl<P, T> implements Stream<P, T> {
           state.shouldSkip = false;
           await handler(item);
         }
-      })
+      }),
     );
   }
 }
@@ -339,12 +339,12 @@ class UnorderedTransactionsScanner {
   private promise?: Promise<void>;
   private isRunning: boolean = false;
 
-  constructor(private readonly ton: ProviderRpcClient, {
+  constructor(private readonly provider: ProviderRpcClient, {
     address,
     onData,
     onEnd,
     fromLt,
-    fromUtime
+    fromUtime,
   }: UnorderedTransactionsScannerParams) {
     this.address = address;
     this.onData = onData;
@@ -362,9 +362,9 @@ class UnorderedTransactionsScanner {
     this.promise = (async () => {
       while (this.isRunning) {
         try {
-          const { transactions, continuation } = await this.ton.getTransactions({
+          const { transactions, continuation } = await this.provider.getTransactions({
             address: this.address,
-            continuation: this.continuation
+            continuation: this.continuation,
           });
 
           if (!this.isRunning || transactions.length == null) {
@@ -384,13 +384,13 @@ class UnorderedTransactionsScanner {
           const info = {
             maxLt: filteredTransactions[0].id.lt,
             minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
-            batchType: 'old'
+            batchType: 'old',
           } as TransactionsBatchInfo;
 
           this.queue.enqueue(() => this.onData({
             address: this.address,
             transactions: filteredTransactions,
-            info
+            info,
           }));
 
           if (continuation != null) {

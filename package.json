@@ -1,8 +1,8 @@
 {
-  "name": "ton-inpage-provider",
-  "version": "0.2.7",
-  "description": "Web3-like interface to TON provided by TON Crystal Wallet browser extension",
-  "repository": "https://github.com/broxus/ton-inpage-provider",
+  "name": "everscale-inpage-provider",
+  "version": "0.3.0",
+  "description": "Web3-like interface to the Everscale blockchain",
+  "repository": "https://github.com/broxus/everscale-inpage-provider",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
