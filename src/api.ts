@@ -254,6 +254,39 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Requests accounts with specified code hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  getAccountsByCodeHash: {
+    input: {
+      /**
+       * Hex encoded code hash
+       */
+      codeHash: string;
+      /**
+       * Last address from previous batch
+       */
+      continuation?: string;
+      /**
+       * Optional limit. Values grater than 50 have no effect
+       */
+      limit?: number;
+    };
+    output: {
+      /**
+       * List of account addresses
+       */
+      accounts: Addr[],
+      /**
+       * Last address from this batch. Should be used as a `continuation` for further requests
+       */
+      continuation: string | undefined;
+    };
+  };
+
+  /**
    * Requests contract transactions
    *
    * ---
@@ -287,6 +320,27 @@ export type ProviderApi<Addr = Address> = {
        * Describes transactions lt rage (none if empty `transactions` array)
        */
       info?: TransactionsBatchInfo;
+    };
+  };
+
+  /**
+   * Searches transaction by hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  getTransaction: {
+    input: {
+      /**
+       * Hex encoded transaction hash
+       */
+      hash: string
+    };
+    output: {
+      /**
+       * Transaction
+       */
+      transaction: Transaction<Addr> | undefined
     };
   };
 

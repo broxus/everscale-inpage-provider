@@ -108,9 +108,9 @@ export class ProviderRpcClient {
         method: K,
       ) => (params?: RawProviderApiRequestParams<K>) => {
         if (this._provider != null) {
-          return this._provider.request({ method, params: params! })
+          return this._provider.request({ method, params: params! });
         } else {
-          throw new ProviderNotInitializedException()
+          throw new ProviderNotInitializedException();
         }
       },
     }) as unknown as RawProviderApiMethods;
@@ -193,9 +193,9 @@ export class ProviderRpcClient {
    */
   public get raw(): Provider {
     if (this._provider != null) {
-      return this._provider
+      return this._provider;
     } else {
-      throw new ProviderNotInitializedException()
+      throw new ProviderNotInitializedException();
     }
   }
 
@@ -450,6 +450,22 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Requests accounts with specified code hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getAccountsByCodeHash(args: ProviderApiRequestParams<'getAccountsByCodeHash'>): Promise<ProviderApiResponse<'getAccountsByCodeHash'>> {
+    const { accounts, continuation } = await this._api.getAccountsByCodeHash({
+      ...args,
+    });
+    return {
+      accounts: accounts.map((address) => new Address(address)),
+      continuation,
+    } as ProviderApiResponse<'getAccountsByCodeHash'>;
+  }
+
+  /**
    * Requests contract transactions
    *
    * ---
@@ -465,6 +481,21 @@ export class ProviderRpcClient {
       continuation,
       info,
     } as ProviderApiResponse<'getTransactions'>;
+  }
+
+  /**
+   * Searches transaction by hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getTransaction(args: ProviderApiRequestParams<'getTransaction'>): Promise<ProviderApiResponse<'getTransaction'>> {
+    const { transaction } = await this._api.getTransaction({
+      ...args,
+    });
+    return {
+      transaction: transaction ? parseTransaction(transaction) : undefined,
+    } as ProviderApiResponse<'getTransaction'>;
   }
 
   /**
