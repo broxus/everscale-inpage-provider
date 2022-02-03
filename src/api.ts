@@ -361,6 +361,12 @@ export type ProviderApi<Addr = Address> = {
        */
       cachedState?: FullContractState;
       /**
+       * Whether to run the method locally as responsible.
+       *
+       * This will use internal message with unlimited account balance.
+       */
+      responsible?: boolean;
+      /**
        * Function call params
        */
       functionCall: FunctionCall<Addr>;

@@ -435,7 +435,16 @@ export type SendExternalParams = {
  * @category Contract
  */
 export type CallParams = {
+  /**
+   * Cached contract state
+   */
   cachedState?: FullContractState;
+  /**
+   * Whether to run the method locally as responsible.
+   *
+   * This will use internal message with unlimited account balance.
+   */
+  responsible?: boolean;
 };
 
 /**

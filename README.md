@@ -18,6 +18,8 @@
 npm install --save everscale-inpage-provider
 ```
 
+> NOTE: this repo was originally used for `ton-inpage-provider` package which is DEPRECATED now.
+
 ### Contents
 
 - [`src/api.ts`](./src/api.ts) - RPC interface description
