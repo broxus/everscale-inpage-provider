@@ -1,22 +1,24 @@
 <p align="center">
-    <h3 align="center">TON inpage provider</h3>
-    <p align="center">Web3-like interface to TON provided by the TON Crystal Wallet browser extension.</p>
+    <h3 align="center">Everscale inpage provider</h3>
+    <p align="center">Web3-like interface to the Everscale blockchain.</p>
     <p align="center">
         <a href="/LICENSE">
-            <img alt="GitHub" src="https://img.shields.io/github/license/broxus/ton-inpage-provider" />
+            <img alt="GitHub" src="https://img.shields.io/github/license/broxus/everscale-inpage-provider" />
         </a>
-        <a href="https://www.npmjs.com/package/ton-inpage-provider">
-            <img alt="npm" src="https://img.shields.io/npm/v/ton-inpage-provider">
+        <a href="https://www.npmjs.com/package/everscale-inpage-provider">
+            <img alt="npm" src="https://img.shields.io/npm/v/everscale-inpage-provider">
         </a>
     </p>
-    <p align="center"><b><a href="https://broxus.github.io/ton-inpage-provider/index.html">Documentation</a></b></p>
+    <p align="center"><b><a href="https://broxus.github.io/everscale-inpage-provider/index.html">Documentation</a></b></p>
 </p>
 
 ### How to install
 
 ```shell
-npm install --save ton-inpage-provider
+npm install --save everscale-inpage-provider
 ```
+
+> NOTE: this repo was originally used for `ton-inpage-provider` package which is DEPRECATED now.
 
 ### Contents
 
@@ -33,18 +35,18 @@ import {
   Address, 
   ProviderRpcClient, 
   TvmException 
-} from 'ton-inpage-provider';
+} from 'everscale-inpage-provider';
 
-const ton = new ProviderRpcClient();
+const ever = new ProviderRpcClient();
 
 async function myApp() {
-  if (!(await ton.hasProvider())) {
+  if (!(await ever.hasProvider())) {
     throw new Error('Extension is not installed');
   }
-  await ton.ensureInitialized();
+  await ever.ensureInitialized();
 
-  const { accountInteraction } = await ton.requestPermissions({
-    permissions: ['tonClient', 'accountInteraction'],
+  const { accountInteraction } = await ever.requestPermissions({
+    permissions: ['basic', 'accountInteraction'],
   });
   if (accountInteraction == null) {
     throw new Error('Insufficient permissions');
@@ -53,7 +55,7 @@ async function myApp() {
   const selectedAddress = accountInteraction.address;
   const dePoolAddress = new Address('0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9');
 
-  const dePool = ton.createContract(DePoolAbi, dePoolAddress);
+  const dePool = ever.createContract(DePoolAbi, dePoolAddress);
 
   const transaction = await dePool
     .methods
@@ -127,7 +129,7 @@ const DePoolAbi = {
   }],
   'data': [],
   'events': [],
-} as const;
+} as const; // NOTE: `as const` is very important here
 
 myApp().catch(console.error);
 ```

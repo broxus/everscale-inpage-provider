@@ -179,7 +179,7 @@ export type TransactionId = {
  * @category Models
  */
 export type Permissions<Addr = Address> = {
-  tonClient: true;
+  basic: true;
   accountInteraction: {
     address: Addr;
     publicKey: string;

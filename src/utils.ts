@@ -87,7 +87,7 @@ type IsHexString<T extends string, L extends readonly number[]> =
 export function mergeTransactions<Addr>(
   knownTransactions: Transaction<Addr>[],
   newTransactions: Transaction<Addr>[],
-  info: TransactionsBatchInfo
+  info: TransactionsBatchInfo,
 ): Transaction<Addr>[] {
   if (info.batchType == 'old') {
     knownTransactions.push(...newTransactions);

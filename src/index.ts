@@ -62,7 +62,7 @@ export interface Provider {
 export type ProviderProperties = {
   /***
    * Provider factory which will be called if injected provider was not found.
-   * Can be used for initialization of the standalone ton client
+   * Can be used for initialization of the standalone Everscale client
    */
   fallback?: () => Promise<Provider>
 };
@@ -81,9 +81,9 @@ if (document.readyState == 'complete') {
 /**
  * @category Provider
  */
-export async function hasTonProvider(): Promise<boolean> {
+export async function hasEverscaleProvider(): Promise<boolean> {
   await ensurePageLoaded;
-  return (window as Record<string, any>).hasTonProvider === true;
+  return (window as Record<string, any>).__hasEverscaleProvider === true;
 }
 
 /**
@@ -96,7 +96,7 @@ export class ProviderRpcClient {
   private _additionalInitializationPromise?: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
-  private _ton?: Provider;
+  private _provider?: Provider;
 
   constructor(properties: ProviderProperties = {}) {
     this._properties = properties;
@@ -106,30 +106,36 @@ export class ProviderRpcClient {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
         method: K,
-      ) => (params?: RawProviderApiRequestParams<K>) => this._ton!.request({ method, params: params! }),
+      ) => (params?: RawProviderApiRequestParams<K>) => {
+        if (this._provider != null) {
+          return this._provider.request({ method, params: params! });
+        } else {
+          throw new ProviderNotInitializedException();
+        }
+      },
     }) as unknown as RawProviderApiMethods;
 
     // Initialize provider with injected object by default
-    this._ton = (window as any).ton;
-    if (this._ton != null) {
+    this._provider = (window as any).__ever;
+    if (this._provider != null) {
       // Provider as already injected
       this._mainInitializationPromise = Promise.resolve();
     } else {
       // Wait until page is loaded and initialization complete
-      this._mainInitializationPromise = hasTonProvider().then((hasTonProvider) => new Promise((resolve, reject) => {
-        if (!hasTonProvider) {
+      this._mainInitializationPromise = hasEverscaleProvider().then((hasProvider) => new Promise((resolve, reject) => {
+        if (!hasProvider) {
           // Fully loaded page doesn't even contain provider flag
           reject(new ProviderNotFoundException());
           return;
         }
 
         // Wait injected provider initialization otherwise
-        this._ton = (window as any).ton;
-        if (this._ton != null) {
+        this._provider = (window as any).__ever;
+        if (this._provider != null) {
           resolve();
         } else {
-          window.addEventListener('ton#initialized', (_data) => {
-            this._ton = (window as any).ton;
+          window.addEventListener('ever#initialized', (_data) => {
+            this._provider = (window as any).__ever;
             resolve();
           });
         }
@@ -138,17 +144,17 @@ export class ProviderRpcClient {
 
     // Will only register handlers for successfully loaded injected provider
     this._mainInitializationPromise.then(() => {
-      if (this._ton != null) {
-        this._registerEventHandlers(this._ton);
+      if (this._provider != null) {
+        this._registerEventHandlers(this._provider);
       }
     });
   }
 
   /**
-   * Checks whether this page has injected ton provider
+   * Checks whether this page has injected Everscale provider
    */
   public async hasProvider(): Promise<boolean> {
-    return hasTonProvider();
+    return hasEverscaleProvider();
   }
 
   /**
@@ -166,8 +172,8 @@ export class ProviderRpcClient {
 
       if (this._additionalInitializationPromise == null) {
         this._additionalInitializationPromise = this._properties.fallback().then(async (provider) => {
-          this._ton = provider;
-          this._registerEventHandlers(this._ton);
+          this._provider = provider;
+          this._registerEventHandlers(this._provider);
         });
       }
 
@@ -179,14 +185,18 @@ export class ProviderRpcClient {
    * Whether provider api is ready
    */
   public get isInitialized(): boolean {
-    return this._ton != null;
+    return this._provider != null;
   }
 
   /**
    * Raw provider
    */
   public get raw(): Provider {
-    return this._ton!;
+    if (this._provider != null) {
+      return this._provider;
+    } else {
+      throw new ProviderNotInitializedException();
+    }
   }
 
   /**
@@ -235,7 +245,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async changeAccount(): Promise<void> {
-    await this._api.changeAccount()
+    await this._api.changeAccount();
   }
 
   /**
@@ -254,6 +264,11 @@ export class ProviderRpcClient {
    * Called on each new transactions batch, received on subscription
    */
   public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<Subscription<'transactionsFound'>>;
+
+  /**
+   * Called every time when provider connection is established
+   */
+  public subscribe(eventName: 'connected'): Promise<Subscription<'connected'>>;
 
   /**
    * Called when inpage provider disconnects from extension
@@ -324,6 +339,7 @@ export class ProviderRpcClient {
     const id = getUniqueId();
 
     switch (eventName) {
+      case 'connected':
       case 'disconnected':
       case 'networkChanged':
       case 'permissionsChanged':
@@ -425,7 +441,7 @@ export class ProviderRpcClient {
    * Requests contract data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
     return await this._api.getFullContractState({
@@ -434,10 +450,26 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Requests accounts with specified code hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getAccountsByCodeHash(args: ProviderApiRequestParams<'getAccountsByCodeHash'>): Promise<ProviderApiResponse<'getAccountsByCodeHash'>> {
+    const { accounts, continuation } = await this._api.getAccountsByCodeHash({
+      ...args,
+    });
+    return {
+      accounts: accounts.map((address) => new Address(address)),
+      continuation,
+    } as ProviderApiResponse<'getAccountsByCodeHash'>;
+  }
+
+  /**
    * Requests contract transactions
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
     const { transactions, continuation, info } = await this._api.getTransactions({
@@ -452,10 +484,25 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Searches transaction by hash
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getTransaction(args: ProviderApiRequestParams<'getTransaction'>): Promise<ProviderApiResponse<'getTransaction'>> {
+    const { transaction } = await this._api.getTransaction({
+      ...args,
+    });
+    return {
+      transaction: transaction ? parseTransaction(transaction) : undefined,
+    } as ProviderApiResponse<'getTransaction'>;
+  }
+
+  /**
    * Calculates contract address from code and init params
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async getExpectedAddress<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<Address> {
     const { address } = await this._api.getExpectedAddress({
@@ -470,7 +517,7 @@ export class ProviderRpcClient {
    * Computes hash of base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async getBocHash(boc: string): Promise<string> {
     return await this._api.getBocHash({
@@ -482,7 +529,7 @@ export class ProviderRpcClient {
    * Creates base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, data: MergeInputObjectsArray<P> }): Promise<ProviderApiResponse<'packIntoCell'>> {
     return await this._api.packIntoCell({
@@ -495,7 +542,7 @@ export class ProviderRpcClient {
    * Decodes base64 encoded BOC
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, boc: string, allowPartial: boolean }): Promise<{ data: MergeOutputObjectsArray<P> }> {
     const { data } = await this._api.unpackFromCell({
@@ -513,7 +560,7 @@ export class ProviderRpcClient {
    * **NOTE:** can only be used on contracts which are deployed and has `pubkey` header
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async extractPublicKey(boc: string): Promise<string> {
     const { publicKey } = await this._api.extractPublicKey({
@@ -526,7 +573,7 @@ export class ProviderRpcClient {
    * Converts base64 encoded contract code into tvc with default init data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async codeToTvc(code: string): Promise<string> {
     const { tvc } = await this._api.codeToTvc({
@@ -539,7 +586,7 @@ export class ProviderRpcClient {
    * Splits base64 encoded state init into code and data
    *
    * ---
-   * Required permissions: `tonClient`
+   * Required permissions: `basic`
    */
   public async splitTvc(tvc: string): Promise<ProviderApiResponse<'splitTvc'>> {
     return await this._api.splitTvc({
@@ -624,6 +671,7 @@ export class ProviderRpcClient {
 
   private _registerEventHandlers(provider: Provider) {
     const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
+      'connected': (data) => data,
       'disconnected': (data) => data,
       'transactionsFound': (data) => ({
         address: new Address(data.address),
@@ -714,7 +762,16 @@ type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
  */
 export class ProviderNotFoundException extends Error {
   constructor() {
-    super('TON provider was not found');
+    super('Everscale provider was not found');
+  }
+}
+
+/**
+ * @category Provider
+ */
+export class ProviderNotInitializedException extends Error {
+  constructor() {
+    super('Everscale provider was not initialized yet');
   }
 }
 
@@ -760,7 +817,7 @@ export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D } ?
  */
 export type AddAssetParams<T extends AssetType> = {
   /**
-   * Owner's TON wallet address.
+   * Owner's wallet address.
    * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
    */
   account: Address,
