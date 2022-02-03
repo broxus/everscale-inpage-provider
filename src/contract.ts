@@ -202,6 +202,7 @@ export class Contract<Abi> {
         let { output, code } = await this.provider.rawApi.runLocal({
           address: this.address.toString(),
           cachedState: args.cachedState,
+          responsible: args.responsible,
           functionCall: {
             abi: this.abi,
             method: this.method,

@@ -10,6 +10,7 @@ export interface ContractState {
   genTimings: GenTimings;
   lastTransactionId?: LastTransactionId;
   isDeployed: boolean;
+  codeHash?: string;
 }
 
 /**
