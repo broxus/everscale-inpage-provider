@@ -239,6 +239,35 @@ export type AssetTypeParams<T extends AssetType, Addr = Address> =
     rootContract: Addr,
   } : never;
 
+/**
+ * @category Models
+ */
+export type EncryptionAlgorithm =
+  | 'ChaCha20Poly1305'
+
+/**
+ * @category Models
+ */
+export type EncryptedData = {
+  algorithm: EncryptionAlgorithm;
+  /**
+   * Hex encoded encryptor's public key
+   */
+  sourcePublicKey: string;
+  /**
+   * Hex encoded recipient public key
+   */
+  recipientPublicKey: string;
+  /**
+   * Base64 encoded data
+   */
+  data: string;
+  /**
+   * Base64 encoded nonce
+   */
+  nonce: string;
+}
+
 /* ABI stuff */
 
 /**

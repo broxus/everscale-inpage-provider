@@ -1,23 +1,24 @@
 import {
+  ProviderApiRequestParams,
+  ProviderApiResponse,
   ProviderEvent,
   ProviderEventData,
   ProviderMethod,
-  ProviderApiResponse,
-  RawProviderEventData,
-  RawProviderRequest,
   RawProviderApiRequestParams,
   RawProviderApiResponse,
-  ProviderApiRequestParams,
+  RawProviderEventData,
+  RawProviderRequest,
 } from './api';
 
 import {
   AbiParam,
+  AssetType,
+  AssetTypeParams,
   ContractUpdatesSubscription,
+  EncryptedData,
   MergeInputObjectsArray,
   MergeOutputObjectsArray,
   ReadonlyAbiParam,
-  AssetType,
-  AssetTypeParams,
   parsePermissions,
   parseTokensObject,
   parseTransaction,
@@ -644,6 +645,28 @@ export class ProviderRpcClient {
    */
   public async signDataRaw(args: ProviderApiRequestParams<'signDataRaw'>): Promise<ProviderApiResponse<'signDataRaw'>> {
     return await this._api.signDataRaw(args);
+  }
+
+  /**
+   * Encrypts arbitrary data with specified algorithm for each specified recipient
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async encryptData(args: ProviderApiRequestParams<'encryptData'>): Promise<EncryptedData[]> {
+    const { encryptedData } = await this._api.encryptData(args);
+    return encryptedData;
+  }
+
+  /**
+   * Decrypts encrypted data. Returns base64 encoded data
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async decryptData(encryptedData: EncryptedData): Promise<string> {
+    const { data } = await this._api.decryptData({ encryptedData });
+    return data;
   }
 
   /**

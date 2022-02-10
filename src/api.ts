@@ -4,6 +4,8 @@ import {
   AssetTypeParams,
   ContractState,
   ContractUpdatesSubscription,
+  EncryptedData,
+  EncryptionAlgorithm,
   FullContractState,
   Transaction,
   TransactionId,
@@ -963,6 +965,57 @@ export type ProviderApi<Addr = Address> = {
       }
     }
   };
+
+  /**
+   * Encrypts arbitrary data with specified algorithm for each specified recipient
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  encryptData: {
+    input: {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Public keys of recipients. Hex encoded
+       */
+      recipientPublicKeys: string[];
+      /**
+       * Encryption algorithm. Nonce will be generated for each recipient
+       */
+      algorithm: EncryptionAlgorithm,
+    };
+    output: {
+      /**
+       * Encrypted data for each recipient public key
+       */
+      encryptedData: EncryptedData[],
+    }
+  }
+
+  /**
+   * Decrypts encrypted data
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  decryptData: {
+    input: {
+      /**
+       * Encrypted data. The recipient's public key must match the public key of the current account.
+       */
+      encryptedData: EncryptedData,
+    };
+    output: {
+      /**
+       * Base64 encoded decrypted data
+       */
+      data: string;
+    }
+  }
 
   /**
    * Calculates transaction fees
