@@ -987,6 +987,10 @@ export type ProviderApi<Addr = Address> = {
        * Encryption algorithm. Nonce will be generated for each recipient
        */
       algorithm: EncryptionAlgorithm,
+      /**
+       * Base64 encoded data
+       */
+      data: string;
     };
     output: {
       /**
