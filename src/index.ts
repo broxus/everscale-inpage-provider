@@ -29,8 +29,8 @@ import {
   AddressLiteral,
   getUniqueId,
 } from './utils';
-import { Subscriber } from './stream';
-import { Contract } from './contract';
+import * as subscriber from './stream';
+import * as contract from './contract';
 
 export * from './api';
 export * from './models';
@@ -99,7 +99,28 @@ export class ProviderRpcClient {
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _provider?: Provider;
 
+  public Contract: new <Abi>(abi: Abi, address: Address) => contract.Contract<Abi>;
+  public Subscriber: new () => subscriber.Subscriber;
+
   constructor(properties: ProviderProperties = {}) {
+    const self = this;
+
+    // Create contract proxy type
+    class ProviderContract<Abi> extends contract.Contract<Abi> {
+      constructor(abi: Abi, address: Address) {
+        super(self, abi, address);
+      }
+    }
+    this.Contract = ProviderContract;
+
+    // Create subscriber proxy type
+    class ProviderSubscriber extends subscriber.Subscriber {
+      constructor() {
+        super(self)
+      }
+    }
+    this.Subscriber = ProviderSubscriber;
+
     this._properties = properties;
 
     // Wrap provider requests
@@ -212,16 +233,20 @@ export class ProviderRpcClient {
    *
    * @param abi Readonly object (must be declared with `as const`)
    * @param address Default contract address
+   *
+   * @deprecated `new ever.Contract(abi, address)` should be used instead
    */
-  public createContract<Abi>(abi: Abi, address: Address): Contract<Abi> {
-    return new Contract<Abi>(this, abi, address);
+  public createContract<Abi>(abi: Abi, address: Address): contract.Contract<Abi> {
+    return new this.Contract<Abi>(abi, address);
   }
 
   /**
    * Creates subscriptions group
+   *
+   * @deprecated `new ever.Subscriber()` should be used instead
    */
-  public createSubscriber(): Subscriber {
-    return new Subscriber(this);
+  public createSubscriber(): subscriber.Subscriber {
+    return new this.Subscriber();
   }
 
   /**
