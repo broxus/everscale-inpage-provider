@@ -84,7 +84,8 @@ if (document.readyState == 'complete') {
  */
 export async function hasEverscaleProvider(): Promise<boolean> {
   await ensurePageLoaded;
-  return (window as Record<string, any>).__hasEverscaleProvider === true;
+  return (window as Record<string, any>).__hasEverscaleProvider === true ||
+    (window as Record<string, any>).hasTonProvider === true;
 }
 
 /**
@@ -111,14 +112,16 @@ export class ProviderRpcClient {
         super(self, abi, address);
       }
     }
+
     this.Contract = ProviderContract;
 
     // Create subscriber proxy type
     class ProviderSubscriber extends subscriber.Subscriber {
       constructor() {
-        super(self)
+        super(self);
       }
     }
+
     this.Subscriber = ProviderSubscriber;
 
     this._properties = properties;
@@ -138,7 +141,7 @@ export class ProviderRpcClient {
     }) as unknown as RawProviderApiMethods;
 
     // Initialize provider with injected object by default
-    this._provider = (window as any).__ever;
+    this._provider = (window as any).__ever || (window as any).ton;
     if (this._provider != null) {
       // Provider as already injected
       this._mainInitializationPromise = Promise.resolve();
@@ -152,12 +155,13 @@ export class ProviderRpcClient {
         }
 
         // Wait injected provider initialization otherwise
-        this._provider = (window as any).__ever;
+        this._provider = (window as any).__ever || (window as any).ton;
         if (this._provider != null) {
           resolve();
         } else {
-          window.addEventListener('ever#initialized', (_data) => {
-            this._provider = (window as any).__ever;
+          const eventName = (window as Record<string, any>).__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
+          window.addEventListener(eventName, (_data) => {
+            this._provider = (window as any).__ever || (window as any).ton;
             resolve();
           });
         }
