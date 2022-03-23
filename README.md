@@ -55,7 +55,7 @@ async function myApp() {
   const selectedAddress = accountInteraction.address;
   const dePoolAddress = new Address('0:bbcbf7eb4b6f1203ba2d4ff5375de30a5408a8130bf79f870efbcfd49ec164e9');
 
-  const dePool = ever.createContract(DePoolAbi, dePoolAddress);
+  const dePool = new ever.Contract(DePoolAbi, dePoolAddress);
 
   const transaction = await dePool
     .methods
