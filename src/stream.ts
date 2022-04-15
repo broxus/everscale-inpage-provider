@@ -100,7 +100,7 @@ export class Subscriber {
   }
 
   private _addSubscription<T extends keyof SubscriptionsWithAddress>(event: T, address: Address): Stream<ProviderEventData<T>> {
-    type EventData = Required<SubscriptionsWithAddress>[T];
+    type EventData = Exclude<SubscriptionsWithAddress[T], undefined>;
 
     const id = getUniqueId();
 
@@ -134,7 +134,7 @@ export class Subscriber {
             Object.values(handlers).forEach(({ onEnd, queue }) => {
               delete handlers[id];
               queue.clear();
-              queue.enqueue(() => onEnd());
+              queue.enqueue(async () => onEnd());
             });
             throw e;
           }),
