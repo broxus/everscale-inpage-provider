@@ -1,6 +1,6 @@
 import { ProviderEvent, ProviderEventData } from './api';
 import { Address, getUniqueId } from './utils';
-import { TransactionId, TransactionsBatchInfo } from './models';
+import {Transaction, TransactionId, TransactionsBatchInfo} from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
@@ -33,6 +33,29 @@ export class Subscriber {
    */
   public transactions(address: Address): Stream<ProviderEventData<'transactionsFound'>> {
     return this._addSubscription('transactionsFound', address);
+  }
+
+  public async oldTransactionsList(
+      address: Address,
+      filter?: { fromLt?: string, fromUtime?: number, toLt?: string, toUtime?: number }
+  ): Promise<Transaction[]> {
+
+    let transactions_list: Transaction[] = [];
+    const onData = async(data: ProviderEventData<'transactionsFound'>) => {
+      transactions_list.push(...data.transactions);
+    }
+    const onEnd = () => {};
+
+    const scanner = new UnorderedTransactionsScanner(this.provider, {
+      address,
+      onData,
+      onEnd,
+      ...filter,
+    });
+    await scanner.start();
+    await scanner.stop();
+
+    return transactions_list;
   }
 
   /**
@@ -326,6 +349,8 @@ type UnorderedTransactionsScannerParams = {
   onEnd: () => void;
   fromLt?: string;
   fromUtime?: number;
+  toLt?: string;
+  toUtime?: number;
 };
 
 class UnorderedTransactionsScanner {
@@ -335,6 +360,8 @@ class UnorderedTransactionsScanner {
   private readonly queue: PromiseQueue = new PromiseQueue();
   private readonly fromLt?: string;
   private readonly fromUtime?: number;
+  private readonly toLt?: string;
+  private readonly toUtime?: number;
   private continuation?: TransactionId;
   private promise?: Promise<void>;
   private isRunning: boolean = false;
@@ -345,12 +372,16 @@ class UnorderedTransactionsScanner {
     onEnd,
     fromLt,
     fromUtime,
+    toLt,
+    toUtime
   }: UnorderedTransactionsScannerParams) {
     this.address = address;
     this.onData = onData;
     this.onEnd = onEnd;
     this.fromLt = fromLt;
     this.fromUtime = fromUtime;
+    this.toLt = toLt;
+    this.toUtime = toUtime;
   }
 
   public async start() {
@@ -371,27 +402,33 @@ class UnorderedTransactionsScanner {
             break;
           }
 
-          const filteredTransactions = transactions.filter((item) => (
-            (this.fromLt == null || item.id.lt > this.fromLt) && (
-              (this.fromUtime == null || item.createdAt > this.fromUtime)
-            )
+          const fromFilteredTransactions = transactions.filter((item) => (
+            (this.fromLt == null || item.id.lt > this.fromLt) &&
+            (this.fromUtime == null || item.createdAt > this.fromUtime)
           ));
 
-          if (filteredTransactions.length == 0) {
+          if (fromFilteredTransactions.length == 0) {
             break;
           }
 
-          const info = {
-            maxLt: filteredTransactions[0].id.lt,
-            minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
-            batchType: 'old',
-          } as TransactionsBatchInfo;
+          const toFilteredTransactions = fromFilteredTransactions.filter((item) => (
+              (this.toLt == null || item.id.lt < this.toLt) &&
+              (this.toUtime == null || item.createdAt < this.toUtime)
+          ));
 
-          this.queue.enqueue(() => this.onData({
-            address: this.address,
-            transactions: filteredTransactions,
-            info,
-          }));
+          if (toFilteredTransactions.length > 0) {
+            const info = {
+              maxLt: toFilteredTransactions[0].id.lt,
+              minLt: toFilteredTransactions[toFilteredTransactions.length - 1].id.lt,
+              batchType: 'old',
+            } as TransactionsBatchInfo;
+
+            this.queue.enqueue(() => this.onData({
+              address: this.address,
+              transactions: toFilteredTransactions,
+              info,
+            }));
+          }
 
           if (continuation != null) {
             this.continuation = continuation;

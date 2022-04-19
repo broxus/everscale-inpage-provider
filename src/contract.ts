@@ -19,6 +19,7 @@ import {
   parseTransaction,
   parseTokensObject,
   serializeTransaction,
+  MergeOutputObjectsArray,
 } from './models';
 import { ProviderRpcClient } from './index';
 
@@ -240,6 +241,62 @@ export class Contract<Abi> {
     return this._abi;
   }
 
+  public async waitForFirstEvent(args: WaitForFirstEventParams<Abi>): Promise<DecodedEvent<Abi, AbiEventName<Abi>>> {
+    const subscriber = new this._provider.Subscriber();
+
+    const oldEventsStream = subscriber.oldTransactions(this._address, args.options);
+    const eventsStream = oldEventsStream.merge(subscriber.transactions(
+        this._address
+    )).flatMap(
+        item => item.transactions
+    ).flatMap(async tx => {
+      return await this.decodeTransactionEvents({transaction: tx});
+    }).filterMap(async event => {
+      if (args.filter) {
+        if (args.filter.name !== event.event) {
+          return undefined;
+        }
+        if (args.filter.params) {
+          for (const [key , value] of Object.entries(args.filter.params)) {
+            const event_param_name = key as keyof MergeOutputObjectsArray<any>;
+            if (event.data[event_param_name] !== value) {
+              return undefined;
+            }
+          }
+        }
+      }
+      return event;
+    })
+
+    return await eventsStream.first();
+  }
+
+  public async getPastEvents(args: GetPastEventParams<Abi>): Promise<DecodedEvent<Abi, AbiEventName<Abi>>[]> {
+    const subscriber = new this._provider.Subscriber();
+
+    const tx_list = await subscriber.oldTransactionsList(this._address, args.options);
+    const events_list = await Promise.all(tx_list.map(async tx => {
+      return await this.decodeTransactionEvents({transaction: tx});
+    }));
+
+    return events_list.flat().filter(event => {
+      if (args.filter) {
+        if (args.filter.name !== event.event) {
+          return false;
+        }
+        if (args.filter.params) {
+          for (const [key , value] of Object.entries(args.filter.params)) {
+            const event_param_name = key as keyof MergeOutputObjectsArray<any>;
+            if (event.data[event_param_name] !== value) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    });
+  }
+
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     try {
       const result = await this._provider.rawApi.decodeTransaction({
@@ -447,6 +504,37 @@ export type CallParams = {
    */
   responsible?: boolean;
 };
+
+
+/**
+ * @category Contract
+ */
+export type EventsFilter<Abi> = {
+  name: AbiEventName<Abi>,
+  params: TokensObject | undefined
+}
+
+
+/**
+ * @category Contract
+ */
+export type EventFilterOptions = {
+  fromLt: string | undefined,
+  fromUtime: number | undefined,
+  toLt: string | undefined,
+  toUtime: number | undefined
+}
+
+
+/**
+ * @category Contract
+ */
+export type GetPastEventParams<Abi> = {
+  filter: EventsFilter<Abi> | undefined,
+  options: EventFilterOptions | undefined
+}
+
+export type WaitForFirstEventParams<Abi> = GetPastEventParams<Abi>;
 
 /**
  * @category Contract
