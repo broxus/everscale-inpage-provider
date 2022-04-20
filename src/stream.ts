@@ -35,29 +35,6 @@ export class Subscriber {
     return this._addSubscription('transactionsFound', address);
   }
 
-  public async oldTransactionsList(
-      address: Address,
-      filter?: { fromLt?: string, fromUtime?: number, toLt?: string, toUtime?: number }
-  ): Promise<Transaction[]> {
-
-    let transactions_list: Transaction[] = [];
-    const onData = async(data: ProviderEventData<'transactionsFound'>) => {
-      transactions_list.push(...data.transactions);
-    }
-    const onEnd = () => {};
-
-    const scanner = new UnorderedTransactionsScanner(this.provider, {
-      address,
-      onData,
-      onEnd,
-      ...filter,
-    });
-    await scanner.start();
-    await scanner.stop();
-
-    return transactions_list;
-  }
-
   /**
    * Returns stream of old transactions
    */
