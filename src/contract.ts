@@ -22,6 +22,7 @@ import {
   parseTokensObject,
   serializeTransaction,
 } from './models';
+import { Subscriber } from './stream';
 import { ProviderRpcClient } from './index';
 
 /**
@@ -84,8 +85,13 @@ export class Contract<Abi> {
         return parseTransaction(transaction);
       }
 
-      async sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
-        const subscriber = new this.provider.Subscriber();
+      async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+        let subscriber = args.subscriber;
+        const hasTempSubscriber = subscriber == null;
+        if (subscriber == null) {
+          subscriber = new this.provider.Subscriber();
+        }
+
         try {
           // Parent transaction from wallet
           let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined;
@@ -159,7 +165,7 @@ export class Contract<Abi> {
             output,
           };
         } finally {
-          await subscriber.unsubscribe();
+          hasTempSubscriber && (await subscriber.unsubscribe());
         }
       }
 
@@ -242,8 +248,14 @@ export class Contract<Abi> {
     return this._abi;
   }
 
-  public async waitForEvent({ options, filter }: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
-    const subscriber = new this._provider.Subscriber();
+  public async waitForEvent(args: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
+    const { options, filter } = args;
+
+    let subscriber = args.subscriber;
+    const hasTempSubscriber = subscriber == null;
+    if (subscriber == null) {
+      subscriber = new this._provider.Subscriber();
+    }
 
     const event = await (
       (options?.fromLt != null || options?.fromUtime != null)
@@ -267,7 +279,7 @@ export class Contract<Abi> {
       })
       .first();
 
-    await subscriber.unsubscribe();
+    hasTempSubscriber && (await subscriber.unsubscribe());
 
     return event;
   }
@@ -536,6 +548,16 @@ export type SendInternalParams = {
 /**
  * @category Contract
  */
+export type SendInternalWithResultParams = SendInternalParams & {
+  /**
+   * Existing subscriber
+   */
+  subscriber?: Subscriber;
+};
+
+/**
+ * @category Contract
+ */
 export type SendExternalParams = {
   publicKey: string;
   stateInit?: string;
@@ -605,6 +627,7 @@ export type EventsPaginatedResponse<Abi> = {
 export type WaitForEventParams<Abi> = {
   filter?: EventsFilter<Abi>,
   options?: EventFilterOptions,
+  subscriber?: Subscriber,
 };
 
 /**
