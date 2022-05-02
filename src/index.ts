@@ -329,6 +329,7 @@ export class ProviderRpcClient {
         ['subscribed']: [],
         ['unsubscribed']: [],
       };
+      private _subscribed = false;
 
       constructor(
         private readonly _subscribe: (s: SubscriptionImpl<T>) => Promise<void>,
@@ -344,6 +345,11 @@ export class ProviderRpcClient {
       }
 
       async subscribe(): Promise<void> {
+        if (this._subscribed) {
+          return;
+        }
+        this._subscribed = true;
+
         await this._subscribe(this);
         for (const handler of this._listeners['subscribed']) {
           handler();
@@ -351,6 +357,11 @@ export class ProviderRpcClient {
       }
 
       async unsubscribe(): Promise<void> {
+        if (!this._subscribed) {
+          return;
+        }
+        this._subscribed = false;
+
         await this._unsubscribe();
         for (const handler of this._listeners['unsubscribed']) {
           handler();

@@ -15,12 +15,12 @@ import {
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
   DecodedAbiEventData,
+  MergeOutputObjectsArray,
+  TransactionId,
   serializeTokensObject,
   parseTransaction,
   parseTokensObject,
   serializeTransaction,
-  MergeOutputObjectsArray,
-  TransactionId,
 } from './models';
 import { ProviderRpcClient } from './index';
 
@@ -85,7 +85,7 @@ export class Contract<Abi> {
       }
 
       async sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
-        const subscriber = this.provider.createSubscriber();
+        const subscriber = new this.provider.Subscriber();
         try {
           // Parent transaction from wallet
           let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined;
@@ -242,34 +242,34 @@ export class Contract<Abi> {
     return this._abi;
   }
 
-  public async waitForEvent(args: WaitForEventParams<Abi>): Promise<DecodedEvent<Abi, AbiEventName<Abi>>> {
+  public async waitForEvent({ options, filter }: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
     const subscriber = new this._provider.Subscriber();
 
-    const oldEventsStream = subscriber.oldTransactions(this._address, args?.options);
-    const eventsStream = oldEventsStream.merge(subscriber.transactions(
-        this._address
-    )).flatMap(
-        item => item.transactions
-    ).flatMap(async tx => {
-      return await this.decodeTransactionEvents({transaction: tx});
-    }).filterMap(async event => {
-      if (args?.filter) {
-        if (args.filter.name !== event.event) {
+    const event = await (
+      (options?.fromLt != null || options?.fromUtime != null)
+        ? subscriber.oldTransactions(this._address, options)
+          .merge(subscriber.transactions(this._address))
+        : subscriber.transactions(this.address)
+    ).flatMap(item => item.transactions)
+      .takeWhile(item => options == null ||
+        (options.fromLt == null || item.id.lt > options.fromLt) &&
+        (options.fromUtime == null || item.createdAt > options.fromUtime) &&
+        (options.toLt == null || item.id.lt < options.toLt) &&
+        (options.toUtime == null || item.createdAt < options.toUtime),
+      )
+      .flatMap(tx => this.decodeTransactionEvents({ transaction: tx }))
+      .filterMap(async event => {
+        if (filter == null || (await filter(event))) {
+          return event;
+        } else {
           return undefined;
         }
-        if (args.filter?.params) {
-          for (const [key , value] of Object.entries(args.filter.params)) {
-            const event_param_name = key as keyof MergeOutputObjectsArray<any>;
-            if (event.data[event_param_name] != value) {
-              return undefined;
-            }
-          }
-        }
-      }
-      return event;
-    })
+      })
+      .first();
 
-    return await eventsStream.first();
+    await subscriber.unsubscribe();
+
+    return event;
   }
 
   public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsPaginatedResponse<Abi>> {
@@ -280,7 +280,7 @@ export class Contract<Abi> {
     while (continue_iteration) {
       const { transactions, continuation } = await this._provider.getTransactions({
         address: this._address,
-        continuation: cur_offset
+        continuation: cur_offset,
       });
 
       if (transactions.length === null) {
@@ -288,8 +288,8 @@ export class Contract<Abi> {
       }
 
       const fromFilteredTransactions = transactions.filter((item) => (
-          (args?.options?.fromLt == null || item.id.lt > args?.options?.fromLt) &&
-          (args?.options?.fromUtime == null || item.createdAt > args?.options?.fromUtime)
+        (args?.options?.fromLt == null || item.id.lt > args?.options?.fromLt) &&
+        (args?.options?.fromUtime == null || item.createdAt > args?.options?.fromUtime)
       ));
 
       if (fromFilteredTransactions.length == 0) {
@@ -297,17 +297,17 @@ export class Contract<Abi> {
       }
 
       const toFilteredTransactions = fromFilteredTransactions.filter((item) => (
-          (args?.options?.toLt == null || item.id.lt < args?.options?.toLt) &&
-          (args?.options?.toUtime == null || item.createdAt < args?.options?.toUtime)
+        (args?.options?.toLt == null || item.id.lt < args?.options?.toLt) &&
+        (args?.options?.toUtime == null || item.createdAt < args?.options?.toUtime)
       ));
 
       if (toFilteredTransactions.length > 0) {
         const events_tx_list = await Promise.all(toFilteredTransactions.map(async tx => {
-          const _events =  await this.decodeTransactionEvents({transaction: tx});
+          const _events = await this.decodeTransactionEvents({ transaction: tx });
           return { tx: tx, events: _events };
         }));
 
-        for (const {tx, events} of events_tx_list) {
+        for (const { tx, events } of events_tx_list) {
           const filtered_events = events.filter(event => {
             if (args?.filters) {
               let matched = false;
@@ -317,7 +317,7 @@ export class Contract<Abi> {
                   continue;
                 }
                 if (filter?.params) {
-                  for (const [key , value] of Object.entries(filter.params)) {
+                  for (const [key, value] of Object.entries(filter.params)) {
                     const event_param_name = key as keyof MergeOutputObjectsArray<any>;
                     if (event.data[event_param_name] != value) {
                       filter_match = false;
@@ -354,7 +354,7 @@ export class Contract<Abi> {
       }
     }
 
-    return {events: res_events, offset: new_offset};
+    return { events: res_events, offset: new_offset };
   }
 
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
@@ -565,35 +565,30 @@ export type CallParams = {
   responsible?: boolean;
 };
 
-
 /**
  * @category Contract
  */
-export type EventsFilter<Abi> = {
-  name: AbiEventName<Abi>,
-  params: TokensObject | undefined
-}
-
+export type EventsFilter<Abi, E extends AbiEventName<Abi> =
+  AbiEventName<Abi>> = (event: DecodedEvent<Abi, E>) => (Promise<boolean> | boolean);
 
 /**
  * @category Contract
  */
 export type EventFilterOptions = {
-  fromLt: string | undefined,
-  fromUtime: number | undefined,
-  toLt: string | undefined,
-  toUtime: number | undefined
+  fromLt?: string,
+  fromUtime?: number,
+  toLt?: string,
+  toUtime?: number
 }
-
 
 /**
  * @category Contract
  */
 export type GetPastEventParams<Abi> = {
-  filters: EventsFilter<Abi>[] | undefined,
-  options: EventFilterOptions | undefined,
-  limit: number | undefined,
-  offset: TransactionId | undefined
+  filters?: EventsFilter<Abi, AbiEventName<Abi>>[],
+  options?: EventFilterOptions,
+  limit?: number,
+  continuation?: TransactionId
 }
 
 /**
@@ -601,15 +596,15 @@ export type GetPastEventParams<Abi> = {
  */
 export type EventsPaginatedResponse<Abi> = {
   events: DecodedEvent<Abi, AbiEventName<Abi>>[],
-  offset: TransactionId | undefined
+  continuation?: TransactionId
 }
 
 /**
  * @category Contract
  */
 export type WaitForEventParams<Abi> = {
-  filter: EventsFilter<Abi> | undefined,
-  options: EventFilterOptions | undefined,
+  filter?: EventsFilter<Abi>,
+  options?: EventFilterOptions,
 };
 
 /**

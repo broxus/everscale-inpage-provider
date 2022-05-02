@@ -1,6 +1,6 @@
 import { ProviderEvent, ProviderEventData } from './api';
 import { Address, getUniqueId } from './utils';
-import {Transaction, TransactionId, TransactionsBatchInfo} from './models';
+import { TransactionId, TransactionsBatchInfo } from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
@@ -9,10 +9,11 @@ type SubscriptionsWithAddress = {
   [K in SubscriptionWithAddress]?: {
     subscription: Promise<Subscription<K>>
     handlers: {
-      [id: number]: {
-        onData: (event: ProviderEventData<K>) => Promise<void>,
-        onEnd: () => void,
+      [id: string]: {
+        onData: (event: ProviderEventData<K>) => Promise<boolean>,
+        onEnd: (eof: boolean) => void,
         queue: PromiseQueue
+        state: { eof: boolean, finished: boolean },
       }
     }
   }
@@ -31,36 +32,44 @@ export class Subscriber {
   /**
    * Returns stream of new transactions
    */
-  public transactions(address: Address): Stream<ProviderEventData<'transactionsFound'>> {
-    return this._addSubscription('transactionsFound', address);
+  public transactions(address: Address): IdentityStream<ProviderEventData<'transactionsFound'>> {
+    return this._addSubscription('transactionsFound', address, false);
   }
 
   /**
    * Returns stream of old transactions
    */
-  public oldTransactions(address: Address, filter?: { fromLt?: string, fromUtime?: number }): Stream<ProviderEventData<'transactionsFound'>> {
+  public oldTransactions(
+    address: Address,
+    filter?: { fromLt?: string, fromUtime?: number },
+  ): IdentityStream<ProviderEventData<'transactionsFound'>, true> {
     const id = getUniqueId();
 
-    return new StreamImpl(async (onData, onEnd) => {
-      const scanner = new UnorderedTransactionsScanner(this.provider, {
-        address,
-        onData,
-        onEnd,
-        ...filter,
-      });
-      this.scanners[id] = scanner;
-      await scanner.start();
-    }, async () => {
-      const scanner = this.scanners[id];
-      delete this.scanners[id];
-      if (scanner != null) {
-        await scanner.stop();
-      }
-    }, identity);
+    return new StreamImpl(
+      async (onData, onEnd) => {
+        const scanner = new UnorderedTransactionsScanner(this.provider, {
+          address,
+          onData,
+          onEnd,
+          ...filter,
+        });
+        this.scanners[id] = scanner;
+        await scanner.start();
+      },
+      async () => {
+        const scanner = this.scanners[id];
+        delete this.scanners[id];
+        if (scanner != null) {
+          await scanner.stop();
+        }
+      },
+      identity,
+      true,
+    );
   }
 
-  public states(address: Address): Stream<ProviderEventData<'contractStateChanged'>> {
-    return this._addSubscription('contractStateChanged', address);
+  public states(address: Address): IdentityStream<ProviderEventData<'contractStateChanged'>> {
+    return this._addSubscription('contractStateChanged', address, false);
   }
 
   public async unsubscribe(): Promise<void> {
@@ -99,68 +108,38 @@ export class Subscriber {
     );
   }
 
-  private _addSubscription<T extends keyof SubscriptionsWithAddress>(event: T, address: Address): Stream<ProviderEventData<T>> {
+  private _addSubscription<T extends keyof SubscriptionsWithAddress, F extends boolean>(
+    event: T,
+    address: Address,
+    isFinite: F,
+  ): IdentityStream<ProviderEventData<T>, F> {
     type EventData = Exclude<SubscriptionsWithAddress[T], undefined>;
 
-    const id = getUniqueId();
+    const rawAddress = address.toString();
 
-    return new StreamImpl((onData, onEnd) => {
-      let subscriptions = this.subscriptions[address.toString()] as SubscriptionsWithAddress | undefined;
-      let eventData = subscriptions?.[event] as EventData | undefined;
-      if (eventData == null) {
-        const handlers = {
-          [id]: { onData, onEnd, queue: new PromiseQueue() },
-        } as EventData['handlers'];
-
-        eventData = {
-          subscription: (this.provider.subscribe as any)(event, {
-            address,
-          }).then((subscription: Subscription<T>) => {
-            subscription.on('data', (data) => {
-              Object.values(handlers).forEach(({ onData, queue }) => {
-                queue.enqueue(() => onData(data));
-              });
-            });
-            subscription.on('unsubscribed', () => {
-              Object.values(handlers).forEach(({ onEnd, queue }) => {
-                delete handlers[id];
-                queue.clear();
-                queue.enqueue(async () => onEnd());
-              });
-            });
-            return subscription;
-          }).catch((e: Error) => {
-            console.error(e);
-            Object.values(handlers).forEach(({ onEnd, queue }) => {
-              delete handlers[id];
-              queue.clear();
-              queue.enqueue(async () => onEnd());
-            });
-            throw e;
-          }),
-          handlers,
-        } as EventData;
-
-        if (subscriptions == null) {
-          subscriptions = {
-            [event]: eventData,
-          };
-          this.subscriptions[address.toString()] = subscriptions;
-        } else {
-          subscriptions[event] = eventData;
-        }
-      } else {
-        eventData.handlers[id] = { onData, onEnd, queue: new PromiseQueue() } as EventData['handlers'][number];
-      }
-    }, () => {
-      const subscriptions = this.subscriptions[address.toString()] as SubscriptionsWithAddress | undefined;
+    const stopProducer = (id: string) => {
+      const subscriptions = this.subscriptions[rawAddress] as SubscriptionsWithAddress | undefined;
       if (subscriptions == null) {
+        // No subscriptions for the address
         return;
       }
 
       const eventData = subscriptions[event] as EventData | undefined;
       if (eventData != null) {
-        delete eventData.handlers[id];
+        const handler = eventData.handlers[id] as EventData['handlers'][number] | undefined;
+        if (handler != null) {
+          // Remove event handler with the id
+          delete eventData.handlers[id];
+
+          const { queue, onEnd, state } = handler;
+          if (!state.finished) {
+            state.finished = true;
+            queue.clear();
+            queue.enqueue(async () => onEnd(state.eof));
+          }
+        }
+
+        // Remove event data subscription if there are none of them
         if (Object.keys(eventData.handlers).length === 0) {
           const subscription = eventData.subscription as Promise<Subscription<T>>;
           delete subscriptions[event];
@@ -171,159 +150,491 @@ export class Subscriber {
         }
       }
 
+      // Remove address subscriptions object if it is empty
       if (Object.keys(subscriptions).length === 0) {
-        delete this.subscriptions[address.toString()];
+        delete this.subscriptions[rawAddress];
       }
-    }, identity);
+    };
+
+    const id = getUniqueId().toString();
+
+    return new StreamImpl(
+      (onData, onEnd) => {
+        let subscriptions = this.subscriptions[rawAddress] as SubscriptionsWithAddress | undefined;
+        let eventData = subscriptions?.[event] as EventData | undefined;
+
+        const state = { eof: false, finished: false };
+
+        // Create handler object
+        const handler = {
+          onData,
+          onEnd,
+          queue: new PromiseQueue(),
+          state,
+        } as EventData['handlers'][number];
+
+        if (eventData != null) {
+          // Add handler if there is already a handler group
+          eventData.handlers[id] = handler;
+          return;
+        }
+
+        // Create handlers group
+        const handlers = {
+          [id]: handler,
+        } as EventData['handlers'];
+
+        // Create subscription
+        const subscription = (this.provider.subscribe as any)(event, { address })
+          .then((subscription: Subscription<T>) => {
+            subscription.on('data', (data) => {
+              Object.values(handlers).forEach(({ onData, queue, state }) => {
+                // Skip closed streams
+                if (state.eof || state.finished) {
+                  return;
+                }
+
+                queue.enqueue(async () => {
+                  if (!(await onData(data))) {
+                    state.eof = true;
+                    stopProducer(id);
+                  }
+                });
+              });
+            });
+            subscription.on('unsubscribed', () => {
+              Object.keys(handlers).forEach(stopProducer);
+            });
+            return subscription;
+          }).catch((e: Error) => {
+            console.error(e);
+            Object.keys(handlers).forEach(stopProducer);
+            throw e;
+          });
+
+        // Add event data to subscriptions
+        eventData = { subscription, handlers } as EventData;
+        if (subscriptions == null) {
+          this.subscriptions[rawAddress] = { [event]: eventData };
+        } else {
+          subscriptions[event] = eventData;
+        }
+      },
+      () => stopProducer(id),
+      identity,
+      isFinite,
+    );
   }
 }
 
-async function identity<P>(event: P, handler: (item: P) => (Promise<void> | void)) {
-  await handler(event);
+async function identity<P>(item: P, handler: (item: P) => (Promise<boolean> | boolean)) {
+  return handler(item);
 }
 
 /**
  * @category Stream
  */
-export interface Stream<P, T = P> {
-  readonly makeProducer: (onData: (event: P) => Promise<void>, onEnd: () => void) => void;
+export type BothFinite<F extends boolean, F1 extends boolean> =
+  F extends true ? F1 extends true ? true : false : false;
+
+/**
+ * @category Stream
+ */
+export type IdentityStream<T, F extends boolean = false> = Stream<T, T, F>;
+
+/**
+ * @category Stream
+ */
+export interface Stream<P, T, F extends boolean = false> {
+  readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => void;
   readonly stopProducer: () => void;
+  readonly isFinite: F;
 
-  first(): Promise<T>;
+  /**
+   * Waits for the first element or the end of the stream
+   */
+  first(): Promise<F extends true ? T | undefined : T>;
 
+  /**
+   * Folds every element into an accumulator by applying an operation, returning the final result
+   */
+  fold: F extends true ? <B>(init: B, f: (init: B, item: T) => (Promise<B> | B)) => Promise<B> : never;
+
+  /**
+   * Waits until the end of the stream
+   */
+  finished: F extends true ? () => Promise<undefined> : never;
+
+  /**
+   * Executes handler on each item
+   */
   on(handler: (item: T) => (Promise<void> | void)): void;
 
-  merge(other: Stream<P, T>): Stream<P, T>;
+  /**
+   * Merges two streams
+   */
+  merge<F1 extends boolean>(other: Stream<P, T, F1>): Stream<P, T, BothFinite<F, F1>>;
 
-  filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T>;
+  /**
+   * Alias for the `.map((item) => { f(item); return item; })`
+   */
+  tap(handler: (item: T) => (Promise<void> | void)): Stream<P, T, F>;
 
-  filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U>;
+  /**
+   * Skip elements where `f(item) == false`
+   */
+  filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, F>;
 
-  map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U>;
+  /**
+   * Modifies items and skip all `undefined`
+   */
+  filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U, F>;
 
-  flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U>;
+  /**
+   * Modifies items
+   */
+  map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U, F>;
 
-  skip(n: number): Stream<P, T>;
+  /**
+   * Creates an iterator that flattens nested structure
+   */
+  flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U, F>;
 
-  skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T>;
+  /**
+   * Creates an iterator that skips the first n elements
+   */
+  skip(n: number): Stream<P, T, F>;
+
+  /**
+   * Creates an iterator that skips elements based on a predicate
+   */
+  skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, F>;
+
+  /**
+   * Creates an iterator that yields the first n elements, or fewer if the underlying iterator ends sooner
+   */
+  take(n: number): Stream<P, T, true>;
+
+  /**
+   * Creates an iterator that yields elements based on a predicate
+   */
+  takeWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, true>;
+
+  /**
+   * Creates an iterator that yields mapped elements based on a predicate until first `undefined` is found
+   */
+  takeWhileMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U, true>;
 }
 
-class StreamImpl<P, T> implements Stream<P, T> {
+class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
   constructor(
-    readonly makeProducer: (onData: (event: P) => Promise<void>, onEnd: () => void) => void,
+    readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => void,
     readonly stopProducer: () => void,
-    readonly extractor: (event: P, handler: (item: T) => (Promise<void> | void)) => Promise<void>) {
+    readonly extractor: (data: P, handler: (item: T) => (Promise<boolean> | boolean)) => Promise<boolean>,
+    readonly isFinite: F,
+  ) {
   }
 
-  public first(): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
-      this.makeProducer(async (event) => {
-        await this.extractor(event, (item) => {
-          this.stopProducer();
-          resolve(item);
-        });
-      }, () => reject(new Error('Subscription closed')));
+  public first(): Promise<F extends true ? T | undefined : T> {
+    type R = F extends true ? T | undefined : T;
+
+    let state: { found: false } | { found: true, result: T } = { found: false };
+
+    return new Promise<R>(async (resolve: (value: R) => void, reject) => {
+      this.makeProducer(
+        // onData
+        (data) => this.extractor(data, (item) => {
+          Object.assign(state, { found: true, result: item });
+          return false;
+        }),
+        // onEnd
+        (eof) => {
+          if (eof) {
+            if (this.isFinite) {
+              resolve((state.found ? state.result : undefined) as R);
+            } else if (state.found) {
+              resolve(state.result as R);
+            } else {
+              reject(new Error('Unexpected end of stream'));
+            }
+          } else {
+            reject(new Error('Subscription closed'));
+          }
+        },
+      );
     });
   }
+
+  /**
+   * Folds every element into an accumulator by applying an operation, returning the final result
+   */
+  public fold = this.onlyFinite(<B>(init: B, f: (init: B, item: T) => (Promise<B> | B)): Promise<B> => {
+    let state = init;
+
+    return new Promise<B>(async (resolve: (value: B) => void, reject) => {
+      this.makeProducer(
+        // onData
+        (data) => this.extractor(data, async (item) => {
+          state = await f(state, item);
+          return true;
+        }),
+        // onEnd
+        (eof) => {
+          if (eof) {
+            resolve(state);
+          } else {
+            reject(new Error('Subscription closed'));
+          }
+        },
+      );
+    });
+  });
+
+  /**
+   * Waits until the end of the stream
+   */
+  public finished = this.onlyFinite((): Promise<undefined> => new Promise<undefined>(async (resolve, reject) => {
+      this.makeProducer(
+        // onData
+        (data) => this.extractor(data, (_item) => true),
+        // onEnd
+        (eof) => {
+          if (eof) {
+            resolve(undefined);
+          } else {
+            reject(new Error('Subscription closed'));
+          }
+        },
+      );
+    }),
+  );
 
   public on(handler: (item: T) => (Promise<void> | void)): void {
-    this.makeProducer(async (event) => {
-      await this.extractor(event, handler);
-    }, () => {
-    });
-  }
-
-  public merge(other: Stream<P, T>): Stream<P, T> {
-    return new StreamImpl<P, T>(async (onEvent, onEnd) => {
-      const state = {
-        counter: 0,
-      };
-      const checkEnd = () => {
-        if (++state.counter == 2) {
-          onEnd();
-        }
-      };
-
-      this.makeProducer(onEvent, checkEnd);
-      other.makeProducer(onEvent, checkEnd);
-    }, () => {
-      this.stopProducer();
-      other.stopProducer();
-    }, this.extractor) as Stream<P, T>;
-  }
-
-  public filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
-      this.extractor(event, async (item) => {
-        if (await f(item)) {
-          await handler(item);
-        }
+    this.makeProducer(
+      (event) => this.extractor(event, async (item) => {
+        await handler(item);
+        return true;
       }),
+      (_eof) => {
+      });
+  }
+
+  public merge<F1 extends boolean>(other: Stream<P, T, F1>): Stream<P, T, BothFinite<F, F1>> {
+    return new StreamImpl<P, T, BothFinite<F, F1>>(
+      (onData, onEnd) => {
+        const state = {
+          stopped: false,
+          counter: 0,
+        };
+        const checkEnd = (eof: boolean) => {
+          if (state.stopped) {
+            return;
+          }
+
+          if (++state.counter == 2 || !eof) {
+            state.stopped = true;
+            onEnd(eof);
+          }
+        };
+
+        this.makeProducer(onData, checkEnd);
+        other.makeProducer(onData, checkEnd);
+      },
+      () => {
+        this.stopProducer();
+        other.stopProducer();
+      },
+      this.extractor,
+      (this.isFinite && other.isFinite) as BothFinite<F, F1>,
     );
   }
 
-  public filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
-      this.extractor(event, async (item: T) => {
-        const newItem = await f(item);
-        if (newItem !== undefined) {
-          await handler(newItem);
-        }
-      }),
+  public tap(f: (item: T) => (Promise<void> | void)): Stream<P, T, F> {
+    return new StreamImpl<P, T, F>(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          await f(item);
+          return handler(item);
+        }),
+      this.isFinite,
     );
   }
 
-  public map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U> {
-    return this.filterMap(f);
-  }
-
-  public flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U> {
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
-      this.extractor(event, async (item: T) => {
-        const items = await f(item);
-        for (const newItem of items) {
-          await handler(newItem);
-        }
-      }),
+  public filter(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, F> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item) => {
+          if (await f(item)) {
+            return handler(item);
+          } else {
+            return true;
+          }
+        }),
+      this.isFinite,
     );
   }
 
-  public skip(n: number): Stream<P, T> {
+  public filterMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U, F> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          const newItem = await f(item);
+          if (newItem !== undefined) {
+            return handler(newItem);
+          } else {
+            return true;
+          }
+        }),
+      this.isFinite,
+    );
+  }
+
+  public map<U>(f: (item: T) => (Promise<U> | U)): Stream<P, U, F> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          const newItem = await f(item);
+          return handler(newItem);
+        }),
+      this.isFinite,
+    );
+  }
+
+  public flatMap<U>(f: (item: T) => (Promise<U[]> | U[])): Stream<P, U, F> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          const items = await f(item);
+          for (const newItem of items) {
+            if (!(await handler(newItem))) {
+              return false;
+            }
+          }
+          return true;
+        }),
+      this.isFinite,
+    );
+  }
+
+  public skip(n: number): Stream<P, T, F> {
     const state = {
       index: 0,
     };
 
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
-      this.extractor(event, async (item) => {
-        if (state.index >= n) {
-          await handler(item);
-        } else {
-          ++state.index;
-        }
-      }),
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, (item) => {
+          if (state.index >= n) {
+            return handler(item);
+          } else {
+            ++state.index;
+            return true;
+          }
+        }),
+      this.isFinite,
     );
   }
 
-  public skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T> {
+  public skipWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, F> {
     const state = {
       shouldSkip: true,
     };
 
-    return new StreamImpl(this.makeProducer, this.stopProducer, (event, handler) =>
-      this.extractor(event, async (item) => {
-        if (!state.shouldSkip || !(await f(item))) {
-          state.shouldSkip = false;
-          await handler(item);
-        }
-      }),
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item) => {
+          if (!state.shouldSkip || !(await f(item))) {
+            state.shouldSkip = false;
+            return handler(item);
+          } else {
+            return true;
+          }
+        }),
+      this.isFinite,
     );
+  }
+
+  public take(n: number): Stream<P, T, true> {
+    const state = {
+      index: 0,
+    };
+
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, (item) => {
+          if (state.index < n) {
+            ++state.index;
+            return handler(item);
+          } else {
+            return false;
+          }
+        }),
+      true,
+    );
+  }
+
+  public takeWhile(f: (item: T) => (Promise<boolean> | boolean)): Stream<P, T, true> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item) => {
+          if (await f(item)) {
+            return handler(item);
+          } else {
+            return false;
+          }
+        }),
+      true,
+    );
+  }
+
+  public takeWhileMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U, true> {
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          const newItem = await f(item);
+          if (newItem !== undefined) {
+            return handler(newItem);
+          } else {
+            return false;
+          }
+        }),
+      true,
+    );
+  }
+
+  private onlyFinite<C>(f: C): F extends true ? C : never {
+    if (this.isFinite) {
+      return f as any;
+    } else {
+      throw new Error('Expected finite stream');
+    }
   }
 }
 
 type UnorderedTransactionsScannerParams = {
   address: Address;
-  onData: (data: ProviderEventData<'transactionsFound'>) => Promise<void>;
-  onEnd: () => void;
+  onData: (data: ProviderEventData<'transactionsFound'>) => Promise<boolean>;
+  onEnd: (eof: boolean) => void;
   fromLt?: string;
   fromUtime?: number;
   toLt?: string;
@@ -331,34 +642,15 @@ type UnorderedTransactionsScannerParams = {
 };
 
 class UnorderedTransactionsScanner {
-  private readonly address: Address;
-  private readonly onData: (data: ProviderEventData<'transactionsFound'>) => Promise<void>;
-  private readonly onEnd: () => void;
   private readonly queue: PromiseQueue = new PromiseQueue();
-  private readonly fromLt?: string;
-  private readonly fromUtime?: number;
-  private readonly toLt?: string;
-  private readonly toUtime?: number;
+
   private continuation?: TransactionId;
   private promise?: Promise<void>;
   private isRunning: boolean = false;
 
-  constructor(private readonly provider: ProviderRpcClient, {
-    address,
-    onData,
-    onEnd,
-    fromLt,
-    fromUtime,
-    toLt,
-    toUtime
-  }: UnorderedTransactionsScannerParams) {
-    this.address = address;
-    this.onData = onData;
-    this.onEnd = onEnd;
-    this.fromLt = fromLt;
-    this.fromUtime = fromUtime;
-    this.toLt = toLt;
-    this.toUtime = toUtime;
+  constructor(
+    private readonly provider: ProviderRpcClient,
+    private readonly params: UnorderedTransactionsScannerParams) {
   }
 
   public async start() {
@@ -368,29 +660,36 @@ class UnorderedTransactionsScanner {
 
     this.isRunning = true;
     this.promise = (async () => {
-      while (this.isRunning) {
+      const params = this.params;
+      let state = {
+        complete: false,
+      };
+
+      while (this.isRunning && !state.complete) {
         try {
           const { transactions, continuation } = await this.provider.getTransactions({
-            address: this.address,
+            address: this.params.address,
             continuation: this.continuation,
           });
 
-          if (!this.isRunning || transactions.length == null) {
+          state.complete = !state.complete && transactions.length == null;
+          if (!this.isRunning || state.complete) {
             break;
           }
 
           const fromFilteredTransactions = transactions.filter((item) => (
-            (this.fromLt == null || item.id.lt > this.fromLt) &&
-            (this.fromUtime == null || item.createdAt > this.fromUtime)
+            (params.fromLt == null || item.id.lt > params.fromLt) &&
+            (params.fromUtime == null || item.createdAt > params.fromUtime)
           ));
 
           if (fromFilteredTransactions.length == 0) {
+            state.complete = true;
             break;
           }
 
           const toFilteredTransactions = fromFilteredTransactions.filter((item) => (
-              (this.toLt == null || item.id.lt < this.toLt) &&
-              (this.toUtime == null || item.createdAt < this.toUtime)
+            (params.toLt == null || item.id.lt < params.toLt) &&
+            (params.toUtime == null || item.createdAt < params.toUtime)
           ));
 
           if (toFilteredTransactions.length > 0) {
@@ -400,16 +699,23 @@ class UnorderedTransactionsScanner {
               batchType: 'old',
             } as TransactionsBatchInfo;
 
-            this.queue.enqueue(() => this.onData({
-              address: this.address,
-              transactions: toFilteredTransactions,
-              info,
-            }));
+            this.queue.enqueue(async () => {
+              const isRunning = this.params.onData({
+                address: this.params.address,
+                transactions: toFilteredTransactions,
+                info,
+              });
+              if (!isRunning) {
+                state.complete = true;
+                this.isRunning = false;
+              }
+            });
           }
 
           if (continuation != null) {
             this.continuation = continuation;
           } else {
+            state.complete = true;
             break;
           }
         } catch (e) {
@@ -417,7 +723,7 @@ class UnorderedTransactionsScanner {
         }
       }
 
-      this.queue.enqueue(async () => this.onEnd());
+      this.queue.enqueue(async () => this.params.onEnd(state.complete));
       this.isRunning = false;
       this.continuation = undefined;
     })();
@@ -429,7 +735,7 @@ class UnorderedTransactionsScanner {
     if (this.promise != null) {
       await this.promise;
     } else {
-      this.onEnd();
+      this.params.onEnd(false);
     }
   }
 }
