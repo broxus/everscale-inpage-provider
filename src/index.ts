@@ -57,15 +57,22 @@ export interface Provider {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 }
 
+const getProvider = (): Provider | undefined => (window as any).__ever || (window as any).ton;
+
 /**
  * @category Provider
  */
 export type ProviderProperties = {
   /***
+   * Ignore injected provider and try to use `fallback` instead.
+   * @default false
+   */
+  forceUseFallback?: boolean;
+  /***
    * Provider factory which will be called if injected provider was not found.
    * Can be used for initialization of the standalone Everscale client
    */
-  fallback?: () => Promise<Provider>
+  fallback?: () => Promise<Provider>;
 };
 
 let ensurePageLoaded: Promise<void>;
@@ -92,10 +99,8 @@ export async function hasEverscaleProvider(): Promise<boolean> {
  * @category Provider
  */
 export class ProviderRpcClient {
-  private readonly _properties: ProviderProperties;
   private readonly _api: RawProviderApiMethods;
-  private readonly _mainInitializationPromise: Promise<void>;
-  private _additionalInitializationPromise?: Promise<void>;
+  private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
   private _provider?: Provider;
@@ -124,8 +129,6 @@ export class ProviderRpcClient {
 
     this.Subscriber = ProviderSubscriber;
 
-    this._properties = properties;
-
     // Wrap provider requests
     this._api = new Proxy({}, {
       get: <K extends ProviderMethod>(
@@ -140,36 +143,50 @@ export class ProviderRpcClient {
       },
     }) as unknown as RawProviderApiMethods;
 
-    // Initialize provider with injected object by default
-    this._provider = (window as any).__ever || (window as any).ton;
-    if (this._provider != null) {
-      // Provider as already injected
-      this._mainInitializationPromise = Promise.resolve();
+    if (properties.forceUseFallback === true) {
+      this._initializationPromise = properties.fallback != null
+        ? properties.fallback()
+          .then((provider) => {
+            this._provider = provider;
+          })
+        : Promise.resolve();
     } else {
-      // Wait until page is loaded and initialization complete
-      this._mainInitializationPromise = hasEverscaleProvider().then((hasProvider) => new Promise((resolve, reject) => {
-        if (!hasProvider) {
-          // Fully loaded page doesn't even contain provider flag
-          reject(new ProviderNotFoundException());
-          return;
-        }
+      // Initialize provider with injected object by default
+      this._provider = getProvider();
+      if (this._provider != null) {
+        // Provider as already injected
+        this._initializationPromise = Promise.resolve();
+      } else {
+        // Wait until page is loaded and initialization complete
+        this._initializationPromise = hasEverscaleProvider()
+          .then((hasProvider) => new Promise<void>((resolve) => {
+            if (!hasProvider) {
+              // Fully loaded page doesn't even contain provider flag
+              return resolve();
+            }
 
-        // Wait injected provider initialization otherwise
-        this._provider = (window as any).__ever || (window as any).ton;
-        if (this._provider != null) {
-          resolve();
-        } else {
-          const eventName = (window as Record<string, any>).__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
-          window.addEventListener(eventName, (_data) => {
-            this._provider = (window as any).__ever || (window as any).ton;
-            resolve();
+            // Wait injected provider initialization otherwise
+            this._provider = getProvider();
+            if (this._provider != null) {
+              resolve();
+            } else {
+              const eventName = (window as Record<string, any>).__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
+              window.addEventListener(eventName, (_data) => {
+                this._provider = getProvider();
+                resolve();
+              });
+            }
+          }))
+          .then(async () => {
+            if (this._provider == null && properties.fallback != null) {
+              this._provider = await properties.fallback();
+            }
           });
-        }
-      }));
+      }
     }
 
     // Will only register handlers for successfully loaded injected provider
-    this._mainInitializationPromise.then(() => {
+    this._initializationPromise.then(() => {
       if (this._provider != null) {
         this._registerEventHandlers(this._provider);
       }
@@ -189,21 +206,9 @@ export class ProviderRpcClient {
    * @throws ProviderNotFoundException when no provider found
    */
   public async ensureInitialized(): Promise<void> {
-    try {
-      await this._mainInitializationPromise;
-    } catch (e) {
-      if (this._properties.fallback == null) {
-        throw e;
-      }
-
-      if (this._additionalInitializationPromise == null) {
-        this._additionalInitializationPromise = this._properties.fallback().then(async (provider) => {
-          this._provider = provider;
-          this._registerEventHandlers(this._provider);
-        });
-      }
-
-      await this._additionalInitializationPromise;
+    await this._initializationPromise;
+    if (this._provider == null) {
+      throw new ProviderNotFoundException();
     }
   }
 
