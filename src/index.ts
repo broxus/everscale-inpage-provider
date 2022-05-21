@@ -99,6 +99,7 @@ export async function hasEverscaleProvider(): Promise<boolean> {
  * @category Provider
  */
 export class ProviderRpcClient {
+  private readonly _properties: ProviderProperties;
   private readonly _api: RawProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
@@ -109,6 +110,8 @@ export class ProviderRpcClient {
   public Subscriber: new () => subscriber.Subscriber;
 
   constructor(properties: ProviderProperties = {}) {
+    this._properties = properties;
+
     const self = this;
 
     // Create contract proxy type
@@ -194,9 +197,13 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Checks whether this page has injected Everscale provider
+   * Checks whether this page has injected Everscale provider or
+   * there is a fallback provider.
    */
   public async hasProvider(): Promise<boolean> {
+    if (this._properties.fallback != null) {
+      return true;
+    }
     return hasEverscaleProvider();
   }
 
