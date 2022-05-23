@@ -15,11 +15,14 @@ import {
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
   DecodedAbiEventData,
+  MergeOutputObjectsArray,
+  TransactionId,
   serializeTokensObject,
   parseTransaction,
   parseTokensObject,
   serializeTransaction,
 } from './models';
+import { Subscriber } from './stream';
 import { ProviderRpcClient } from './index';
 
 /**
@@ -82,8 +85,13 @@ export class Contract<Abi> {
         return parseTransaction(transaction);
       }
 
-      async sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
-        const subscriber = this.provider.createSubscriber();
+      async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+        let subscriber = args.subscriber;
+        const hasTempSubscriber = subscriber == null;
+        if (subscriber == null) {
+          subscriber = new this.provider.Subscriber();
+        }
+
         try {
           // Parent transaction from wallet
           let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined;
@@ -157,7 +165,7 @@ export class Contract<Abi> {
             output,
           };
         } finally {
-          await subscriber.unsubscribe();
+          hasTempSubscriber && (await subscriber.unsubscribe());
         }
       }
 
@@ -238,6 +246,105 @@ export class Contract<Abi> {
 
   public get abi(): string {
     return this._abi;
+  }
+
+  public async waitForEvent(args: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
+    const { range, filter } = args;
+
+    let subscriber = args.subscriber;
+    const hasTempSubscriber = subscriber == null;
+    if (subscriber == null) {
+      subscriber = new this._provider.Subscriber();
+    }
+
+    const event = await (
+      (range?.fromLt != null || range?.fromUtime != null)
+        ? subscriber.oldTransactions(this._address, range)
+          .merge(subscriber.transactions(this._address))
+        : subscriber.transactions(this.address)
+    ).flatMap(item => item.transactions)
+      .takeWhile(item => range == null ||
+        (range.fromLt == null || item.id.lt > range.fromLt) &&
+        (range.fromUtime == null || item.createdAt > range.fromUtime) &&
+        (range.toLt == null || item.id.lt < range.toLt) &&
+        (range.toUtime == null || item.createdAt < range.toUtime),
+      )
+      .flatMap(tx => this.decodeTransactionEvents({ transaction: tx }))
+      .filterMap(async event => {
+        if (filter == null || (await filter(event))) {
+          return event;
+        } else {
+          return undefined;
+        }
+      })
+      .first();
+
+    hasTempSubscriber && (await subscriber.unsubscribe());
+
+    return event;
+  }
+
+  public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsBatch<Abi>> {
+    const { range, filter, limit } = args;
+
+    let result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
+    let currentContinuation = args?.continuation;
+
+    outer: while (true) {
+      const { transactions, continuation } = await this._provider.getTransactions({
+        address: this._address,
+        continuation: currentContinuation,
+      });
+      if (transactions.length === null) {
+        break;
+      }
+
+      const filteredTransactions = transactions.filter((item) => (
+        (range?.fromLt == null || item.id.lt > range.fromLt) &&
+        (range?.fromUtime == null || item.createdAt > range.fromUtime) &&
+        (range?.toLt == null || item.id.lt < range?.toLt) &&
+        (range?.toUtime == null || item.createdAt < range?.toUtime)
+      ));
+
+      if (filteredTransactions.length > 0) {
+        const parsedEvents = await Promise.all(filteredTransactions.map(async tx => {
+          return { tx, events: await this.decodeTransactionEvents({ transaction: tx }) };
+        }));
+
+        for (let { tx, events } of parsedEvents) {
+          if (filter != null) {
+            events = await Promise.all(
+              events.map(async event =>
+                (await filter(event)) ? event : undefined,
+              ),
+            ).then(events =>
+              events.filter((event): event is Awaited<DecodedEvent<Abi, AbiEventName<Abi>>> =>
+                event != null),
+            );
+          }
+
+          currentContinuation = tx.id; // update continuation in case of early break
+
+          for (const event of events) {
+            if (limit != null && result.length >= limit) {
+              break outer;
+            }
+            result.push(event);
+          }
+
+          if (limit != null && result.length >= limit) {
+            break outer;
+          }
+        }
+      }
+
+      currentContinuation = continuation;
+      if (currentContinuation == null) {
+        break;
+      }
+    }
+
+    return { events: result, continuation: currentContinuation };
   }
 
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
@@ -419,6 +526,16 @@ export type SendInternalParams = {
 /**
  * @category Contract
  */
+export type SendInternalWithResultParams = SendInternalParams & {
+  /**
+   * Existing subscriber
+   */
+  subscriber?: Subscriber;
+};
+
+/**
+ * @category Contract
+ */
 export type SendExternalParams = {
   publicKey: string;
   stateInit?: string;
@@ -447,6 +564,49 @@ export type CallParams = {
    */
   responsible?: boolean;
 };
+
+/**
+ * @category Contract
+ */
+export type GetPastEventParams<Abi> = {
+  filter?: EventsFilter<Abi, AbiEventName<Abi>>,
+  range?: EventsRange,
+  limit?: number,
+  continuation?: TransactionId
+}
+
+/**
+ * @category Contract
+ */
+export type WaitForEventParams<Abi> = {
+  filter?: EventsFilter<Abi>,
+  range?: EventsRange,
+  subscriber?: Subscriber,
+};
+
+/**
+ * @category Contract
+ */
+export type EventsBatch<Abi> = {
+  events: DecodedEvent<Abi, AbiEventName<Abi>>[],
+  continuation?: TransactionId
+}
+
+/**
+ * @category Contract
+ */
+export type EventsFilter<Abi, E extends AbiEventName<Abi> =
+  AbiEventName<Abi>> = (event: DecodedEvent<Abi, E>) => (Promise<boolean> | boolean);
+
+/**
+ * @category Contract
+ */
+export type EventsRange = {
+  fromLt?: string,
+  fromUtime?: number,
+  toLt?: string,
+  toUtime?: number
+}
 
 /**
  * @category Contract
