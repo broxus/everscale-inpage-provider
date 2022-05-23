@@ -249,7 +249,7 @@ export class Contract<Abi> {
   }
 
   public async waitForEvent(args: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
-    const { options, filter } = args;
+    const { range, filter } = args;
 
     let subscriber = args.subscriber;
     const hasTempSubscriber = subscriber == null;
@@ -258,16 +258,16 @@ export class Contract<Abi> {
     }
 
     const event = await (
-      (options?.fromLt != null || options?.fromUtime != null)
-        ? subscriber.oldTransactions(this._address, options)
+      (range?.fromLt != null || range?.fromUtime != null)
+        ? subscriber.oldTransactions(this._address, range)
           .merge(subscriber.transactions(this._address))
         : subscriber.transactions(this.address)
     ).flatMap(item => item.transactions)
-      .takeWhile(item => options == null ||
-        (options.fromLt == null || item.id.lt > options.fromLt) &&
-        (options.fromUtime == null || item.createdAt > options.fromUtime) &&
-        (options.toLt == null || item.id.lt < options.toLt) &&
-        (options.toUtime == null || item.createdAt < options.toUtime),
+      .takeWhile(item => range == null ||
+        (range.fromLt == null || item.id.lt > range.fromLt) &&
+        (range.fromUtime == null || item.createdAt > range.fromUtime) &&
+        (range.toLt == null || item.id.lt < range.toLt) &&
+        (range.toUtime == null || item.createdAt < range.toUtime),
       )
       .flatMap(tx => this.decodeTransactionEvents({ transaction: tx }))
       .filterMap(async event => {
@@ -284,89 +284,67 @@ export class Contract<Abi> {
     return event;
   }
 
-  public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsPaginatedResponse<Abi>> {
-    let res_events: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
-    let new_offset: TransactionId | undefined;
-    let cur_offset = args?.offset;
-    let continue_iteration = true;
-    while (continue_iteration) {
+  public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsBatch<Abi>> {
+    const { range, filter, limit } = args;
+
+    let result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
+    let currentContinuation = args?.continuation;
+
+    outer: while (true) {
       const { transactions, continuation } = await this._provider.getTransactions({
         address: this._address,
-        continuation: cur_offset,
+        continuation: currentContinuation,
       });
-
       if (transactions.length === null) {
         break;
       }
 
-      const fromFilteredTransactions = transactions.filter((item) => (
-        (args?.options?.fromLt == null || item.id.lt > args?.options?.fromLt) &&
-        (args?.options?.fromUtime == null || item.createdAt > args?.options?.fromUtime)
+      const filteredTransactions = transactions.filter((item) => (
+        (range?.fromLt == null || item.id.lt > range.fromLt) &&
+        (range?.fromUtime == null || item.createdAt > range.fromUtime) &&
+        (range?.toLt == null || item.id.lt < range?.toLt) &&
+        (range?.toUtime == null || item.createdAt < range?.toUtime)
       ));
 
-      if (fromFilteredTransactions.length == 0) {
-        break;
-      }
-
-      const toFilteredTransactions = fromFilteredTransactions.filter((item) => (
-        (args?.options?.toLt == null || item.id.lt < args?.options?.toLt) &&
-        (args?.options?.toUtime == null || item.createdAt < args?.options?.toUtime)
-      ));
-
-      if (toFilteredTransactions.length > 0) {
-        const events_tx_list = await Promise.all(toFilteredTransactions.map(async tx => {
-          const _events = await this.decodeTransactionEvents({ transaction: tx });
-          return { tx: tx, events: _events };
+      if (filteredTransactions.length > 0) {
+        const parsedEvents = await Promise.all(filteredTransactions.map(async tx => {
+          return { tx, events: await this.decodeTransactionEvents({ transaction: tx }) };
         }));
 
-        for (const { tx, events } of events_tx_list) {
-          const filtered_events = events.filter(event => {
-            if (args?.filters) {
-              let matched = false;
-              for (const filter of args.filters) {
-                let filter_match = true;
-                if (filter.name !== event.event) {
-                  continue;
-                }
-                if (filter?.params) {
-                  for (const [key, value] of Object.entries(filter.params)) {
-                    const event_param_name = key as keyof MergeOutputObjectsArray<any>;
-                    if (event.data[event_param_name] != value) {
-                      filter_match = false;
-                      break;
-                    }
-                  }
-                }
-                matched = matched || filter_match;
-              }
-              return matched;
-            }
-            return true;
-          });
-
-          for (const event of filtered_events) {
-            if (args?.limit && res_events.length === args.limit) {
-              continue_iteration = false;
-              break;
-            }
-            res_events.push(event);
+        for (let { tx, events } of parsedEvents) {
+          if (filter != null) {
+            events = await Promise.all(
+              events.map(async event =>
+                (await filter(event)) ? event : undefined,
+              ),
+            ).then(events =>
+              events.filter((event): event is Awaited<DecodedEvent<Abi, AbiEventName<Abi>>> =>
+                event != null),
+            );
           }
 
-          if (!continue_iteration) {
-            new_offset = tx.id;
-            break;
+          currentContinuation = tx.id; // update continuation in case of early break
+
+          for (const event of events) {
+            if (limit != null && result.length >= limit) {
+              break outer;
+            }
+            result.push(event);
+          }
+
+          if (limit != null && result.length >= limit) {
+            break outer;
           }
         }
       }
 
-      if (continuation != null) {
-        cur_offset = continuation;
-      } else {
+      currentContinuation = continuation;
+      if (currentContinuation == null) {
         break;
       }
     }
 
-    return { events: res_events, offset: new_offset };
+    return { events: result, continuation: currentContinuation };
   }
 
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
@@ -590,34 +568,10 @@ export type CallParams = {
 /**
  * @category Contract
  */
-export type EventsFilter<Abi, E extends AbiEventName<Abi> =
-  AbiEventName<Abi>> = (event: DecodedEvent<Abi, E>) => (Promise<boolean> | boolean);
-
-/**
- * @category Contract
- */
-export type EventFilterOptions = {
-  fromLt?: string,
-  fromUtime?: number,
-  toLt?: string,
-  toUtime?: number
-}
-
-/**
- * @category Contract
- */
 export type GetPastEventParams<Abi> = {
-  filters?: EventsFilter<Abi, AbiEventName<Abi>>[],
-  options?: EventFilterOptions,
+  filter?: EventsFilter<Abi, AbiEventName<Abi>>,
+  range?: EventsRange,
   limit?: number,
-  continuation?: TransactionId
-}
-
-/**
- * @category Contract
- */
-export type EventsPaginatedResponse<Abi> = {
-  events: DecodedEvent<Abi, AbiEventName<Abi>>[],
   continuation?: TransactionId
 }
 
@@ -626,9 +580,33 @@ export type EventsPaginatedResponse<Abi> = {
  */
 export type WaitForEventParams<Abi> = {
   filter?: EventsFilter<Abi>,
-  options?: EventFilterOptions,
+  range?: EventsRange,
   subscriber?: Subscriber,
 };
+
+/**
+ * @category Contract
+ */
+export type EventsBatch<Abi> = {
+  events: DecodedEvent<Abi, AbiEventName<Abi>>[],
+  continuation?: TransactionId
+}
+
+/**
+ * @category Contract
+ */
+export type EventsFilter<Abi, E extends AbiEventName<Abi> =
+  AbiEventName<Abi>> = (event: DecodedEvent<Abi, E>) => (Promise<boolean> | boolean);
+
+/**
+ * @category Contract
+ */
+export type EventsRange = {
+  fromLt?: string,
+  fromUtime?: number,
+  toLt?: string,
+  toUtime?: number
+}
 
 /**
  * @category Contract
