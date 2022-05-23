@@ -276,6 +276,11 @@ export interface Stream<P, T, F extends boolean = false> {
   merge<F1 extends boolean>(other: Stream<P, T, F1>): Stream<P, T, BothFinite<F, F1>>;
 
   /**
+   * Creates a stream which gives the current iteration count as well as the value
+   */
+  enumerate(): Stream<P, { index: number, item: T }, F>;
+
+  /**
    * Alias for the `.map((item) => { f(item); return item; })`
    */
   tap(handler: (item: T) => (Promise<void> | void)): Stream<P, T, F>;
@@ -446,6 +451,25 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
       },
       this.extractor,
       (this.isFinite && other.isFinite) as BothFinite<F, F1>,
+    );
+  }
+
+  public enumerate(): Stream<P, { index: number, item: T }, F> {
+    const state = {
+      index: 0,
+    };
+
+    return new StreamImpl(
+      this.makeProducer,
+      this.stopProducer,
+      (event, handler) =>
+        this.extractor(event, async (item: T) => {
+          return handler({
+            index: state.index++,
+            item,
+          });
+        }),
+      this.isFinite,
     );
   }
 
@@ -626,7 +650,7 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
     if (this.isFinite) {
       return f as any;
     } else {
-      throw new Error('Expected finite stream');
+      return undefined as never;
     }
   }
 }
