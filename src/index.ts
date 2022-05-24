@@ -57,8 +57,6 @@ export interface Provider {
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
 }
 
-const getProvider = (): Provider | undefined => (window as any).__ever || (window as any).ton;
-
 /**
  * @category Provider
  */
@@ -75,8 +73,10 @@ export type ProviderProperties = {
   fallback?: () => Promise<Provider>;
 };
 
+const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
 let ensurePageLoaded: Promise<void>;
-if (document.readyState == 'complete') {
+if (!isBrowser || document.readyState == 'complete') {
   ensurePageLoaded = Promise.resolve();
 } else {
   ensurePageLoaded = new Promise<void>((resolve) => {
@@ -86,10 +86,16 @@ if (document.readyState == 'complete') {
   });
 }
 
+const getProvider = (): Provider | undefined => isBrowser ? ((window as any).__ever || (window as any).ton) : undefined;
+
 /**
  * @category Provider
  */
 export async function hasEverscaleProvider(): Promise<boolean> {
+  if (!isBrowser) {
+    return false;
+  }
+
   await ensurePageLoaded;
   return (window as Record<string, any>).__hasEverscaleProvider === true ||
     (window as Record<string, any>).hasTonProvider === true;
