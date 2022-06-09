@@ -107,9 +107,9 @@ export async function hasEverscaleProvider(): Promise<boolean> {
 export class ProviderRpcClient {
   private readonly _properties: ProviderProperties;
   private readonly _api: RawProviderApiMethods;
-  private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
   private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
+  private _initializationPromise!: Promise<void>;
   private _provider?: Provider;
 
   public Contract: new <Abi>(abi: Abi, address: Address) => contract.Contract<Abi>;
@@ -151,6 +151,12 @@ export class ProviderRpcClient {
         }
       },
     }) as unknown as RawProviderApiMethods;
+
+    this._setInitializationPromise();
+  }
+
+  private _setInitializationPromise() {
+    const properties = this._properties;
 
     if (properties.forceUseFallback === true) {
       this._initializationPromise = properties.fallback != null
@@ -225,6 +231,17 @@ export class ProviderRpcClient {
     }
   }
 
+  public async forceConnect(): Promise<void> {
+    while (true) {
+      await this._initializationPromise;
+      if (this._provider != null) {
+        return;
+      }
+
+      this._setInitializationPromise();
+    }
+  }
+
   /**
    * Whether provider api is ready
    */
@@ -280,6 +297,9 @@ export class ProviderRpcClient {
    * Required permissions: none
    */
   public async requestPermissions(args: ProviderApiRequestParams<'requestPermissions'>): Promise<ProviderApiResponse<'requestPermissions'>> {
+    // TEMP
+    await this.forceConnect();
+
     const result = await this._api.requestPermissions({
       permissions: args.permissions,
     });
