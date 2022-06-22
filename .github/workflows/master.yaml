@@ -1,0 +1,25 @@
+on: [push]
+
+name: master
+
+jobs:
+  docs:
+    name: Generate docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Generate documentation
+        run: npx typedoc
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
