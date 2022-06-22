@@ -558,18 +558,32 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Calculates contract address from code and init params
+   * Computes contract address from code and init params
    *
    * ---
    * Required permissions: `basic`
    */
   public async getExpectedAddress<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<Address> {
-    const { address } = await this._api.getExpectedAddress({
+    const { address } = await this.getStateInit(abi, args);
+    return address;
+  }
+
+  /**
+   * Computes contract address and state from code and init params
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getStateInit<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<ProviderApiResponse<'getExpectedAddress'>> {
+    const { address, stateInit } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
       ...args,
       initParams: serializeTokensObject(args.initParams),
     });
-    return new Address(address);
+    return {
+      address: new Address(address),
+      stateInit,
+    };
   }
 
   /**
@@ -642,6 +656,16 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Merges code and data into state init
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async mergeTvc(args: ProviderApiRequestParams<'mergeTvc'>): Promise<ProviderApiResponse<'mergeTvc'>> {
+    return await this._api.mergeTvc(args);
+  }
+
+  /**
    * Splits base64 encoded state init into code and data
    *
    * ---
@@ -651,6 +675,23 @@ export class ProviderRpcClient {
     return await this._api.splitTvc({
       tvc,
     });
+  }
+
+  /**
+   * Merges code and data into state init
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async setCodeSalt<P extends readonly ReadonlyAbiParam[]>(args: SetCodeSaltParams<P>): Promise<ProviderApiResponse<'setCodeSalt'>> {
+    let salt;
+    if (typeof args.salt === 'string') {
+      salt = args.salt;
+    } else {
+      const { boc } = await this.packIntoCell(args.salt);
+      salt = boc;
+    }
+    return await this._api.setCodeSalt({ code: args.code, salt });
   }
 
   /**
@@ -892,6 +933,20 @@ export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D } ?
      */
     initParams: MergeInputObjectsArray<D>;
   } : never;
+
+/**
+ * @category Provider
+ */
+export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
+  /**
+   * Base64 encoded contract code
+   */
+  code: string,
+  /**
+   * Base64 encoded salt (as BOC) or params of boc encoder
+   */
+  salt: string | { structure: P, data: MergeInputObjectsArray<P> }
+}
 
 /**
  * @category Provider

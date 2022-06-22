@@ -419,6 +419,10 @@ export type ProviderApi<Addr = Address> = {
        * Contract address
        */
       address: Addr;
+      /**
+       * Base64 encoded state init
+       */
+      stateInit: string;
     };
   };
 
@@ -520,7 +524,7 @@ export type ProviderApi<Addr = Address> = {
        */
       publicKey: string;
     };
-  }
+  };
 
   /**
    * Converts base64 encoded contract code into tvc with default init data
@@ -541,7 +545,32 @@ export type ProviderApi<Addr = Address> = {
        */
       tvc: string;
     };
-  }
+  };
+
+  /**
+   * Merges base64 encoded contract code and state into a tvc
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  mergeTvc: {
+    input: {
+      /**
+       * Base64 encoded contract code
+       */
+      code: string;
+      /**
+       * Base64 encoded contract data
+       */
+      data: string;
+    };
+    output: {
+      /**
+       * Base64 encoded state init
+       */
+      tvc: string;
+    }
+  };
 
   /**
    * Splits base64 encoded state init into code and data
@@ -566,7 +595,32 @@ export type ProviderApi<Addr = Address> = {
        */
       code: string | undefined;
     };
-  }
+  };
+
+  /**
+   * Inserts salt into code
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  setCodeSalt: {
+    input: {
+      /**
+       * Base64 encoded contract code
+       */
+      code: string;
+      /**
+       * Base64 encoded salt (as BOC)
+       */
+      salt: string;
+    };
+    output: {
+      /**
+       * Base64 encoded contract code with salt
+       */
+      code: string;
+    }
+  };
 
   /**
    * Creates internal message body
