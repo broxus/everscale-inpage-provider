@@ -15,7 +15,6 @@ import {
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
   DecodedAbiEventData,
-  MergeOutputObjectsArray,
   TransactionId,
   serializeTokensObject,
   parseTransaction,
@@ -71,6 +70,7 @@ export class Contract<Abi> {
       }
 
       async send(args: SendInternalParams): Promise<Transaction> {
+        await this.provider.ensureInitialized();
         const { transaction } = await this.provider.rawApi.sendMessage({
           sender: args.from.toString(),
           recipient: this.address.toString(),
@@ -86,6 +86,7 @@ export class Contract<Abi> {
       }
 
       async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+        await this.provider.ensureInitialized();
         let subscriber = args.subscriber;
         const hasTempSubscriber = subscriber == null;
         if (subscriber == null) {
@@ -170,6 +171,7 @@ export class Contract<Abi> {
       }
 
       async estimateFees(args: SendInternalParams): Promise<string> {
+        await this.provider.ensureInitialized();
         const { fees } = await this.provider.rawApi.estimateFees({
           sender: args.from.toString(),
           recipient: this.address.toString(),
@@ -184,6 +186,7 @@ export class Contract<Abi> {
       }
 
       async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
+        await this.provider.ensureInitialized();
         let method = args.withoutSignature === true
           ? this.provider.rawApi.sendUnsignedExternalMessage
           : this.provider.rawApi.sendExternalMessage;
@@ -207,6 +210,7 @@ export class Contract<Abi> {
       }
 
       async call(args: CallParams = {}): Promise<any> {
+        await this.provider.ensureInitialized();
         let { output, code } = await this.provider.rawApi.runLocal({
           address: this.address.toString(),
           cachedState: args.cachedState,
@@ -348,6 +352,7 @@ export class Contract<Abi> {
   }
 
   public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
+    await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeTransaction({
         transaction: serializeTransaction(args.transaction),
@@ -373,6 +378,7 @@ export class Contract<Abi> {
   }
 
   public async decodeTransactionEvents(args: DecodeTransactionEventsParams): Promise<DecodedEvent<Abi, AbiEventName<Abi>>[]> {
+    await this._provider.ensureInitialized();
     try {
       const { events } = await this._provider.rawApi.decodeTransactionEvents({
         transaction: serializeTransaction(args.transaction),
@@ -397,6 +403,7 @@ export class Contract<Abi> {
   }
 
   public async decodeInputMessage(args: DecodeInputParams<Abi>): Promise<DecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
+    await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeInput({
         abi: this._abi,
@@ -422,6 +429,7 @@ export class Contract<Abi> {
   }
 
   public async decodeOutputMessage(args: DecodeOutputParams<Abi>): Promise<DecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
+    await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeOutput({
         abi: this._abi,

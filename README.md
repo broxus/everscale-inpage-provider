@@ -43,7 +43,6 @@ async function myApp() {
   if (!(await ever.hasProvider())) {
     throw new Error('Extension is not installed');
   }
-  await ever.ensureInitialized();
 
   const { accountInteraction } = await ever.requestPermissions({
     permissions: ['basic', 'accountInteraction'],

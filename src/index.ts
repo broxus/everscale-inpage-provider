@@ -280,6 +280,7 @@ export class ProviderRpcClient {
    * Required permissions: none
    */
   public async requestPermissions(args: ProviderApiRequestParams<'requestPermissions'>): Promise<ProviderApiResponse<'requestPermissions'>> {
+    await this.ensureInitialized();
     const result = await this._api.requestPermissions({
       permissions: args.permissions,
     });
@@ -293,6 +294,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async changeAccount(): Promise<void> {
+    await this.ensureInitialized();
     await this._api.changeAccount();
   }
 
@@ -300,6 +302,7 @@ export class ProviderRpcClient {
    * Removes all permissions for current origin and stops all subscriptions
    */
   public async disconnect(): Promise<void> {
+    await this.ensureInitialized();
     await this._api.disconnect();
   }
 
@@ -418,6 +421,8 @@ export class ProviderRpcClient {
       }
       case 'transactionsFound':
       case 'contractStateChanged': {
+        await this.ensureInitialized();
+
         const address = params!.address.toString();
 
         const subscription = new SubscriptionImpl<T>(async (subscription) => {
@@ -489,6 +494,7 @@ export class ProviderRpcClient {
    * Required permissions: none
    */
   public async getProviderState(): Promise<ProviderApiResponse<'getProviderState'>> {
+    await this.ensureInitialized();
     const state = await this._api.getProviderState();
     return {
       ...state,
@@ -503,6 +509,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
+    await this.ensureInitialized();
     return await this._api.getFullContractState({
       address: args.address.toString(),
     }) as ProviderApiResponse<'getFullContractState'>;
@@ -515,6 +522,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getAccountsByCodeHash(args: ProviderApiRequestParams<'getAccountsByCodeHash'>): Promise<ProviderApiResponse<'getAccountsByCodeHash'>> {
+    await this.ensureInitialized();
     const { accounts, continuation } = await this._api.getAccountsByCodeHash({
       ...args,
     });
@@ -531,6 +539,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
+    await this.ensureInitialized();
     const { transactions, continuation, info } = await this._api.getTransactions({
       ...args,
       address: args.address.toString(),
@@ -549,6 +558,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getTransaction(args: ProviderApiRequestParams<'getTransaction'>): Promise<ProviderApiResponse<'getTransaction'>> {
+    await this.ensureInitialized();
     const { transaction } = await this._api.getTransaction({
       ...args,
     });
@@ -575,6 +585,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getStateInit<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<ProviderApiResponse<'getExpectedAddress'>> {
+    await this.ensureInitialized();
     const { address, stateInit } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
       ...args,
@@ -593,6 +604,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async getBocHash(boc: string): Promise<string> {
+    await this.ensureInitialized();
     return await this._api.getBocHash({
       boc,
     }).then(({ hash }) => hash);
@@ -605,6 +617,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, data: MergeInputObjectsArray<P> }): Promise<ProviderApiResponse<'packIntoCell'>> {
+    await this.ensureInitialized();
     return await this._api.packIntoCell({
       structure: args.structure as unknown as AbiParam[],
       data: serializeTokensObject(args.data),
@@ -618,6 +631,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, boc: string, allowPartial: boolean }): Promise<{ data: MergeOutputObjectsArray<P> }> {
+    await this.ensureInitialized();
     const { data } = await this._api.unpackFromCell({
       ...args,
       structure: args.structure as unknown as AbiParam[],
@@ -636,6 +650,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async extractPublicKey(boc: string): Promise<string> {
+    await this.ensureInitialized();
     const { publicKey } = await this._api.extractPublicKey({
       boc,
     });
@@ -649,6 +664,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async codeToTvc(code: string): Promise<string> {
+    await this.ensureInitialized();
     const { tvc } = await this._api.codeToTvc({
       code,
     });
@@ -662,6 +678,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async mergeTvc(args: ProviderApiRequestParams<'mergeTvc'>): Promise<ProviderApiResponse<'mergeTvc'>> {
+    await this.ensureInitialized();
     return await this._api.mergeTvc(args);
   }
 
@@ -672,6 +689,7 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async splitTvc(tvc: string): Promise<ProviderApiResponse<'splitTvc'>> {
+    await this.ensureInitialized();
     return await this._api.splitTvc({
       tvc,
     });
@@ -686,6 +704,7 @@ export class ProviderRpcClient {
   public async setCodeSalt<P extends readonly ReadonlyAbiParam[]>(args: SetCodeSaltParams<P>): Promise<ProviderApiResponse<'setCodeSalt'>> {
     let salt;
     if (typeof args.salt === 'string') {
+      await this.ensureInitialized();
       salt = args.salt;
     } else {
       const { boc } = await this.packIntoCell(args.salt);
@@ -701,6 +720,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async addAsset<T extends AssetType>(args: AddAssetParams<T>): Promise<ProviderApiResponse<'addAsset'>> {
+    await this.ensureInitialized();
     let params: AssetTypeParams<T, string>;
     switch (args.type) {
       case 'tip3_token': {
@@ -721,6 +741,7 @@ export class ProviderRpcClient {
   }
 
   public async verifySignature(args: ProviderApiRequestParams<'verifySignature'>): Promise<ProviderApiResponse<'verifySignature'>> {
+    await this.ensureInitialized();
     return await this._api.verifySignature(args);
   }
 
@@ -733,6 +754,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async signData(args: ProviderApiRequestParams<'signData'>): Promise<ProviderApiResponse<'signData'>> {
+    await this.ensureInitialized();
     return await this._api.signData(args);
   }
 
@@ -743,6 +765,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async signDataRaw(args: ProviderApiRequestParams<'signDataRaw'>): Promise<ProviderApiResponse<'signDataRaw'>> {
+    await this.ensureInitialized();
     return await this._api.signDataRaw(args);
   }
 
@@ -753,6 +776,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async encryptData(args: ProviderApiRequestParams<'encryptData'>): Promise<EncryptedData[]> {
+    await this.ensureInitialized();
     const { encryptedData } = await this._api.encryptData(args);
     return encryptedData;
   }
@@ -764,6 +788,7 @@ export class ProviderRpcClient {
    * Requires permissions: `accountInteraction`
    */
   public async decryptData(encryptedData: EncryptedData): Promise<string> {
+    await this.ensureInitialized();
     const { data } = await this._api.decryptData({ encryptedData });
     return data;
   }
@@ -776,6 +801,7 @@ export class ProviderRpcClient {
    * Required permissions: `accountInteraction`
    */
   public async sendMessage(args: ProviderApiRequestParams<'sendMessage'>): Promise<ProviderApiResponse<'sendMessage'>> {
+    await this.ensureInitialized();
     const { transaction } = await this._api.sendMessage({
       ...args,
       sender: args.sender.toString(),
