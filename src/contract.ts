@@ -513,8 +513,15 @@ export interface ContractMethod<I, O> {
 
   /**
    * Runs message locally
+   *
+   * @param args
    */
   call(args?: CallParams): Promise<O>;
+
+  /**
+   * Encodes method call as BOC
+   */
+  encodeInternal(): Promise<string>
 }
 
 /**
