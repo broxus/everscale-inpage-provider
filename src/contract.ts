@@ -228,6 +228,16 @@ export class Contract<Abi> {
           return parseTokensObject(this.functionAbi.outputs, output);
         }
       }
+
+      async encodeInternal(): Promise<string> {
+        await this.provider.ensureInitialized();
+        let { boc } = await this.provider.rawApi.encodeInternalInput({
+          abi: this.abi,
+          method: this.method,
+          params: this.params,
+        });
+        return boc;
+      }
     }
 
     this._methods = new Proxy({}, {
