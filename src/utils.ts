@@ -57,7 +57,10 @@ export class AddressLiteral<T extends string> extends Address {
   }
 }
 
-type CheckAddress<T extends string> = AddressImpl<T, Lowercase<T>>;
+/**
+ * @category Utils
+ */
+export type CheckAddress<T extends string> = AddressImpl<T, Lowercase<T>>;
 
 type AddressPrefix = '0:' | '-1:'
 type AddressImpl<T, Tl extends string> = Tl extends `${AddressPrefix}${infer Hash}`

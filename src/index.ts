@@ -36,7 +36,7 @@ export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
-export { Address, AddressLiteral, UniqueArray, mergeTransactions } from './utils';
+export { Address, CheckAddress, AddressLiteral, UniqueArray, mergeTransactions } from './utils';
 
 /**
  * @category Provider
