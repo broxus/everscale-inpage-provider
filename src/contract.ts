@@ -283,7 +283,11 @@ export class Contract<Abi> {
         (range.toLt == null || item.id.lt < range.toLt) &&
         (range.toUtime == null || item.createdAt < range.toUtime),
       )
-      .flatMap(tx => this.decodeTransactionEvents({ transaction: tx }))
+      .flatMap(tx => this.decodeTransactionEvents({ transaction: tx })
+        .then((events) => {
+          events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
+          return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
+        }))
       .filterMap(async event => {
         if (filter == null || (await filter(event))) {
           return event;
@@ -301,7 +305,7 @@ export class Contract<Abi> {
   public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsBatch<Abi>> {
     const { range, filter, limit } = args;
 
-    let result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
+    let result: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[] = [];
     let currentContinuation = args?.continuation;
 
     outer: while (true) {
@@ -322,7 +326,12 @@ export class Contract<Abi> {
 
       if (filteredTransactions.length > 0) {
         const parsedEvents = await Promise.all(filteredTransactions.map(async tx => {
-          return { tx, events: await this.decodeTransactionEvents({ transaction: tx }) };
+          return {
+            tx, events: await this.decodeTransactionEvents({ transaction: tx }).then((events) => {
+              events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
+              return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
+            }),
+          };
         }));
 
         for (let { tx, events } of parsedEvents) {
@@ -332,7 +341,7 @@ export class Contract<Abi> {
                 (await filter(event)) ? event : undefined,
               ),
             ).then(events =>
-              events.filter((event): event is Awaited<DecodedEvent<Abi, AbiEventName<Abi>>> =>
+              events.filter((event): event is Awaited<DecodedEventWithTransaction<Abi, AbiEventName<Abi>>> =>
                 event != null),
             );
           }
@@ -521,7 +530,7 @@ export interface ContractMethod<I, O> {
   /**
    * Encodes method call as BOC
    */
-  encodeInternal(): Promise<string>
+  encodeInternal(): Promise<string>;
 }
 
 /**
@@ -604,7 +613,7 @@ export type GetPastEventParams<Abi> = {
  * @category Contract
  */
 export type WaitForEventParams<Abi> = {
-  filter?: EventsFilter<Abi>,
+  filter?: EventsFilter<Abi, AbiEventName<Abi>>,
   range?: EventsRange,
   subscriber?: Subscriber,
 };
@@ -613,7 +622,7 @@ export type WaitForEventParams<Abi> = {
  * @category Contract
  */
 export type EventsBatch<Abi> = {
-  events: DecodedEvent<Abi, AbiEventName<Abi>>[],
+  events: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[],
   continuation?: TransactionId
 }
 
@@ -621,7 +630,13 @@ export type EventsBatch<Abi> = {
  * @category Contract
  */
 export type EventsFilter<Abi, E extends AbiEventName<Abi> =
-  AbiEventName<Abi>> = (event: DecodedEvent<Abi, E>) => (Promise<boolean> | boolean);
+  AbiEventName<Abi>> = (event: DecodedEventWithTransaction<Abi, E>) => (Promise<boolean> | boolean);
+
+/**
+ * @category Contract
+ */
+export type DecodedEventWithTransaction<Abi, E extends AbiEventName<Abi>> =
+  DecodedEvent<Abi, E> & { transaction: Transaction };
 
 /**
  * @category Contract
