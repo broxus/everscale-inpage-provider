@@ -46,7 +46,7 @@ export class Subscriber {
     const id = getUniqueId();
 
     return new StreamImpl(
-      async (onData, onEnd) => {
+      (onData, onEnd) => {
         const scanner = new UnorderedTransactionsScanner(this.provider, {
           address,
           onData,
@@ -54,7 +54,10 @@ export class Subscriber {
           ...filter,
         });
         this.scanners[id] = scanner;
-        await scanner.start();
+        scanner.start();
+
+        // Subscription is not required
+        return Promise.resolve();
       },
       async () => {
         const scanner = this.scanners[id];
@@ -176,7 +179,7 @@ export class Subscriber {
         if (eventData != null) {
           // Add handler if there is already a handler group
           eventData.handlers[id] = handler;
-          return;
+          return Promise.resolve();
         }
 
         // Create handlers group
@@ -219,6 +222,10 @@ export class Subscriber {
         } else {
           subscriptions[event] = eventData;
         }
+
+        // Wait until subscribed
+        return subscription.then(() => {
+        });
       },
       () => stopProducer(id),
       identity,
@@ -246,9 +253,14 @@ export type IdentityStream<T, F extends boolean = false> = Stream<T, T, F>;
  * @category Stream
  */
 export interface Stream<P, T, F extends boolean = false> {
-  readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => void;
+  readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => Promise<void>;
   readonly stopProducer: () => void;
   readonly isFinite: F;
+
+  /**
+   * Waits until contract subscription is ready and then returns a promise with the result
+   */
+  delayed<R>(f: (stream: Delayed<P, T, F>) => DelayedPromise<R>): Promise<() => R>;
 
   /**
    * Waits for the first element or the end of the stream
@@ -263,7 +275,7 @@ export interface Stream<P, T, F extends boolean = false> {
   /**
    * Waits until the end of the stream
    */
-  finished: F extends true ? () => Promise<undefined> : never;
+  finished: F extends true ? () => Promise<void> : never;
 
   /**
    * Executes handler on each item
@@ -331,22 +343,72 @@ export interface Stream<P, T, F extends boolean = false> {
   takeWhileMap<U>(f: (item: T) => (Promise<(U | undefined)> | (U | undefined))): Stream<P, U, true>;
 }
 
+/**
+ * @category Stream
+ */
+export type Delayed<P, T, F extends boolean> = {
+  first: MakeDelayedPromise<Stream<P, T, F>['first']>,
+  on: MakeDelayedPromise<Stream<P, T, F>['on']>,
+} & (F extends true ? {
+  fold: MakeDelayedPromise<Stream<P, T, F>['fold']>,
+  finished: MakeDelayedPromise<Stream<P, T, F>['finished']>,
+} : {});
+
+/**
+ * @category Stream
+ */
+export type MakeDelayedPromise<F> = F extends (...args: infer Args) => infer R
+  ? (...args: Args) => DelayedPromise<R>
+  : never;
+
+/**
+ * @category Stream
+ */
+export type DelayedPromise<T> = { subscribed: Promise<void>, result: T };
+
 class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
   constructor(
-    readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => void,
+    readonly makeProducer: (onData: (data: P) => Promise<boolean>, onEnd: (eof: boolean) => void) => Promise<void>,
     readonly stopProducer: () => void,
     readonly extractor: (data: P, handler: (item: T) => (Promise<boolean> | boolean)) => Promise<boolean>,
     readonly isFinite: F,
   ) {
   }
 
-  public first(): Promise<F extends true ? T | undefined : T> {
+  public async delayed<R>(f: (stream: Delayed<P, T, F>) => DelayedPromise<R>): Promise<() => R> {
+    const { subscribed, result } = f({
+      first: (() => {
+        const ctx: { subscribed?: Promise<void> } = {};
+        const result = this.first(ctx);
+        return { subscribed: ctx.subscribed!, result };
+      }),
+      on: (handler: (item: T) => (Promise<void> | void)): DelayedPromise<void> => {
+        const ctx: { subscribed?: Promise<void> } = {};
+        this.on(handler, ctx);
+        return { subscribed: ctx.subscribed!, result: undefined };
+      },
+      fold: this.fold != null ? <B>(init: B, f: (init: B, item: T) => (Promise<B> | B)): DelayedPromise<Promise<B>> => {
+        const ctx: { subscribed?: Promise<void> } = {};
+        const result = this.fold(init, f, ctx);
+        return { subscribed: ctx.subscribed!, result };
+      } : undefined as never,
+      finished: this.finished != null ? (): DelayedPromise<Promise<void>> => {
+        const ctx: { subscribed?: Promise<void> } = {};
+        const result = this.finished(ctx);
+        return { subscribed: ctx.subscribed!, result };
+      } : undefined as never,
+    } as unknown as Delayed<P, T, F>);
+    await subscribed;
+    return () => result;
+  }
+
+  public first(ctx?: { subscribed?: Promise<void> }): Promise<F extends true ? T | undefined : T> {
     type R = F extends true ? T | undefined : T;
 
     let state: { found: false } | { found: true, result: T } = { found: false };
 
-    return new Promise<R>(async (resolve: (value: R) => void, reject) => {
-      this.makeProducer(
+    return new Promise<R>((resolve: (value: R) => void, reject) => {
+      const subscribed = this.makeProducer(
         // onData
         (data) => this.extractor(data, (item) => {
           Object.assign(state, { found: true, result: item });
@@ -367,17 +429,21 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
           }
         },
       );
+
+      if (ctx != null) {
+        ctx.subscribed = subscribed;
+      }
     });
   }
 
   /**
    * Folds every element into an accumulator by applying an operation, returning the final result
    */
-  public fold = this.onlyFinite(<B>(init: B, f: (init: B, item: T) => (Promise<B> | B)): Promise<B> => {
+  public fold = this.onlyFinite(<B>(init: B, f: (init: B, item: T) => (Promise<B> | B), ctx?: { subscribed?: Promise<void> }): Promise<B> => {
     let state = init;
 
-    return new Promise<B>(async (resolve: (value: B) => void, reject) => {
-      this.makeProducer(
+    return new Promise<B>((resolve: (value: B) => void, reject) => {
+      const subscribed = this.makeProducer(
         // onData
         (data) => this.extractor(data, async (item) => {
           state = await f(state, item);
@@ -392,14 +458,19 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
           }
         },
       );
+
+      if (ctx != null) {
+        ctx.subscribed = subscribed;
+      }
     });
   });
 
   /**
    * Waits until the end of the stream
    */
-  public finished = this.onlyFinite((): Promise<undefined> => new Promise<undefined>(async (resolve, reject) => {
-      this.makeProducer(
+  public finished = this.onlyFinite((ctx?: { subscribed?: Promise<void> }): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
+      const subscribed = this.makeProducer(
         // onData
         (data) => this.extractor(data, (_item) => true),
         // onEnd
@@ -411,17 +482,26 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
           }
         },
       );
-    }),
-  );
 
-  public on(handler: (item: T) => (Promise<void> | void)): void {
-    this.makeProducer(
+      if (ctx != null) {
+        ctx.subscribed = subscribed;
+      }
+    });
+  });
+
+  public on(handler: (item: T) => (Promise<void> | void), ctx?: { subscribed?: Promise<void> }): void {
+    const subscribed = this.makeProducer(
       (event) => this.extractor(event, async (item) => {
         await handler(item);
         return true;
       }),
       (_eof) => {
-      });
+      },
+    );
+
+    if (ctx != null) {
+      ctx.subscribed = subscribed;
+    }
   }
 
   public merge<F1 extends boolean>(other: Stream<P, T, F1>): Stream<P, T, BothFinite<F, F1>> {
@@ -442,8 +522,11 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
           }
         };
 
-        this.makeProducer(onData, checkEnd);
-        other.makeProducer(onData, checkEnd);
+        return Promise.all([
+          this.makeProducer(onData, checkEnd),
+          other.makeProducer(onData, checkEnd),
+        ]).then(() => {
+        });
       },
       () => {
         this.stopProducer();
@@ -646,7 +729,7 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
     );
   }
 
-  private onlyFinite<C>(f: C): F extends true ? C : never {
+  public onlyFinite<C>(f: C): F extends true ? C : never {
     if (this.isFinite) {
       return f as any;
     } else {
@@ -677,7 +760,7 @@ class UnorderedTransactionsScanner {
     private readonly params: UnorderedTransactionsScannerParams) {
   }
 
-  public async start() {
+  public start() {
     if (this.isRunning || this.promise != null) {
       return;
     }
