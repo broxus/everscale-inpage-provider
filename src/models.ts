@@ -330,13 +330,14 @@ export type FunctionCall<Addr = Address> = {
  */
 export type RawFunctionCall = FunctionCall<string>;
 
-type AbiParamKindUint = 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
-type AbiParamKindInt = 'int8' | 'int16' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
+type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
+type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
 type AbiParamKindTuple = 'tuple';
 type AbiParamKindBool = 'bool';
 type AbiParamKindCell = 'cell';
 type AbiParamKindAddress = 'address';
 type AbiParamKindBytes = 'bytes';
+type AbiParamKindFixedBytes = `fixedbytes${NonZeroDigit | `${'1' | '2'}${Digit}` | '30' | '31' | '32'}`;
 type AbiParamKindString = 'string';
 type AbiParamKindGram = 'gram';
 type AbiParamKindTime = 'time';
@@ -348,6 +349,8 @@ type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindA
 
 type AbiParamOptional = `optional(${AbiParamKind})`
 
+type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+type NonZeroDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
 /**
  * @category Models
@@ -360,6 +363,7 @@ export type AbiParamKind =
   | AbiParamKindCell
   | AbiParamKindAddress
   | AbiParamKindBytes
+  | AbiParamKindFixedBytes
   | AbiParamKindString
   | AbiParamKindGram
   | AbiParamKindTime
