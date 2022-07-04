@@ -505,7 +505,7 @@ export type HeadersObject = {
 type InputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
     : T extends AbiParamKindBool ? boolean
-      : T extends AbiParamKindCell | AbiParamKindBytes | AbiParamKindString | AbiParamKindPublicKey ? string
+      : T extends AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
         : T extends AbiParamKindAddress ? Address
           : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
             : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
@@ -514,7 +514,7 @@ type InputTokenValue<T, C> =
                   : never;
 
 type OutputTokenValue<T, C> =
-  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindString | AbiParamKindPublicKey ? string
+  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
     : T extends AbiParamKindExpire ? number
       : T extends AbiParamKindBool ? boolean
         : T extends AbiParamKindAddress ? Address
