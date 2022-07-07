@@ -714,6 +714,20 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Retrieves salt from code. Returns undefined if code doesn't contain salt
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getCodeSalt(args: GetCodeSaltParams): Promise<string | undefined> {
+    await this.ensureInitialized();
+    const { salt } = await this.rawApi.getCodeSalt({
+      code: args.code,
+    });
+    return salt;
+  }
+
+  /**
    * Adds asset to the selected account
    *
    * ---
@@ -972,6 +986,16 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
    * Base64 encoded salt (as BOC) or params of boc encoder
    */
   salt: string | { structure: P, data: MergeInputObjectsArray<P> }
+}
+
+/**
+ * @category Provider
+ */
+export type GetCodeSaltParams = {
+  /**
+   * Base64 encoded contract code
+   */
+  code: string,
 }
 
 /**

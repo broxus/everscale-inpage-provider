@@ -623,6 +623,27 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Retrieves salt from code. Returns undefined if code doesn't contain salt
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  getCodeSalt: {
+    input: {
+      /**
+       * Base64 encoded contract code
+       */
+      code: string;
+    };
+    output: {
+      /**
+       * Base64 encoded salt (as BOC)
+       */
+      salt: string | undefined;
+    }
+  }
+
+  /**
    * Creates internal message body
    *
    * ---
