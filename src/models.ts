@@ -87,6 +87,11 @@ export type Transaction<Addr = Address> = {
 /**
  * @category Models
  */
+export type TransactionWithAccount<Addr = Address> = Transaction<Addr> & { account: Addr };
+
+/**
+ * @category Models
+ */
 export type RawTransaction = Transaction<string>;
 
 /**
