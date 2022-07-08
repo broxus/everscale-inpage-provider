@@ -48,7 +48,10 @@ export class Subscriber {
         const scanner = new TraceTransactionsScanner(this, {
           origin: transaction,
           onData,
-          onEnd,
+          onEnd: (eof) => {
+            delete this.scanners[id];
+            onEnd(eof);
+          },
         });
         this.scanners[id] = scanner;
         scanner.start();
@@ -82,7 +85,10 @@ export class Subscriber {
         const scanner = new UnorderedTransactionsScanner(this.provider, {
           address,
           onData,
-          onEnd,
+          onEnd: (eof) => {
+            delete this.scanners[id];
+            onEnd(eof);
+          },
           ...filter,
         });
         this.scanners[id] = scanner;
@@ -1018,7 +1024,7 @@ class TraceTransactionsScanner implements Scanner {
         this.queue.enqueue(async () => this.params.onEnd(state.complete));
         this.isRunning = false;
 
-        for (const stream of Object.values(this.streams)) {
+        for (const stream of this.streams.values()) {
           stream.stopProducer();
         }
       }
