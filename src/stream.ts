@@ -982,6 +982,10 @@ class TraceTransactionsScanner implements Scanner {
           startDstStreams(transaction);
 
           for (const message of transaction.outMessages) {
+            if (message.dst == null) {
+              continue;
+            }
+
             const pendingTransaction = this.pendingTransactions.get(message.hash);
 
             let transactionPromise: Promise<TransactionWithAccount>;
