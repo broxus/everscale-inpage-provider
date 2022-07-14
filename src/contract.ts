@@ -471,6 +471,31 @@ export class Contract<Abi> {
       return undefined;
     }
   }
+
+  public async decodeEvent(args: DecodeEventParams<Abi>): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
+    await this._provider.ensureInitialized();
+    try {
+      const result = await this._provider.rawApi.decodeEvent({
+        abi: this.abi,
+        body: args.body,
+        event: args.events,
+      });
+      if (result == null) {
+        return undefined;
+      }
+
+      let { event, data } = result;
+
+      const rawAbi = this._events[event];
+
+      return {
+        event,
+        data: rawAbi.inputs != null ? parseTokensObject(rawAbi.inputs, data) : {},
+      } as DecodedEvent<Abi, AbiEventName<Abi>>;
+    } catch (_) {
+      return undefined;
+    }
+  }
 }
 
 /**
@@ -680,9 +705,23 @@ export type DecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T,
  * @category Contract
  */
 export type DecodeOutputParams<Abi> = {
+  /**
+   * Base64 encoded message body BOC
+   */
   body: string;
   methods: UniqueArray<AbiFunctionName<Abi>[]>;
 };
+
+/**
+ * @category Contract
+ */
+export type DecodeEventParams<Abi> = {
+  /**
+   * Base64 encoded message body BOC
+   */
+  body: string;
+  events: UniqueArray<AbiEventName<Abi>[]>;
+}
 
 /**
  * @category Contract
