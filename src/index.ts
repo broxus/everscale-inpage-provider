@@ -365,7 +365,7 @@ export class ProviderRpcClient {
         return this;
       }
 
-      async subscribe(): Promise<void> {
+      subscribe = async (): Promise<void> => {
         if (this._subscribed) {
           return;
         }
@@ -375,9 +375,9 @@ export class ProviderRpcClient {
         for (const handler of this._listeners['subscribed']) {
           handler();
         }
-      }
+      };
 
-      async unsubscribe(): Promise<void> {
+      unsubscribe = async (): Promise<void> => {
         if (!this._subscribed) {
           return;
         }
@@ -387,7 +387,7 @@ export class ProviderRpcClient {
         for (const handler of this._listeners['unsubscribed']) {
           handler();
         }
-      }
+      };
 
       notify(data: ProviderEventData<T>) {
         for (const handler of this._listeners['data']) {
@@ -923,12 +923,12 @@ export interface Subscription<T extends ProviderEvent> {
   /**
    * Can be used to re-subscribe with the same parameters.
    */
-  subscribe(): Promise<void>;
+  subscribe: () => Promise<void>;
 
   /**
    * Unsubscribes the subscription.
    */
-  unsubscribe(): Promise<void>;
+  unsubscribe: () => Promise<void>;
 }
 
 type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';

@@ -39,7 +39,9 @@ export class Address {
     return this._address;
   }
 
-  public equals(other: Address | string): boolean {
+  public equals = (other: Address | string): boolean => this._equals(other);
+
+  private _equals(other: Address | string): boolean {
     if (other instanceof Address) {
       return this._address == other._address;
     } else {

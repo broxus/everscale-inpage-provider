@@ -113,7 +113,9 @@ export class Subscriber {
     return this._addSubscription('contractStateChanged', address, false);
   }
 
-  public async unsubscribe(): Promise<void> {
+  public unsubscribe = async (): Promise<void> => this._unsubscribe();
+
+  private async _unsubscribe(): Promise<void> {
     const subscriptions = Object.assign({}, this.subscriptions);
     for (const address of Object.keys(this.subscriptions)) {
       delete this.subscriptions[address];
