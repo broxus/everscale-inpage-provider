@@ -502,6 +502,20 @@ export class ProviderRpcClient {
     } as ProviderApiResponse<'getProviderState'>;
   }
 
+
+  /**
+   * Requests contract balance
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getBalance(address: Address): Promise<string> {
+    const { state } = await this.getFullContractState({
+      address,
+    });
+    return state == null ? '0' : state?.balance;
+  }
+
   /**
    * Requests contract data
    *
