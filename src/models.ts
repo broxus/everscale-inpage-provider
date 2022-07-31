@@ -161,6 +161,24 @@ export function parseMessage(message: RawMessage): Message {
 /**
  * @category Models
  */
+export type DelayedMessage<Addr = Address> = {
+  /**
+   * External message hash
+   */
+  hash: string;
+  /**
+   * Destination account address (`sender` for `sendMessageDelayed`, `recipient` for `sendExternalMessageDelayed`)
+   */
+  account: Addr,
+  /**
+   * Message expiration timestamp
+   */
+  expireAt: number;
+}
+
+/**
+ * @category Models
+ */
 export type AccountStatus = 'uninit' | 'frozen' | 'active' | 'nonexist';
 
 /**

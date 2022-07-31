@@ -14,6 +14,7 @@ import {
   Permission,
   FunctionCall,
   TokensObject,
+  DelayedMessage,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -63,6 +64,24 @@ export type ProviderEvents<Addr = Address> = {
      */
     state: ContractState;
   };
+
+  /**
+   * Called every time a delayed message was delivered or expired
+   */
+  messageStatusUpdated: {
+    /**
+     * Account address
+     */
+    address: Addr,
+    /**
+     * Message hash
+     */
+    hash: string;
+    /**
+     * If not null, the transaction of the delivered message. Otherwise, the message has expired.
+     */
+    transaction?: Transaction<Addr>;
+  }
 
   /**
    * Called each time the user changes network
@@ -1155,6 +1174,47 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Sends an internal message from the user account without waiting for the transaction.
+   * Shows an approval window to the user.
+   *
+   * @see messageStatusUpdated
+   *
+   * ---
+   * Required permissions: `accountInteraction`
+   */
+  sendMessageDelayed: {
+    input: {
+      /**
+       * Preferred wallet address.
+       * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+       */
+      sender: Addr;
+      /**
+       * Message destination address
+       */
+      recipient: Addr;
+      /**
+       * Amount of nano EVER to send
+       */
+      amount: string;
+      /**
+       * Whether to bounce message back on error
+       */
+      bounce: boolean;
+      /**
+       * Optional function call
+       */
+      payload?: FunctionCall<Addr>;
+    };
+    output: {
+      /**
+       * External message info
+       */
+      message: DelayedMessage<Addr>;
+    };
+  };
+
+  /**
    * Sends an external message to the contract
    * Shows and approval window to the user
    *
@@ -1195,6 +1255,43 @@ export type ProviderApi<Addr = Address> = {
        * Parsed function call output
        */
       output: TokensObject<Addr> | undefined;
+    };
+  };
+
+  /**
+   * Sends an external message to the contract without waiting for the transaction.
+   * Shows and approval window to the user
+   *
+   * @see messageStatusUpdated
+   *
+   * ---
+   * Required permissions: `accountInteraction`
+   */
+  sendExternalMessageDelayed: {
+    input: {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Message destination address
+       */
+      recipient: Addr;
+      /**
+       * Optional base64 encoded `.tvc` file
+       */
+      stateInit?: string;
+      /**
+       * Function call
+       */
+      payload: FunctionCall<Addr>;
+    };
+    output: {
+      /**
+       * External message info
+       */
+      message: DelayedMessage<Addr>;
     };
   };
 };
