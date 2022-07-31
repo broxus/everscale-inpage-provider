@@ -16,5 +16,9 @@
     "Utils",
     "*"
   ],
-  "hideGenerator": true
+  "sort": [
+    "source-order"
+  ],
+  "hideGenerator": true,
+  "customCss": "typedoc.css"
 }

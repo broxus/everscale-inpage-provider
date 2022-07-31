@@ -15,8 +15,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Generate documentation
-        run: npx typedoc
+        run: npm run build:docs
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
