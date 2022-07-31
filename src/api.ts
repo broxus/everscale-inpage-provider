@@ -21,31 +21,6 @@ import { UniqueArray, Address } from './utils';
 /**
  * @category Provider Api
  */
-export interface ProviderState<Addr = Address> {
-  /**
-   * Selected connection name (Mainnet / Testnet)
-   */
-  selectedConnection: string;
-  /**
-   * Object with active permissions attached data
-   */
-  permissions: Partial<Permissions<Addr>>;
-  /**
-   * Current subscription states
-   */
-  subscriptions: {
-    [address: string]: ContractUpdatesSubscription;
-  };
-}
-
-/**
- * @category Provider Api
- */
-export type RawProviderState = ProviderState<string>
-
-/**
- * @category Provider Api
- */
 export type ProviderEvents<Addr = Address> = {
   /**
    * Called when inpage provider connects to the extension
@@ -93,7 +68,16 @@ export type ProviderEvents<Addr = Address> = {
    * Called each time the user changes network
    */
   networkChanged: {
+    /**
+     * Network group name
+     *
+     * @deprecated `networkId` should be used instead
+     */
     selectedConnection: string;
+    /**
+     * Numeric network id
+     */
+    networkId: number;
   };
 
   /**
@@ -110,11 +94,6 @@ export type ProviderEvents<Addr = Address> = {
    */
   loggedOut: {};
 }
-
-/**
- * @category Provider Api
- */
-export type RawProviderEvents = ProviderEvents<string>;
 
 /**
  * @category Provider Api
@@ -214,9 +193,15 @@ export type ProviderApi<Addr = Address> = {
        */
       numericVersion: number;
       /**
-       * Selected connection name (Mainnet / Testnet)
+       * Selected connection group name (`mainnet` / `testnet` / etc.)
+       *
+       * @deprecated `networkId` should be used instead
        */
       selectedConnection: string;
+      /**
+       * Numeric network id
+       */
+      networkId: number;
       /**
        * List of supported permissions
        */
@@ -1213,11 +1198,6 @@ export type ProviderApi<Addr = Address> = {
     };
   };
 };
-
-/**
- * @category Provider Api
- */
-export type RawProviderApi = ProviderApi<string>;
 
 /**
  * @category Provider Api
