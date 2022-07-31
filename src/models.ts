@@ -35,6 +35,7 @@ export type WalletContractType =
   | 'SafeMultisigWallet'
   | 'SafeMultisigWallet24h'
   | 'SetcodeMultisigWallet'
+  | 'SetcodeMultisigWallet24h'
   | 'BridgeMultisigWallet'
   | 'SurfWallet'
   | 'WalletV3';
