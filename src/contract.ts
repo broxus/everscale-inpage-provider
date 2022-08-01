@@ -17,6 +17,7 @@ import {
   DecodedAbiFunctionInputs,
   DecodedAbiEventData,
   TransactionId,
+  DelayedMessage,
   serializeTokensObject,
   parseTransaction,
   parseTokensObject,
@@ -57,189 +58,6 @@ export class Contract<Abi> {
     }, {} as typeof Contract.prototype._events);
 
     this._address = address;
-
-    class ContractMethodImpl implements ContractMethod<any, any> {
-      readonly params: RawTokensObject;
-
-      constructor(readonly provider: ProviderRpcClient,
-                  readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] },
-                  readonly abi: string,
-                  readonly address: Address,
-                  readonly method: string,
-                  params: TokensObject) {
-        this.params = serializeTokensObject(params);
-      }
-
-      async send(args: SendInternalParams): Promise<Transaction> {
-        await this.provider.ensureInitialized();
-        const { transaction } = await this.provider.rawApi.sendMessage({
-          sender: args.from.toString(),
-          recipient: this.address.toString(),
-          amount: args.amount,
-          bounce: args.bounce == null ? true : args.bounce,
-          payload: {
-            abi: this.abi,
-            method: this.method,
-            params: this.params,
-          },
-        });
-        return parseTransaction(transaction);
-      }
-
-      async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
-        await this.provider.ensureInitialized();
-        let subscriber = args.subscriber;
-        const hasTempSubscriber = subscriber == null;
-        if (subscriber == null) {
-          subscriber = new this.provider.Subscriber();
-        }
-
-        try {
-          // Parent transaction from wallet
-          let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined = undefined;
-
-          // Child transaction promise
-          let resolveChildTransactionPromise: ((transaction: Transaction) => void) | undefined;
-          const childTransactionPromise = new Promise<Transaction>((resolve) => {
-            resolveChildTransactionPromise = (tx) => resolve(tx);
-          });
-
-          // Array for collecting transactions on target before parent transaction promise resolution
-          const possibleChildren: Transaction[] = [];
-
-          // Subscribe to this account
-          subscriber.transactions(this.address)
-            .flatMap(batch => batch.transactions)
-            // Listen only messages from sender
-            .filter(item => item.inMessage.src?.equals(args.from) || false)
-            .on((tx) => {
-              if (parentTransaction == null) {
-                // If we don't known whether the message was sent just collect all transactions from the sender
-                possibleChildren.push(tx);
-              } else if (parentTransaction.possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0) {
-                // Resolve promise if transaction was found
-                resolveChildTransactionPromise?.(tx);
-              }
-            });
-
-          // Send message
-          const transaction = await this.send(args);
-          // Extract all outgoing messages from the parent transaction to this contract
-          const possibleMessages = transaction.outMessages.filter(msg => msg.dst?.equals(this.address) || false);
-
-          // Update stream state
-          parentTransaction = {
-            transaction,
-            possibleMessages,
-          };
-
-          // Check whether child transaction was already found
-          const alreadyReceived = possibleChildren.find((tx) => {
-            return possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0;
-          });
-          if (alreadyReceived != null) {
-            resolveChildTransactionPromise?.(alreadyReceived);
-          }
-
-          const childTransaction = await childTransactionPromise;
-
-          // Parse output
-          let output: any = undefined;
-          try {
-            const result = await this.provider.rawApi.decodeTransaction({
-              transaction: serializeTransaction(childTransaction),
-              abi: this.abi,
-              method: this.method,
-            });
-            if (result != null) {
-              output = this.functionAbi.outputs != null
-                ? parseTokensObject(this.functionAbi.outputs, result.output)
-                : {};
-            }
-          } catch (e) {
-            console.error(e);
-          }
-
-          // Done
-          return {
-            parentTransaction: parentTransaction.transaction,
-            childTransaction,
-            output,
-          };
-        } finally {
-          hasTempSubscriber && (await subscriber.unsubscribe());
-        }
-      }
-
-      async estimateFees(args: SendInternalParams): Promise<string> {
-        await this.provider.ensureInitialized();
-        const { fees } = await this.provider.rawApi.estimateFees({
-          sender: args.from.toString(),
-          recipient: this.address.toString(),
-          amount: args.amount,
-          payload: {
-            abi: this.abi,
-            method: this.method,
-            params: this.params,
-          },
-        });
-        return fees;
-      }
-
-      async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
-        await this.provider.ensureInitialized();
-        const method = args.withoutSignature === true
-          ? this.provider.rawApi.sendUnsignedExternalMessage
-          : this.provider.rawApi.sendExternalMessage;
-
-        const { transaction, output } = await method({
-          publicKey: args.publicKey,
-          recipient: this.address.toString(),
-          stateInit: args.stateInit,
-          payload: {
-            abi: this.abi,
-            method: this.method,
-            params: this.params,
-          },
-          local: args.local,
-        });
-
-        return {
-          transaction: parseTransaction(transaction),
-          output: output != null ? parseTokensObject(this.functionAbi.outputs, output) : undefined,
-        };
-      }
-
-      async call(args: CallParams = {}): Promise<any> {
-        await this.provider.ensureInitialized();
-        const { output, code } = await this.provider.rawApi.runLocal({
-          address: this.address.toString(),
-          cachedState: args.cachedState,
-          responsible: args.responsible,
-          functionCall: {
-            abi: this.abi,
-            method: this.method,
-            params: this.params,
-          },
-        });
-
-        if (output == null || code != 0) {
-          throw new TvmException(code);
-        } else {
-          return parseTokensObject(this.functionAbi.outputs, output);
-        }
-      }
-
-      async encodeInternal(): Promise<string> {
-        await this.provider.ensureInitialized();
-        const { boc } = await this.provider.rawApi.encodeInternalInput({
-          abi: this.abi,
-          method: this.method,
-          params: this.params,
-        });
-        return boc;
-      }
-    }
 
     this._methods = new Proxy({}, {
       get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
@@ -511,6 +329,40 @@ export class TvmException extends Error {
 /**
  * @category Contract
  */
+export class MessageExpiredException extends Error {
+  constructor(public readonly address: Address, public readonly hash: string) {
+    super(`Message expired: ${hash}`);
+  }
+}
+
+/**
+ * @category Contract
+ */
+export type DelayedMessageExecution = {
+  /**
+   * External message hash
+   */
+  messageHash: string;
+  /**
+   * Message expiration timestamp
+   */
+  expireAt: number;
+  /**
+   * Transaction promise (it will be rejected if the message has expired)
+   */
+  transaction: Promise<Transaction>;
+};
+
+/**
+ * @category Contract
+ */
+export type ContractMethods<C> = {
+  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
+}
+
+/**
+ * @category Contract
+ */
 export interface ContractMethod<I, O> {
   /**
    * Target contract address
@@ -521,11 +373,18 @@ export interface ContractMethod<I, O> {
   readonly params: I;
 
   /**
-   * Sends internal message and returns wallet transactions
+   * Sends internal message and returns wallet transaction
    *
    * @param args
    */
   send(args: SendInternalParams): Promise<Transaction>;
+
+  /**
+   * Sends internal message without waiting for the transaction
+   *
+   * @param args
+   */
+  sendDelayed(args: SendInternalParams): Promise<DelayedMessageExecution>;
 
   /**
    * Sends internal message and waits for the new transaction on target address
@@ -536,6 +395,8 @@ export interface ContractMethod<I, O> {
 
   /**
    * Estimates wallet fee for calling this method as an internal message
+   *
+   * @param args
    */
   estimateFees(args: SendInternalParams): Promise<string>;
 
@@ -545,6 +406,13 @@ export interface ContractMethod<I, O> {
    * @param args
    */
   sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: O }>;
+
+  /**
+   * Sends external message without waiting for the transaction
+   *
+   * @param args
+   */
+  sendExternalDelayed(args: SendExternalDelayedParams): Promise<DelayedMessageExecution>;
 
   /**
    * Runs message locally
@@ -559,11 +427,310 @@ export interface ContractMethod<I, O> {
   encodeInternal(): Promise<string>;
 }
 
-/**
- * @category Contract
- */
-export type ContractMethods<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
+class ContractMethodImpl implements ContractMethod<any, any> {
+  readonly params: RawTokensObject;
+
+  constructor(readonly provider: ProviderRpcClient,
+              readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] },
+              readonly abi: string,
+              readonly address: Address,
+              readonly method: string,
+              params: TokensObject) {
+    this.params = serializeTokensObject(params);
+  }
+
+  async send(args: SendInternalParams): Promise<Transaction> {
+    await this.provider.ensureInitialized();
+    const { transaction } = await this.provider.rawApi.sendMessage({
+      sender: args.from.toString(),
+      recipient: this.address.toString(),
+      amount: args.amount,
+      bounce: args.bounce == null ? true : args.bounce,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+    });
+    return parseTransaction(transaction);
+  }
+
+  async sendDelayed(args: SendInternalParams): Promise<DelayedMessageExecution> {
+    await this.provider.ensureInitialized();
+
+    const transactions = new DelayedTransactions;
+
+    const subscription = await this.provider.subscribe('messageStatusUpdated');
+    subscription.on('data', (data) => {
+      if (!data.address.equals(args.from)) {
+        return;
+      }
+      transactions.fillTransaction(data.hash, data.transaction);
+    });
+
+    const { message } = await this.provider.rawApi.sendMessageDelayed({
+      sender: args.from.toString(),
+      recipient: this.address.toString(),
+      amount: args.amount,
+      bounce: args.bounce == null ? true : args.bounce,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+    }).catch(e => {
+      subscription.unsubscribe().catch(console.error);
+      throw e;
+    });
+
+    const transaction = transactions
+      .waitTransaction(this.address, message.hash)
+      .finally(() => subscription.unsubscribe().catch(console.error));
+
+    return {
+      messageHash: message.hash,
+      expireAt: message.expireAt,
+      transaction,
+    };
+  }
+
+  async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+    await this.provider.ensureInitialized();
+    let subscriber = args.subscriber;
+    const hasTempSubscriber = subscriber == null;
+    if (subscriber == null) {
+      subscriber = new this.provider.Subscriber();
+    }
+
+    try {
+      // Parent transaction from wallet
+      let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined = undefined;
+
+      // Child transaction promise
+      let resolveChildTransactionPromise: ((transaction: Transaction) => void) | undefined;
+      const childTransactionPromise = new Promise<Transaction>((resolve) => {
+        resolveChildTransactionPromise = (tx) => resolve(tx);
+      });
+
+      // Array for collecting transactions on target before parent transaction promise resolution
+      const possibleChildren: Transaction[] = [];
+
+      // Subscribe to this account
+      subscriber.transactions(this.address)
+        .flatMap(batch => batch.transactions)
+        // Listen only messages from sender
+        .filter(item => item.inMessage.src?.equals(args.from) || false)
+        .on((tx) => {
+          if (parentTransaction == null) {
+            // If we don't known whether the message was sent just collect all transactions from the sender
+            possibleChildren.push(tx);
+          } else if (parentTransaction.possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0) {
+            // Resolve promise if transaction was found
+            resolveChildTransactionPromise?.(tx);
+          }
+        });
+
+      // Send message
+      const transaction = await this.send(args);
+      // Extract all outgoing messages from the parent transaction to this contract
+      const possibleMessages = transaction.outMessages.filter(msg => msg.dst?.equals(this.address) || false);
+
+      // Update stream state
+      parentTransaction = {
+        transaction,
+        possibleMessages,
+      };
+
+      // Check whether child transaction was already found
+      const alreadyReceived = possibleChildren.find((tx) => {
+        return possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0;
+      });
+      if (alreadyReceived != null) {
+        resolveChildTransactionPromise?.(alreadyReceived);
+      }
+
+      const childTransaction = await childTransactionPromise;
+
+      // Parse output
+      let output: any = undefined;
+      try {
+        const result = await this.provider.rawApi.decodeTransaction({
+          transaction: serializeTransaction(childTransaction),
+          abi: this.abi,
+          method: this.method,
+        });
+        if (result != null) {
+          output = this.functionAbi.outputs != null
+            ? parseTokensObject(this.functionAbi.outputs, result.output)
+            : {};
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Done
+      return {
+        parentTransaction: parentTransaction.transaction,
+        childTransaction,
+        output,
+      };
+    } finally {
+      hasTempSubscriber && (await subscriber.unsubscribe());
+    }
+  }
+
+  async estimateFees(args: SendInternalParams): Promise<string> {
+    await this.provider.ensureInitialized();
+    const { fees } = await this.provider.rawApi.estimateFees({
+      sender: args.from.toString(),
+      recipient: this.address.toString(),
+      amount: args.amount,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+    });
+    return fees;
+  }
+
+  async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
+    await this.provider.ensureInitialized();
+    const method = args.withoutSignature === true
+      ? this.provider.rawApi.sendUnsignedExternalMessage
+      : this.provider.rawApi.sendExternalMessage;
+
+    const { transaction, output } = await method({
+      publicKey: args.publicKey,
+      recipient: this.address.toString(),
+      stateInit: args.stateInit,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+      local: args.local,
+    });
+
+    return {
+      transaction: parseTransaction(transaction),
+      output: output != null ? parseTokensObject(this.functionAbi.outputs, output) : undefined,
+    };
+  }
+
+  async sendExternalDelayed(args: SendExternalDelayedParams): Promise<DelayedMessageExecution> {
+    await this.provider.ensureInitialized();
+
+    const transactions = new DelayedTransactions;
+
+    const subscription = await this.provider.subscribe('messageStatusUpdated');
+    subscription.on('data', (data) => {
+      if (!data.address.equals(this.address)) {
+        return;
+      }
+      transactions.fillTransaction(data.hash, data.transaction);
+    });
+
+    const { message } = await this.provider.rawApi.sendExternalMessageDelayed({
+      publicKey: args.publicKey,
+      recipient: this.address.toString(),
+      stateInit: args.stateInit,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+    }).catch(e => {
+      subscription.unsubscribe().catch(console.error);
+      throw e;
+    });
+
+    const transaction = transactions
+      .waitTransaction(this.address, message.hash)
+      .finally(() => subscription.unsubscribe().catch(console.error));
+
+    return {
+      messageHash: message.hash,
+      expireAt: message.expireAt,
+      transaction,
+    };
+  }
+
+  async call(args: CallParams = {}): Promise<any> {
+    await this.provider.ensureInitialized();
+    const { output, code } = await this.provider.rawApi.runLocal({
+      address: this.address.toString(),
+      cachedState: args.cachedState,
+      responsible: args.responsible,
+      functionCall: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+    });
+
+    if (output == null || code != 0) {
+      throw new TvmException(code);
+    } else {
+      return parseTokensObject(this.functionAbi.outputs, output);
+    }
+  }
+
+  async encodeInternal(): Promise<string> {
+    await this.provider.ensureInitialized();
+    const { boc } = await this.provider.rawApi.encodeInternalInput({
+      abi: this.abi,
+      method: this.method,
+      params: this.params,
+    });
+    return boc;
+  }
+}
+
+class DelayedTransactions {
+  private readonly transactions: Map<string, {
+    promise: Promise<Transaction | undefined>,
+    resolve: (transaction?: Transaction) => void,
+    reject: () => void,
+  }> = new Map();
+
+  public async waitTransaction(address: Address, hash: string): Promise<Transaction> {
+    let transaction = this.transactions.get(hash)?.promise;
+    if (transaction == null) {
+      let resolve: (transaction?: Transaction) => void;
+      let reject: () => void;
+      transaction = new Promise<Transaction | undefined>((promiseResolve, promiseReject) => {
+        resolve = (tx) => promiseResolve(tx);
+        reject = () => promiseReject();
+      });
+      this.transactions.set(hash, {
+        promise: transaction,
+        resolve: resolve!,
+        reject: reject!,
+      });
+    }
+
+    const tx = await transaction;
+    if (tx == null) {
+      throw new MessageExpiredException(address, hash);
+    }
+    return tx;
+  }
+
+  public fillTransaction(hash: string, transaction?: Transaction) {
+    const pendingTransaction = this.transactions.get(hash);
+    if (pendingTransaction != null) {
+      pendingTransaction.resolve(transaction);
+    } else {
+      this.transactions.set(hash, {
+        promise: Promise.resolve(transaction),
+        resolve: () => { /* do nothing */
+        },
+        reject: () => { /* do nothing */
+        },
+      });
+    }
+  }
 }
 
 /**
@@ -607,6 +774,14 @@ export type SendExternalParams = {
    * Whether to prepare this message without signature. Default: false
    */
   withoutSignature?: boolean;
+};
+
+/**
+ * @category Contract
+ */
+export type SendExternalDelayedParams = {
+  publicKey: string;
+  stateInit?: string;
 };
 
 /**

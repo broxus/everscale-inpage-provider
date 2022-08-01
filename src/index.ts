@@ -340,6 +340,11 @@ export class ProviderRpcClient {
   public subscribe(eventName: 'disconnected'): Promise<Subscription<'disconnected'>>;
 
   /**
+   * Called every time a delayed message was delivered or expired
+   */
+  public subscribe(eventName: 'messageStatusUpdated'): Promise<Subscription<'messageStatusUpdated'>>;
+
+  /**
    * Called each time the user changes network
    */
   public subscribe(eventName: 'networkChanged'): Promise<Subscription<'networkChanged'>>;
@@ -419,6 +424,7 @@ export class ProviderRpcClient {
     switch (eventName) {
       case 'connected':
       case 'disconnected':
+      case 'messageStatusUpdated':
       case 'networkChanged':
       case 'permissionsChanged':
       case 'loggedOut': {
