@@ -8,15 +8,21 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "typedoc",
-    "lint": "eslint"
+    "lint": "npx eslint ."
   },
   "author": "",
   "license": "GPL-3.0",
+  "engines": {
+    "node": ">=14"
+  },
+  "type": "module",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.24.0",
-    "eslint": "^7.26.0",
-    "eslint-config-prettier": "^8.3.0",
-    "typedoc": "^0.23.9",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "typedoc": "^0.23.10",
     "typedoc-plugin-missing-exports": "^0.23.0",
     "typescript": "^4.2.4"
   },

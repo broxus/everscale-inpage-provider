@@ -96,7 +96,7 @@ export class Contract<Abi> {
 
         try {
           // Parent transaction from wallet
-          let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined;
+          let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined = undefined;
 
           // Child transaction promise
           let resolveChildTransactionPromise: ((transaction: Transaction) => void) | undefined;
@@ -188,11 +188,11 @@ export class Contract<Abi> {
 
       async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
         await this.provider.ensureInitialized();
-        let method = args.withoutSignature === true
+        const method = args.withoutSignature === true
           ? this.provider.rawApi.sendUnsignedExternalMessage
           : this.provider.rawApi.sendExternalMessage;
 
-        let { transaction, output } = await method({
+        const { transaction, output } = await method({
           publicKey: args.publicKey,
           recipient: this.address.toString(),
           stateInit: args.stateInit,
@@ -212,7 +212,7 @@ export class Contract<Abi> {
 
       async call(args: CallParams = {}): Promise<any> {
         await this.provider.ensureInitialized();
-        let { output, code } = await this.provider.rawApi.runLocal({
+        const { output, code } = await this.provider.rawApi.runLocal({
           address: this.address.toString(),
           cachedState: args.cachedState,
           responsible: args.responsible,
@@ -232,7 +232,7 @@ export class Contract<Abi> {
 
       async encodeInternal(): Promise<string> {
         await this.provider.ensureInitialized();
-        let { boc } = await this.provider.rawApi.encodeInternalInput({
+        const { boc } = await this.provider.rawApi.encodeInternalInput({
           abi: this.abi,
           method: this.method,
           params: this.params,
@@ -242,8 +242,8 @@ export class Contract<Abi> {
     }
 
     this._methods = new Proxy({}, {
-      get: <K extends AbiFunctionName<Abi>>(_object: {}, method: K) => {
-        const rawAbi = (this._functions as any)[method];
+      get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
+        const rawAbi = this._functions[method];
         return (params: AbiFunctionInputs<Abi, K>) => new ContractMethodImpl(
           this._provider, rawAbi, this._abi, this._address, method, params,
         );
@@ -251,11 +251,11 @@ export class Contract<Abi> {
     }) as unknown as ContractMethods<Abi>;
   }
 
-  public get methods() {
+  public get methods(): ContractMethods<Abi> {
     return this._methods;
   }
 
-  public get address() {
+  public get address(): Address {
     return this._address;
   }
 
@@ -306,7 +306,7 @@ export class Contract<Abi> {
   public async getPastEvents(args: GetPastEventParams<Abi>): Promise<EventsBatch<Abi>> {
     const { range, filter, limit } = args;
 
-    let result: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[] = [];
+    const result: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[] = [];
     let currentContinuation = args?.continuation;
 
     outer: while (true) {
@@ -383,7 +383,7 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      let { method, input, output } = result;
+      const { method, input, output } = result;
 
       const rawAbi = this._functions[method];
 
@@ -435,7 +435,7 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      let { method, input } = result;
+      const { method, input } = result;
 
       const rawAbi = this._functions[method];
 
@@ -460,7 +460,7 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      let { method, output } = result;
+      const { method, output } = result;
 
       const rawAbi = this._functions[method];
 
@@ -485,7 +485,7 @@ export class Contract<Abi> {
         return undefined;
       }
 
-      let { event, data } = result;
+      const { event, data } = result;
 
       const rawAbi = this._events[event];
 

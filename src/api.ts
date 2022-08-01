@@ -26,7 +26,7 @@ export type ProviderEvents<Addr = Address> = {
   /**
    * Called when inpage provider connects to the extension
    */
-  connected: {};
+  connected: Record<string, never>;
 
   /**
    * Called when inpage provider disconnects from extension
@@ -111,7 +111,7 @@ export type ProviderEvents<Addr = Address> = {
   /**
    * Called when the user logs out of the extension
    */
-  loggedOut: {};
+  loggedOut: Record<string, never>;
 }
 
 /**
@@ -149,7 +149,7 @@ export type ProviderApi<Addr = Address> = {
    * ---
    * Required permissions: none
    */
-  disconnect: {};
+  disconnect: Record<string, never>;
 
   /**
    * Subscribes to contract updates.
@@ -193,7 +193,7 @@ export type ProviderApi<Addr = Address> = {
    * ---
    * Required permissions: none
    */
-  unsubscribeAll: {};
+  unsubscribeAll: Record<string, never>;
 
   /**
    * Returns provider api state
@@ -1320,8 +1320,7 @@ export type ProviderMethod = keyof ProviderApi;
  * @category Provider Api
  */
 export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> =
-  ProviderApi<Addr>[T] extends { input: infer I } ? I
-    : ProviderApi<Addr>[T] extends {} ? undefined : never;
+  ProviderApi<Addr>[T] extends { input: infer I } ? I : undefined;
 
 /**
  * @category Provider Api
@@ -1332,8 +1331,7 @@ export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiR
  * @category Provider Api
  */
 export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> =
-  ProviderApi<Addr>[T] extends { output: infer O } ? O
-    : ProviderApi<Addr>[T] extends {} ? undefined : never;
+  ProviderApi<Addr>[T] extends { output: infer O } ? O : undefined;
 
 /**
  * @category Provider Api

@@ -24,11 +24,7 @@ import {
   parseTransaction,
   serializeTokensObject,
 } from './models';
-import {
-  Address,
-  AddressLiteral,
-  getUniqueId,
-} from './utils';
+import { Address, getUniqueId } from './utils';
 import * as subscriber from './stream';
 import * as contract from './contract';
 
@@ -73,10 +69,19 @@ export type ProviderProperties = {
   fallback?: () => Promise<Provider>;
 };
 
+declare global {
+  interface Window {
+    __ever: Provider | undefined;
+    __hasEverscaleProvider: boolean | undefined;
+    ton: Provider | undefined;
+    hasTonProvider: boolean | undefined;
+  }
+}
+
 const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
 
 let ensurePageLoaded: Promise<void>;
-if (!isBrowser || document.readyState == 'complete') {
+if (!isBrowser || document.readyState === 'complete') {
   ensurePageLoaded = Promise.resolve();
 } else {
   ensurePageLoaded = new Promise<void>((resolve) => {
@@ -86,7 +91,7 @@ if (!isBrowser || document.readyState == 'complete') {
   });
 }
 
-const getProvider = (): Provider | undefined => isBrowser ? ((window as any).__ever || (window as any).ton) : undefined;
+const getProvider = (): Provider | undefined => isBrowser ? window.__ever || window.ton : undefined;
 
 /**
  * @category Provider
@@ -97,8 +102,7 @@ export async function hasEverscaleProvider(): Promise<boolean> {
   }
 
   await ensurePageLoaded;
-  return (window as Record<string, any>).__hasEverscaleProvider === true ||
-    (window as Record<string, any>).hasTonProvider === true;
+  return window.__hasEverscaleProvider === true || window.hasTonProvider === true;
 }
 
 /**
@@ -108,8 +112,17 @@ export class ProviderRpcClient {
   private readonly _properties: ProviderProperties;
   private readonly _api: RawProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
-  private readonly _subscriptions: { [K in ProviderEvent]?: { [id: number]: (data: ProviderEventData<K>) => void } } = {};
-  private readonly _contractSubscriptions: { [address: string]: { [id: number]: ContractUpdatesSubscription } } = {};
+  private readonly _subscriptions: { [K in ProviderEvent]: Map<number, (data: ProviderEventData<K>) => void> } = {
+    connected: new Map(),
+    disconnected: new Map(),
+    transactionsFound: new Map(),
+    contractStateChanged: new Map(),
+    messageStatusUpdated: new Map(),
+    networkChanged: new Map(),
+    permissionsChanged: new Map(),
+    loggedOut: new Map(),
+  };
+  private readonly _contractSubscriptions: Map<string, Map<number, ContractUpdatesSubscription>> = new Map();
   private _provider?: Provider;
 
   public Contract: new <Abi>(abi: Abi, address: Address) => contract.Contract<Abi>;
@@ -143,9 +156,9 @@ export class ProviderRpcClient {
       get: <K extends ProviderMethod>(
         _object: ProviderRpcClient,
         method: K,
-      ) => (params?: RawProviderApiRequestParams<K>) => {
+      ) => (params: RawProviderApiRequestParams<K>) => {
         if (this._provider != null) {
-          return this._provider.request({ method, params: params! });
+          return this._provider.request({ method, params });
         } else {
           throw new ProviderNotInitializedException();
         }
@@ -179,8 +192,8 @@ export class ProviderRpcClient {
             if (this._provider != null) {
               resolve();
             } else {
-              const eventName = (window as Record<string, any>).__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
-              window.addEventListener(eventName, (_data) => {
+              const eventName = window.__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
+              window.addEventListener(eventName, (_) => {
                 this._provider = getProvider();
                 resolve();
               });
@@ -344,11 +357,14 @@ export class ProviderRpcClient {
   public subscribe(eventName: 'loggedOut'): Promise<Subscription<'loggedOut'>>;
 
   public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<Subscription<T>> {
+    type Handler<K extends SubscriptionEvent, T extends ProviderEvent> =
+      K extends 'data' ? (data: ProviderEventData<T>) => void : () => void;
+
     class SubscriptionImpl<T extends ProviderEvent> implements Subscription<T> {
-      private readonly _listeners: { [K in SubscriptionEvent]: ((data?: any) => void)[] } = {
-        ['data']: [],
-        ['subscribed']: [],
-        ['unsubscribed']: [],
+      private readonly _listeners: { [K in SubscriptionEvent]: Handler<K, T>[] } = {
+        data: [],
+        subscribed: [],
+        unsubscribed: [],
       };
       private _subscribed = false;
 
@@ -360,7 +376,7 @@ export class ProviderRpcClient {
       on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
       on(eventName: 'subscribed', listener: () => void): this;
       on(eventName: 'unsubscribed', listener: () => void): this;
-      on(eventName: SubscriptionEvent, listener: ((data: ProviderEventData<T>) => void) | (() => void)): this {
+      on<K extends SubscriptionEvent>(eventName: K, listener: Handler<K, T>): this {
         this._listeners[eventName].push(listener);
         return this;
       }
@@ -396,7 +412,7 @@ export class ProviderRpcClient {
       }
     }
 
-    let existingSubscriptions = this._getEventSubscriptions(eventName);
+    const existingSubscriptions = this._subscriptions[eventName];
 
     const id = getUniqueId();
 
@@ -407,74 +423,79 @@ export class ProviderRpcClient {
       case 'permissionsChanged':
       case 'loggedOut': {
         const subscription = new SubscriptionImpl<T>(async (subscription) => {
-          if (existingSubscriptions[id] != null) {
+          if (existingSubscriptions.has(id)) {
             return;
           }
-          existingSubscriptions[id] = (data) => {
+          existingSubscriptions.set(id, (data) => {
             subscription.notify(data);
-          };
+          });
         }, async () => {
-          delete existingSubscriptions[id];
+          existingSubscriptions.delete(id);
         });
         await subscription.subscribe();
         return subscription;
       }
       case 'transactionsFound':
       case 'contractStateChanged': {
+        if (params == null) {
+          throw new Error('Address must be specified for the subscription');
+        }
+
         await this.ensureInitialized();
 
-        const address = params!.address.toString();
+        const address = params.address.toString();
 
         const subscription = new SubscriptionImpl<T>(async (subscription) => {
-          if (existingSubscriptions[id] != null) {
+          if (existingSubscriptions.has(id)) {
             return;
           }
-          existingSubscriptions[id] = ((data: ProviderEventData<'transactionsFound' | 'contractStateChanged'>) => {
-            if (data.address.toString() == address) {
+          existingSubscriptions.set(id, ((data: ProviderEventData<'transactionsFound' | 'contractStateChanged'>) => {
+            if (data.address.toString() === address) {
               subscription.notify(data as ProviderEventData<T>);
             }
-          }) as (data: ProviderEventData<T>) => void;
+          }) as (data: ProviderEventData<T>) => void);
 
-          let contractSubscriptions = this._contractSubscriptions[address];
+          let contractSubscriptions = this._contractSubscriptions.get(address);
           if (contractSubscriptions == null) {
-            contractSubscriptions = {};
-            this._contractSubscriptions[address] = contractSubscriptions;
+            contractSubscriptions = new Map();
+            this._contractSubscriptions.set(address, contractSubscriptions);
           }
 
-          contractSubscriptions[id] = {
-            state: eventName == 'contractStateChanged',
-            transactions: eventName == 'transactionsFound',
+          const subscriptionState = {
+            state: eventName === 'contractStateChanged',
+            transactions: eventName === 'transactionsFound',
           };
+          contractSubscriptions.set(id, subscriptionState);
 
           const {
             total,
             withoutExcluded,
-          } = foldSubscriptions(Object.values(contractSubscriptions), contractSubscriptions[id]);
+          } = foldSubscriptions(contractSubscriptions.values(), subscriptionState);
 
           try {
-            if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
+            if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
               await this.rawApi.subscribe({ address, subscriptions: total });
             }
           } catch (e) {
-            delete existingSubscriptions[id];
-            delete contractSubscriptions[id];
+            existingSubscriptions.delete(id);
+            contractSubscriptions.delete(id);
             throw e;
           }
         }, async () => {
-          delete existingSubscriptions[id];
+          existingSubscriptions.delete(id);
 
-          const contractSubscriptions = this._contractSubscriptions[address];
+          const contractSubscriptions = this._contractSubscriptions.get(address);
           if (contractSubscriptions == null) {
             return;
           }
-          const updates = contractSubscriptions[id];
+          const updates = contractSubscriptions.get(id);
 
-          const { total, withoutExcluded } = foldSubscriptions(Object.values(contractSubscriptions), updates);
-          delete contractSubscriptions[id];
+          const { total, withoutExcluded } = foldSubscriptions(contractSubscriptions.values(), updates);
+          contractSubscriptions.delete(id);
 
           if (!withoutExcluded.transactions && !withoutExcluded.state) {
             await this.rawApi.unsubscribe({ address });
-          } else if (total.transactions != withoutExcluded.transactions || total.state != withoutExcluded.state) {
+          } else if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
             await this.rawApi.subscribe({ address, subscriptions: withoutExcluded });
           }
         });
@@ -873,27 +894,12 @@ export class ProviderRpcClient {
     for (const [eventName, extractor] of Object.entries(knownEvents)) {
       provider.addListener(eventName as ProviderEvent, (data) => {
         const handlers = this._subscriptions[eventName as ProviderEvent];
-        if (handlers == null) {
-          return;
-        }
         const parsed = (extractor as any)(data);
-        for (const handler of Object.values(handlers)) {
+        for (const handler of handlers.values()) {
           handler(parsed);
         }
       });
     }
-  }
-
-  private _getEventSubscriptions<T extends ProviderEvent>(
-    eventName: T,
-  ): ({ [id: number]: (data: ProviderEventData<T>) => void }) {
-    let existingSubscriptions = this._subscriptions[eventName];
-    if (existingSubscriptions == null) {
-      existingSubscriptions = {};
-      this._subscriptions[eventName] = existingSubscriptions;
-    }
-
-    return existingSubscriptions as { [id: number]: (data: ProviderEventData<T>) => void };
   }
 }
 
@@ -959,9 +965,9 @@ export class ProviderNotInitializedException extends Error {
 /**
  * @category Provider
  */
-export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends {}
-  ? (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
-  : () => Promise<RawProviderApiResponse<P>>
+export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends undefined
+  ? () => Promise<RawProviderApiResponse<P>>
+  : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
 
 /**
  * @category Provider
@@ -1038,7 +1044,7 @@ export type AddAssetParams<T extends AssetType> = {
 
 function foldSubscriptions(
   subscriptions: Iterable<ContractUpdatesSubscription>,
-  except: ContractUpdatesSubscription,
+  except?: ContractUpdatesSubscription,
 ): { total: ContractUpdatesSubscription, withoutExcluded: ContractUpdatesSubscription } {
   const total = { state: false, transactions: false };
   const withoutExcluded = Object.assign({}, total);
@@ -1050,7 +1056,7 @@ function foldSubscriptions(
 
     total.state ||= item.state;
     total.transactions ||= item.transactions;
-    if (item != except) {
+    if (item !== except) {
       withoutExcluded.state ||= item.state;
       withoutExcluded.transactions ||= item.transactions;
     }

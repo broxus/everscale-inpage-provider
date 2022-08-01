@@ -297,15 +297,6 @@ export type EncryptedData = {
 /**
  * @category Models
  */
-export type SignedMessage = {
-  bodyHash: string;
-  expireAt: number;
-  boc: string;
-};
-
-/**
- * @category Models
- */
 export type TokenValue<Addr = Address> =
   | null
   | boolean
@@ -348,11 +339,6 @@ export type FunctionCall<Addr = Address> = {
    */
   params: TokensObject<Addr>;
 }
-
-/**
- * @category Models
- */
-export type RawFunctionCall = FunctionCall<string>;
 
 type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
 type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
@@ -480,7 +466,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
         const rawParam = { name: param.name, type: rawType, components: param.components } as AbiParam;
         return parseTokenValue(rawParam, token);
       }
-    } else if (rawType == 'tuple') {
+    } else if (rawType === 'tuple') {
       type TokenValueTuple<Addr> = { [K in string]: TokenValue<Addr> };
 
       const result: TokenValueTuple<Address> = {};
@@ -490,7 +476,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
         }
       }
       return result;
-    } else if (rawType == 'address') {
+    } else if (rawType === 'address') {
       return new Address(token as string) as TokenValue;
     } else {
       return token;
@@ -516,15 +502,6 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
     return result;
   }
 }
-
-/**
- * @category Models
- */
-export type HeadersObject = {
-  pubkey?: string;
-  expire?: string | number;
-  time?: string | number;
-};
 
 type InputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
@@ -566,7 +543,7 @@ export type OutputTokenObject<O> = O extends { name: infer K, type: infer T, com
 export type MergeInputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? {} : never;
+    : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? Record<string, never> : never;
 
 /**
  * @category Models
@@ -574,7 +551,7 @@ export type MergeInputObjectsArray<A> =
 export type MergeOutputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? {} : never;
+    : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? Record<string, never> : never;
 
 type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never;
 type AbiEvent<C> = C extends { events: infer E } ? E extends readonly unknown[] ? ArrayItemType<E> : never : never;

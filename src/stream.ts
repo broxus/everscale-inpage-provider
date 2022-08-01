@@ -5,17 +5,17 @@ import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
 
+type EventHandler<K extends SubscriptionWithAddress> = {
+  onData: (event: ProviderEventData<K>) => Promise<boolean>,
+  onEnd: (eof: boolean) => void,
+  queue: PromiseQueue
+  state: { eof: boolean, finished: boolean },
+};
+
 type SubscriptionsWithAddress = {
   [K in SubscriptionWithAddress]?: {
     subscription: Promise<Subscription<K>>
-    handlers: {
-      [id: string]: {
-        onData: (event: ProviderEventData<K>) => Promise<boolean>,
-        onEnd: (eof: boolean) => void,
-        queue: PromiseQueue
-        state: { eof: boolean, finished: boolean },
-      }
-    }
+    handlers: Map<number, EventHandler<K>>
   }
 };
 
@@ -23,8 +23,8 @@ type SubscriptionsWithAddress = {
  * @category Stream
  */
 export class Subscriber {
-  private readonly subscriptions: { [address: string]: SubscriptionsWithAddress } = {};
-  private readonly scanners: { [id: number]: Scanner } = {};
+  private readonly subscriptions: Map<string, SubscriptionsWithAddress> = new Map();
+  private readonly scanners: Map<number, Scanner> = new Map();
 
   constructor(private readonly provider: ProviderRpcClient) {
   }
@@ -49,20 +49,20 @@ export class Subscriber {
           origin: transaction,
           onData,
           onEnd: (eof) => {
-            delete this.scanners[id];
+            this.scanners.delete(id);
             onEnd(eof);
           },
         });
-        this.scanners[id] = scanner;
+        this.scanners.set(id, scanner);
         scanner.start();
 
         // Subscription is not required
         return Promise.resolve();
       },
       async () => {
-        const scanner = this.scanners[id];
-        delete this.scanners[id];
+        const scanner = this.scanners.get(id);
         if (scanner != null) {
+          this.scanners.delete(id);
           await scanner.stop();
         }
       },
@@ -86,21 +86,21 @@ export class Subscriber {
           address,
           onData,
           onEnd: (eof) => {
-            delete this.scanners[id];
+            this.scanners.delete(id);
             onEnd(eof);
           },
           ...filter,
         });
-        this.scanners[id] = scanner;
+        this.scanners.set(id, scanner);
         scanner.start();
 
         // Subscription is not required
         return Promise.resolve();
       },
       async () => {
-        const scanner = this.scanners[id];
-        delete this.scanners[id];
+        const scanner = this.scanners.get(id);
         if (scanner != null) {
+          this.scanners.delete(id);
           await scanner.stop();
         }
       },
@@ -116,39 +116,29 @@ export class Subscriber {
   public unsubscribe = async (): Promise<void> => this._unsubscribe();
 
   private async _unsubscribe(): Promise<void> {
-    const subscriptions = Object.assign({}, this.subscriptions);
-    for (const address of Object.keys(this.subscriptions)) {
-      delete this.subscriptions[address];
-    }
+    const tasks: Promise<void>[] = [];
 
-    const scanners = Object.assign({}, this.scanners);
-    for (const id of Object.keys(this.scanners)) {
-      delete this.scanners[id as any];
-    }
-
-    await Promise.all(
-      Object.values(subscriptions)
-        .map(async (item: SubscriptionsWithAddress) => {
-          const events = Object.assign({}, item);
-          for (const event of Object.keys(events)) {
-            delete item[event as unknown as SubscriptionWithAddress];
-          }
-
-          await Promise.all(
-            Object.values(events).map((eventData) => {
-              if (eventData == null) {
-                return;
-              }
-
-              return eventData.subscription.then((item: Subscription<SubscriptionWithAddress>) => {
-                return item.unsubscribe();
-              }).catch(() => {
-                // ignore
-              });
-            }),
+    for (const item of this.subscriptions.values()) {
+      for (const [event, eventData] of Object.entries(item)) {
+        delete item[event as unknown as SubscriptionWithAddress];
+        if (eventData != null) {
+          tasks.push(
+            eventData.subscription
+              .then(item => item.unsubscribe())
+              .catch(() => { /* ignore */
+              }),
           );
-        }).concat(Object.values(scanners).map((item) => item.stop())),
-    );
+        }
+      }
+    }
+    this.subscriptions.clear();
+
+    for (const scanner of this.scanners.values()) {
+      tasks.push(scanner.stop());
+    }
+    this.scanners.clear();
+
+    await Promise.all(tasks);
   }
 
   private _addSubscription<T extends keyof SubscriptionsWithAddress, F extends boolean>(
@@ -160,8 +150,8 @@ export class Subscriber {
 
     const rawAddress = address.toString();
 
-    const stopProducer = (id: string) => {
-      const subscriptions = this.subscriptions[rawAddress] as SubscriptionsWithAddress | undefined;
+    const stopProducer = (id: number) => {
+      const subscriptions = this.subscriptions.get(rawAddress);
       if (subscriptions == null) {
         // No subscriptions for the address
         return;
@@ -169,10 +159,10 @@ export class Subscriber {
 
       const eventData = subscriptions[event] as EventData | undefined;
       if (eventData != null) {
-        const handler = eventData.handlers[id] as EventData['handlers'][number] | undefined;
+        const handler = eventData.handlers.get(id);
         if (handler != null) {
           // Remove event handler with the id
-          delete eventData.handlers[id];
+          eventData.handlers.delete(id);
 
           const { queue, onEnd, state } = handler;
           if (!state.finished) {
@@ -183,7 +173,7 @@ export class Subscriber {
         }
 
         // Remove event data subscription if there are none of them
-        if (Object.keys(eventData.handlers).length === 0) {
+        if (eventData.handlers.size === 0) {
           const subscription = eventData.subscription as Promise<Subscription<T>>;
           delete subscriptions[event];
 
@@ -194,47 +184,48 @@ export class Subscriber {
       }
 
       // Remove address subscriptions object if it is empty
-      if (Object.keys(subscriptions).length === 0) {
-        delete this.subscriptions[rawAddress];
+      if (subscriptions.contractStateChanged == null && subscriptions.transactionsFound == null) {
+        this.subscriptions.delete(rawAddress);
       }
     };
 
-    const id = getUniqueId().toString();
+    const id = getUniqueId();
 
     return new StreamImpl(
       (onData, onEnd) => {
-        let subscriptions = this.subscriptions[rawAddress] as SubscriptionsWithAddress | undefined;
+        const subscriptions = this.subscriptions.get(rawAddress);
         let eventData = subscriptions?.[event] as EventData | undefined;
 
         const state = { eof: false, finished: false };
 
         // Create handler object
-        const handler = {
+        const handler: EventHandler<T> = {
           onData,
           onEnd,
           queue: new PromiseQueue(),
           state,
-        } as EventData['handlers'][number];
+        };
 
         if (eventData != null) {
           // Add handler if there is already a handler group
-          eventData.handlers[id] = handler;
+          eventData.handlers.set(id, handler);
           return Promise.resolve();
         }
 
         // Create handlers group
-        const handlers = {
-          [id]: handler,
-        } as EventData['handlers'];
+        const handlers: EventData['handlers'] = new Map();
+        handlers.set(id, handler);
+
+        type ProviderMethod = (eventName: T, params: { address: Address }) => Promise<Subscription<T>>;
 
         // Create subscription
-        const subscription = (this.provider.subscribe as any)(event, { address })
+        const subscription = (this.provider.subscribe as unknown as ProviderMethod)(event, { address })
           .then((subscription: Subscription<T>) => {
             subscription.on('data', (data) => {
-              Object.values(handlers).forEach(({ onData, queue, state }) => {
+              for (const { onData, queue, state } of handlers.values()) {
                 // Skip closed streams
                 if (state.eof || state.finished) {
-                  return;
+                  continue;
                 }
 
                 queue.enqueue(async () => {
@@ -243,28 +234,32 @@ export class Subscriber {
                     stopProducer(id);
                   }
                 });
-              });
+              }
             });
             subscription.on('unsubscribed', () => {
-              Object.keys(handlers).forEach(stopProducer);
+              for (const id of handlers.keys()) {
+                stopProducer(id);
+              }
             });
             return subscription;
           }).catch((e: Error) => {
             console.error(e);
-            Object.keys(handlers).forEach(stopProducer);
+            for (const id of handlers.keys()) {
+              stopProducer(id);
+            }
             throw e;
           });
 
         // Add event data to subscriptions
         eventData = { subscription, handlers } as EventData;
         if (subscriptions == null) {
-          this.subscriptions[rawAddress] = { [event]: eventData };
+          this.subscriptions.set(rawAddress, { [event]: eventData });
         } else {
           subscriptions[event] = eventData;
         }
 
         // Wait until subscribed
-        return subscription.then(() => {
+        return subscription.then(() => { /* do nothing */
         });
       },
       () => stopProducer(id),
@@ -396,7 +391,7 @@ export type Delayed<P, T, F extends boolean> = {
 } & (F extends true ? {
   fold: MakeDelayedPromise<Stream<P, T, F>['fold']>,
   finished: MakeDelayedPromise<Stream<P, T, F>['finished']>,
-} : {});
+} : Record<string, never>);
 
 /**
  * @category Stream
@@ -449,7 +444,7 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
   public first(ctx?: { subscribed?: Promise<void> }): Promise<F extends true ? T | undefined : T> {
     type R = F extends true ? T | undefined : T;
 
-    let state: { found: false } | { found: true, result: T } = { found: false };
+    const state: { found: boolean, result?: T } = { found: false };
 
     return new Promise<R>((resolve: (value: R) => void, reject) => {
       const subscribed = this.makeProducer(
@@ -539,7 +534,7 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
         await handler(item);
         return true;
       }),
-      (_eof) => {
+      (_eof) => { /* do nothing */
       },
     );
 
@@ -569,7 +564,7 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
         return Promise.all([
           this.makeProducer(onData, checkEnd),
           other.makeProducer(onData, checkEnd),
-        ]).then(() => {
+        ]).then(() => { /* do nothing */
         });
       },
       () => {
@@ -795,7 +790,7 @@ class UnorderedTransactionsScanner implements Scanner {
 
   private continuation?: TransactionId;
   private promise?: Promise<void>;
-  private isRunning: boolean = false;
+  private isRunning = false;
 
   constructor(
     private readonly provider: ProviderRpcClient,
@@ -811,7 +806,7 @@ class UnorderedTransactionsScanner implements Scanner {
     this.isRunning = true;
     this.promise = (async () => {
       const params = this.params;
-      let state = {
+      const state = {
         complete: false,
       };
 
@@ -899,7 +894,7 @@ class TraceTransactionsScanner implements Scanner {
   private readonly queue: PromiseQueue = new PromiseQueue();
 
   private promise?: Promise<void>;
-  private isRunning: boolean = false;
+  private isRunning = false;
   private readonly streams: Map<string, Stream<any, Transaction>> = new Map();
   private readonly pendingTransactions: Map<string, PendingTransaction> = new Map();
 
@@ -951,9 +946,9 @@ class TraceTransactionsScanner implements Scanner {
             if (pendingTransaction == null) {
               this.pendingTransactions.set(messageHash, {
                 promise: Promise.resolve(transaction),
-                resolve: () => {
+                resolve: () => { /* do nothing */
                 },
-                reject: () => {
+                reject: () => { /* do nothing */
                 },
               });
             } else {
@@ -1016,7 +1011,8 @@ class TraceTransactionsScanner implements Scanner {
             transactionsQueue.push(childTransaction);
           }
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
+        /* do nothing */
       } finally {
         this.queue.enqueue(async () => this.params.onEnd(state.complete));
         this.isRunning = false;
@@ -1050,11 +1046,11 @@ class TraceTransactionsScanner implements Scanner {
 
 class PromiseQueue {
   private readonly queue: (() => Promise<void>)[] = [];
-  private workingOnPromise: boolean = false;
+  private workingOnPromise = false;
 
   public enqueue(promise: () => Promise<void>) {
     this.queue.push(promise);
-    this._dequeue().catch(() => {
+    this._dequeue().catch(() => { /* do nothing */
     });
   }
 

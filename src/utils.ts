@@ -43,9 +43,9 @@ export class Address {
 
   private _equals(other: Address | string): boolean {
     if (other instanceof Address) {
-      return this._address == other._address;
+      return this._address === other._address;
     } else {
-      return this._address == other;
+      return this._address === other;
     }
   }
 }
@@ -99,7 +99,7 @@ export function mergeTransactions<Addr>(
   newTransactions: Transaction<Addr>[],
   info: TransactionsBatchInfo,
 ): Transaction<Addr>[] {
-  if (info.batchType == 'old') {
+  if (info.batchType === 'old') {
     knownTransactions.push(...newTransactions);
     return knownTransactions;
   }
