@@ -1,6 +1,7 @@
 import {
   Address,
   UniqueArray,
+  LT_COLLATOR,
 } from './utils';
 import {
   AbiParam,
@@ -278,9 +279,9 @@ export class Contract<Abi> {
         : subscriber.transactions(this.address)
     ).flatMap(item => item.transactions)
       .takeWhile(item => range == null ||
-        (range.fromLt == null || item.id.lt > range.fromLt) &&
+        (range.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
         (range.fromUtime == null || item.createdAt > range.fromUtime) &&
-        (range.toLt == null || item.id.lt < range.toLt) &&
+        (range.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
         (range.toUtime == null || item.createdAt < range.toUtime),
       )
       .flatMap(tx => this.decodeTransactionEvents({ transaction: tx })
@@ -318,10 +319,10 @@ export class Contract<Abi> {
       }
 
       const filteredTransactions = transactions.filter((item) => (
-        (range?.fromLt == null || item.id.lt > range.fromLt) &&
+        (range?.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
         (range?.fromUtime == null || item.createdAt > range.fromUtime) &&
-        (range?.toLt == null || item.id.lt < range?.toLt) &&
-        (range?.toUtime == null || item.createdAt < range?.toUtime)
+        (range?.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
+        (range?.toUtime == null || item.createdAt < range.toUtime)
       ));
 
       if (filteredTransactions.length > 0) {

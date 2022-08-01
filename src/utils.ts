@@ -78,6 +78,11 @@ type IsHexString<T extends string, L extends readonly number[]> =
     : T extends '' ? L['length'] extends 32 ? true : never : never
 
 /**
+ * @category Utils
+ */
+export const LT_COLLATOR: Intl.Collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+/**
  * Modifies knownTransactions array, merging it with new transactions.
  * All arrays are assumed to be sorted by descending logical time.
  *
@@ -113,7 +118,7 @@ export function mergeTransactions<Addr>(
   let i = 0;
   while (
     i < knownTransactions.length &&
-    knownTransactions[i].id.lt.localeCompare(info.maxLt) >= 0
+    LT_COLLATOR.compare(knownTransactions[i].id.lt, info.maxLt) >= 0
     ) {
     ++i;
   }

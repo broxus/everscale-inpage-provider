@@ -36,7 +36,7 @@ export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
-export { Address, CheckAddress, AddressLiteral, UniqueArray, mergeTransactions } from './utils';
+export { Address, CheckAddress, AddressLiteral, UniqueArray, mergeTransactions, LT_COLLATOR } from './utils';
 
 /**
  * @category Provider
@@ -857,6 +857,11 @@ export class ProviderRpcClient {
       'contractStateChanged': (data) => ({
         address: new Address(data.address),
         state: data.state,
+      }),
+      'messageStatusUpdated': (data) => ({
+        address: new Address(data.address),
+        hash: data.hash,
+        transaction: data.transaction != null ? parseTransaction(data.transaction) : undefined,
       }),
       'networkChanged': data => data,
       'permissionsChanged': (data) => ({

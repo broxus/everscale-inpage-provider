@@ -1,5 +1,5 @@
 import { ProviderEvent, ProviderEventData } from './api';
-import { Address, getUniqueId } from './utils';
+import { Address, getUniqueId, LT_COLLATOR } from './utils';
 import { TransactionId, Transaction, TransactionsBatchInfo, TransactionWithAccount } from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
@@ -788,8 +788,6 @@ type UnorderedTransactionsScannerParams = {
   onEnd: (eof: boolean) => void;
   fromLt?: string;
   fromUtime?: number;
-  toLt?: string;
-  toUtime?: number;
 };
 
 class UnorderedTransactionsScanner implements Scanner {
@@ -829,40 +827,33 @@ class UnorderedTransactionsScanner implements Scanner {
             break;
           }
 
-          const fromFilteredTransactions = transactions.filter((item) => (
-            (params.fromLt == null || item.id.lt > params.fromLt) &&
+          const filteredTransactions = transactions.filter((item) => (
+            (params.fromLt == null || LT_COLLATOR.compare(item.id.lt, params.fromLt) > 0) &&
             (params.fromUtime == null || item.createdAt > params.fromUtime)
           ));
 
-          if (fromFilteredTransactions.length == 0) {
+          if (filteredTransactions.length == 0) {
             state.complete = true;
             break;
           }
 
-          const toFilteredTransactions = fromFilteredTransactions.filter((item) => (
-            (params.toLt == null || item.id.lt < params.toLt) &&
-            (params.toUtime == null || item.createdAt < params.toUtime)
-          ));
+          const info = {
+            maxLt: filteredTransactions[0].id.lt,
+            minLt: filteredTransactions[filteredTransactions.length - 1].id.lt,
+            batchType: 'old',
+          } as TransactionsBatchInfo;
 
-          if (toFilteredTransactions.length > 0) {
-            const info = {
-              maxLt: toFilteredTransactions[0].id.lt,
-              minLt: toFilteredTransactions[toFilteredTransactions.length - 1].id.lt,
-              batchType: 'old',
-            } as TransactionsBatchInfo;
-
-            this.queue.enqueue(async () => {
-              const isRunning = this.params.onData({
-                address: this.params.address,
-                transactions: toFilteredTransactions,
-                info,
-              });
-              if (!isRunning) {
-                state.complete = true;
-                this.isRunning = false;
-              }
+          this.queue.enqueue(async () => {
+            const isRunning = this.params.onData({
+              address: this.params.address,
+              transactions: filteredTransactions,
+              info,
             });
-          }
+            if (!isRunning) {
+              state.complete = true;
+              this.isRunning = false;
+            }
+          });
 
           if (continuation != null) {
             this.continuation = continuation;
