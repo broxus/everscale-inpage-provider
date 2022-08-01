@@ -391,7 +391,7 @@ export type Delayed<P, T, F extends boolean> = {
 } & (F extends true ? {
   fold: MakeDelayedPromise<Stream<P, T, F>['fold']>,
   finished: MakeDelayedPromise<Stream<P, T, F>['finished']>,
-} : Record<string, never>);
+} : {});
 
 /**
  * @category Stream

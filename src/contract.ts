@@ -17,7 +17,6 @@ import {
   DecodedAbiFunctionInputs,
   DecodedAbiEventData,
   TransactionId,
-  DelayedMessage,
   serializeTokensObject,
   parseTransaction,
   parseTokensObject,

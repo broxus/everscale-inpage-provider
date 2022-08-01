@@ -543,7 +543,7 @@ export type OutputTokenObject<O> = O extends { name: infer K, type: infer T, com
 export type MergeInputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? Record<string, never> : never;
+    : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? {} : never;
 
 /**
  * @category Models
@@ -551,7 +551,7 @@ export type MergeInputObjectsArray<A> =
 export type MergeOutputObjectsArray<A> =
   A extends readonly [infer T, ...infer Ts]
     ? (OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? Record<string, never> : never;
+    : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? {} : never;
 
 type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never;
 type AbiEvent<C> = C extends { events: infer E } ? E extends readonly unknown[] ? ArrayItemType<E> : never : never;
