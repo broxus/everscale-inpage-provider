@@ -331,7 +331,7 @@ export class TvmException extends Error {
  */
 export class MessageExpiredException extends Error {
   constructor(public readonly address: Address, public readonly hash: string) {
-    super(`Message expired: ${hash}`);
+    super('Message expired');
   }
 }
 
