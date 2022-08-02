@@ -22,7 +22,7 @@ import {
   parseTokensObject,
   serializeTransaction,
 } from './models';
-import { Subscriber } from './stream';
+import { Stream, Subscriber } from './stream';
 import { ProviderRpcClient } from './index';
 
 /**
@@ -78,6 +78,30 @@ export class Contract<Abi> {
 
   public get abi(): string {
     return this._abi;
+  }
+
+  /**
+   * Creates new contract transactions stream
+   *
+   * @param subscriber
+   */
+  public transactions(subscriber: Subscriber): Stream<unknown, Transaction> {
+    return subscriber.transactions(this._address)
+      .flatMap(({ transactions }) => transactions);
+  }
+
+  /**
+   * Creates new contract events stream
+   *
+   * @param subscriber
+   */
+  public events(subscriber: Subscriber): Stream<unknown, DecodedEventWithTransaction<Abi, AbiEventName<Abi>>> {
+    return subscriber.transactions(this._address)
+      .flatMap(({ transactions }) => transactions)
+      .flatMap((tx) => this.decodeTransactionEvents({ transaction: tx }).then((events) => {
+        events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
+        return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
+      }));
   }
 
   public async waitForEvent(args: WaitForEventParams<Abi> = {}): Promise<DecodedEvent<Abi, AbiEventName<Abi>> | undefined> {
