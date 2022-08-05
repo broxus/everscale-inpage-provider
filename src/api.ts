@@ -1135,7 +1135,7 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
-   * Sends internal message from user account.
+   * Sends an internal message from the user account.
    * Shows an approval window to the user.
    *
    * ---

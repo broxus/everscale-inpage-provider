@@ -24,7 +24,7 @@ import {
   parseTransaction,
   serializeTokensObject,
 } from './models';
-import { Address, getUniqueId } from './utils';
+import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
 import * as contract from './contract';
 
@@ -32,7 +32,15 @@ export * from './api';
 export * from './models';
 export * from './contract';
 export { Stream, Subscriber } from './stream';
-export { Address, CheckAddress, AddressLiteral, UniqueArray, mergeTransactions, LT_COLLATOR } from './utils';
+export {
+  Address,
+  CheckAddress,
+  AddressLiteral,
+  UniqueArray,
+  MessageExpiredException,
+  mergeTransactions,
+  LT_COLLATOR,
+} from './utils';
 
 /**
  * @category Provider
@@ -849,7 +857,7 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Sends internal message from user account.
+   * Sends an internal message from the user account.
    * Shows an approval window to the user.
    *
    * ---
@@ -858,9 +866,10 @@ export class ProviderRpcClient {
   public async sendMessage(args: ProviderApiRequestParams<'sendMessage'>): Promise<ProviderApiResponse<'sendMessage'>> {
     await this.ensureInitialized();
     const { transaction } = await this._api.sendMessage({
-      ...args,
       sender: args.sender.toString(),
       recipient: args.recipient.toString(),
+      amount: args.amount,
+      bounce: args.bounce,
       payload: args.payload ? ({
         abi: args.payload.abi,
         method: args.payload.method,
@@ -869,6 +878,54 @@ export class ProviderRpcClient {
     });
     return {
       transaction: parseTransaction(transaction),
+    };
+  }
+
+  /**
+   * Sends an internal message from the user account without waiting for the transaction.
+   * Shows an approval window to the user.
+   *
+   * @see messageStatusUpdated
+   *
+   * ---
+   * Required permissions: `accountInteraction`
+   */
+  public async sendMessageDelayed(args: ProviderApiRequestParams<'sendMessageDelayed'>): Promise<contract.DelayedMessageExecution> {
+    await this.ensureInitialized();
+
+    const transactions = new DelayedTransactions;
+
+    const subscription = await this.subscribe('messageStatusUpdated');
+    subscription.on('data', (data) => {
+      if (!data.address.equals(args.sender)) {
+        return;
+      }
+      transactions.fillTransaction(data.hash, data.transaction);
+    });
+
+    const { message } = await this._api.sendMessageDelayed({
+      sender: args.sender.toString(),
+      recipient: args.recipient.toString(),
+      amount: args.amount,
+      bounce: args.bounce,
+      payload: args.payload ? ({
+        abi: args.payload.abi,
+        method: args.payload.method,
+        params: serializeTokensObject(args.payload.params),
+      }) : undefined,
+    }).catch(e => {
+      subscription.unsubscribe().catch(console.error);
+      throw e;
+    });
+
+    const transaction = transactions
+      .waitTransaction(args.sender, message.hash)
+      .finally(() => subscription.unsubscribe().catch(console.error));
+
+    return {
+      messageHash: message.hash,
+      expireAt: message.expireAt,
+      transaction,
     };
   }
 

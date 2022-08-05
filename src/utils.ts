@@ -84,6 +84,61 @@ type IsHexString<T extends string, L extends readonly number[]> =
 /**
  * @category Utils
  */
+export class MessageExpiredException extends Error {
+  constructor(public readonly address: Address, public readonly hash: string) {
+    super('Message expired');
+  }
+}
+
+export class DelayedTransactions {
+  private readonly transactions: Map<string, {
+    promise: Promise<Transaction | undefined>,
+    resolve: (transaction?: Transaction) => void,
+    reject: () => void,
+  }> = new Map();
+
+  public async waitTransaction(address: Address, hash: string): Promise<Transaction> {
+    let transaction = this.transactions.get(hash)?.promise;
+    if (transaction == null) {
+      let resolve: (transaction?: Transaction) => void;
+      let reject: () => void;
+      transaction = new Promise<Transaction | undefined>((promiseResolve, promiseReject) => {
+        resolve = (tx) => promiseResolve(tx);
+        reject = () => promiseReject();
+      });
+      this.transactions.set(hash, {
+        promise: transaction,
+        resolve: resolve!,
+        reject: reject!,
+      });
+    }
+
+    const tx = await transaction;
+    if (tx == null) {
+      throw new MessageExpiredException(address, hash);
+    }
+    return tx;
+  }
+
+  public fillTransaction(hash: string, transaction?: Transaction) {
+    const pendingTransaction = this.transactions.get(hash);
+    if (pendingTransaction != null) {
+      pendingTransaction.resolve(transaction);
+    } else {
+      this.transactions.set(hash, {
+        promise: Promise.resolve(transaction),
+        resolve: () => { /* do nothing */
+        },
+        reject: () => { /* do nothing */
+        },
+      });
+    }
+  }
+}
+
+/**
+ * @category Utils
+ */
 export const LT_COLLATOR: Intl.Collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 /**
