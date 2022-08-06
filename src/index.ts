@@ -48,17 +48,17 @@ export {
 export interface Provider {
   request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>;
 
-  addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
-  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
-  on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
-  once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
-  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
-  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): void;
+  prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 }
 
 /**
