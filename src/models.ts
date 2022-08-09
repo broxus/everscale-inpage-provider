@@ -576,6 +576,14 @@ export type AbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeInputObjec
 /**
  * @category Models
  */
+export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> =
+  PickFunction<C, T>['inputs'] extends readonly []
+    ? void | Record<string, never>
+    : AbiFunctionInputs<C, T>;
+
+/**
+ * @category Models
+ */
 export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<PickFunction<C, T>['inputs']>;
 /**
  * @category Models

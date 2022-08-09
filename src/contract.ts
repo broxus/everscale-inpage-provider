@@ -16,6 +16,7 @@ import {
   AbiFunctionInputs,
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
+  AbiFunctionInputsWithDefault,
   DecodedAbiEventData,
   TransactionId,
   serializeTokensObject,
@@ -62,7 +63,7 @@ export class Contract<Abi> {
     this._methods = new Proxy({}, {
       get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
         const rawAbi = this._functions[method];
-        return (params: AbiFunctionInputs<Abi, K>) => new ContractMethodImpl(
+        return (params: TokensObject = {}) => new ContractMethodImpl(
           this._provider, rawAbi, this._abi, this._address, method, params,
         );
       },
@@ -372,7 +373,7 @@ export type DelayedMessageExecution = {
  * @category Contract
  */
 export type ContractMethods<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionInputs<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
+  [K in AbiFunctionName<C>]: (params: AbiFunctionInputsWithDefault<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
 }
 
 /**
