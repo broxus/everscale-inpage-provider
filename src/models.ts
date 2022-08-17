@@ -511,7 +511,7 @@ type InputTokenValue<T, C> =
           : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
             : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
-                : T extends `optional(${infer V})` ? (V | null)
+                : T extends `optional(${infer V})` ? (InputTokenValue<V, C> | null)
                   : never;
 
 type OutputTokenValue<T, C> =
