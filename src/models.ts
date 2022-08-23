@@ -297,6 +297,11 @@ export type EncryptedData = {
 /**
  * @category Models
  */
+export type AbiVersion = '1.0' | '2.0' | '2.1' | '2.2' | '2.3';
+
+/**
+ * @category Models
+ */
 export type TokenValue<Addr = Address> =
   | null
   | boolean

@@ -1,4 +1,5 @@
 import {
+  AbiVersion,
   AbiParam,
   AssetType,
   AssetTypeParams,
@@ -460,6 +461,10 @@ export type ProviderApi<Addr = Address> = {
   packIntoCell: {
     input: {
       /**
+       * ABI version. 2.2 if not specified otherwise
+       */
+      abiVersion?: AbiVersion,
+      /**
        * Cell structure
        */
       structure: AbiParam[];
@@ -484,6 +489,10 @@ export type ProviderApi<Addr = Address> = {
    */
   unpackFromCell: {
     input: {
+      /**
+       * ABI version. 2.2 if not specified otherwise
+       */
+      abiVersion?: AbiVersion,
       /**
        * Cell structure
        */
