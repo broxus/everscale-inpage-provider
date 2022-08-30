@@ -1,4 +1,5 @@
 import {
+  AbiVersion,
   AbiParam,
   AssetType,
   AssetTypeParams,
@@ -330,7 +331,7 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
-   * Searches transaction by hash
+   * Fetches transaction by the exact hash
    *
    * ---
    * Required permissions: `basic`
@@ -340,13 +341,38 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Hex encoded transaction hash
        */
-      hash: string
+      hash: string;
     };
     output: {
       /**
        * Transaction
        */
-      transaction: Transaction<Addr> | undefined
+      transaction: Transaction<Addr> | undefined;
+    };
+  };
+
+  /**
+   * Searches transaction by filters
+   *
+   * NOTE: at least one filter must be specified
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  findTransaction: {
+    input: {
+      /**
+       * Hex encoded incoming message hash
+       */
+      inMessageHash?: string;
+
+      /* TODO: add more filters */
+    };
+    output: {
+      /**
+       * Transaction
+       */
+      transaction: Transaction<Addr> | undefined;
     };
   };
 
@@ -460,6 +486,10 @@ export type ProviderApi<Addr = Address> = {
   packIntoCell: {
     input: {
       /**
+       * ABI version. 2.2 if not specified otherwise
+       */
+      abiVersion?: AbiVersion,
+      /**
        * Cell structure
        */
       structure: AbiParam[];
@@ -484,6 +514,10 @@ export type ProviderApi<Addr = Address> = {
    */
   unpackFromCell: {
     input: {
+      /**
+       * ABI version. 2.2 if not specified otherwise
+       */
+      abiVersion?: AbiVersion,
       /**
        * Cell structure
        */

@@ -11,6 +11,7 @@ import {
 } from './api';
 
 import {
+  AbiVersion,
   AbiParam,
   AssetType,
   AssetTypeParams,
@@ -665,9 +666,14 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, data: MergeInputObjectsArray<P> }): Promise<ProviderApiResponse<'packIntoCell'>> {
+  public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: {
+    abiVersion?: AbiVersion,
+    structure: P,
+    data: MergeInputObjectsArray<P>
+  }): Promise<ProviderApiResponse<'packIntoCell'>> {
     await this.ensureInitialized();
     return await this._api.packIntoCell({
+      abiVersion: args.abiVersion,
       structure: args.structure as unknown as AbiParam[],
       data: serializeTokensObject(args.data),
     }) as ProviderApiResponse<'packIntoCell'>;
@@ -679,7 +685,12 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: { structure: P, boc: string, allowPartial: boolean }): Promise<{ data: MergeOutputObjectsArray<P> }> {
+  public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: {
+    abiVersion?: AbiVersion,
+    structure: P,
+    boc: string,
+    allowPartial: boolean
+  }): Promise<{ data: MergeOutputObjectsArray<P> }> {
     await this.ensureInitialized();
     const { data } = await this._api.unpackFromCell({
       ...args,
