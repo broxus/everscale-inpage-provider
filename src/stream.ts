@@ -1,6 +1,6 @@
 import { ProviderEvent, ProviderEventData } from './api';
 import { Address, getUniqueId, LT_COLLATOR } from './utils';
-import { TransactionId, Transaction, TransactionsBatchInfo, TransactionWithAccount } from './models';
+import { TransactionId, Transaction, TransactionsBatchInfo, TransactionWithAccount, parseTransaction } from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
 type SubscriptionWithAddress = Extract<ProviderEvent, 'transactionsFound' | 'contractStateChanged'>
@@ -45,7 +45,7 @@ export class Subscriber {
 
     return new StreamImpl(
       (onData, onEnd) => {
-        const scanner = new TraceTransactionsScanner(this, {
+        const scanner = new TraceTransactionsScanner(this.provider, {
           origin: transaction,
           onData,
           onEnd: (eof) => {
@@ -885,9 +885,8 @@ type TraceTransactionsScannerParams = {
 };
 
 type PendingTransaction = {
-  promise: Promise<TransactionWithAccount>,
-  resolve: (transaction: TransactionWithAccount) => void,
-  reject: () => void,
+  promise: Promise<TransactionWithAccount | undefined>;
+  reject: () => void;
 }
 
 class TraceTransactionsScanner implements Scanner {
@@ -895,11 +894,10 @@ class TraceTransactionsScanner implements Scanner {
 
   private promise?: Promise<void>;
   private isRunning = false;
-  private readonly streams: Map<string, Stream<any, Transaction>> = new Map();
-  private readonly pendingTransactions: Map<string, PendingTransaction> = new Map();
+  private pendingTransactions?: PendingTransaction[];
 
   constructor(
-    private readonly subscriber: Subscriber,
+    private readonly provider: ProviderRpcClient,
     private readonly params: TraceTransactionsScannerParams,
   ) {
   }
@@ -909,7 +907,7 @@ class TraceTransactionsScanner implements Scanner {
       return;
     }
 
-    const subscriber = this.subscriber;
+    const provider = this.provider;
 
     this.isRunning = true;
     this.promise = (async () => {
@@ -917,45 +915,51 @@ class TraceTransactionsScanner implements Scanner {
         complete: false,
       };
 
-      const fromLt = this.params.origin.id.lt;
+      const makePendingTransaction = (messageHash: string): PendingTransaction => {
+        const state: { stopped: boolean, reject?: () => void, timeout?: number } = { stopped: false };
 
-      const startDstStreams = (transaction: Transaction) => {
-        for (const message of transaction.outMessages) {
-          if (message.dst == null) {
-            continue;
-          }
+        const promise = (async () => {
+          let timeout = 500;
 
-          const address = message.dst.toString();
-          if (this.streams.has(address)) {
-            continue;
-          }
-
-          const stream = subscriber.oldTransactions(message.dst, { fromLt })
-            .merge(subscriber.transactions(message.dst))
-            .flatMap(({ address, transactions }) =>
-              transactions.map(transaction => {
-                (transaction as TransactionWithAccount).account = address;
-                return transaction as TransactionWithAccount;
-              }),
-            );
-          this.streams.set(address, stream);
-
-          stream.on((transaction) => {
-            const messageHash = transaction.inMessage.hash;
-            const pendingTransaction = this.pendingTransactions.get(messageHash);
-            if (pendingTransaction == null) {
-              this.pendingTransactions.set(messageHash, {
-                promise: Promise.resolve(transaction),
-                resolve: () => { /* do nothing */
-                },
-                reject: () => { /* do nothing */
-                },
-              });
-            } else {
-              pendingTransaction.resolve(transaction);
+          while (true) {
+            const result = await provider.rawApi.findTransaction({
+              inMessageHash: messageHash,
+            });
+            if (state.stopped) {
+              return;
             }
-          });
-        }
+
+            if (result.transaction != null) {
+              const transaction = parseTransaction(result.transaction);
+              (transaction as TransactionWithAccount).account = transaction.inMessage.dst!;
+              return (transaction as TransactionWithAccount);
+            }
+
+            let resolve: () => void;
+            const promise = new Promise<void>((resolvePromise, rejectPromise) => {
+              resolve = () => resolvePromise();
+              state.reject = () => rejectPromise();
+            });
+            state.timeout = setTimeout(resolve!, timeout);
+            await promise;
+            if (state.stopped) {
+              return;
+            }
+
+            state.reject = undefined;
+            timeout = Math.min(timeout * 2, 3000);
+          }
+        })();
+
+        const reject = () => {
+          state.stopped = true;
+          state.reject?.();
+          if (state.timeout != null) {
+            clearTimeout(state.timeout);
+          }
+        };
+
+        return { promise, reject };
       };
 
       const transactionsQueue = [this.params.origin];
@@ -967,35 +971,19 @@ class TraceTransactionsScanner implements Scanner {
             break;
           }
 
-          startDstStreams(transaction);
+          // Spawn promises
+          const pendingTransactions = transaction
+            .outMessages
+            .filter((message) => message.dst != null)
+            .map((message) => {
+              const messageHash = message.hash;
+              return makePendingTransaction(messageHash);
+            });
+          this.pendingTransactions = pendingTransactions;
 
-          for (const message of transaction.outMessages) {
-            if (message.dst == null) {
-              continue;
-            }
-
-            const pendingTransaction = this.pendingTransactions.get(message.hash);
-
-            let transactionPromise: Promise<TransactionWithAccount>;
-            if (pendingTransaction == null) {
-              let resolve: (transaction: TransactionWithAccount) => void;
-              let reject: () => void;
-              const promise = new Promise<TransactionWithAccount>((promiseResolve, promiseReject) => {
-                resolve = (tx) => promiseResolve(tx);
-                reject = () => promiseReject();
-              });
-              this.pendingTransactions.set(message.hash, {
-                promise,
-                resolve: resolve!,
-                reject: reject!,
-              });
-              transactionPromise = promise;
-            } else {
-              transactionPromise = pendingTransaction.promise;
-            }
-
-            const childTransaction = await transactionPromise;
-            if (!this.isRunning || state.complete) {
+          for (const { promise } of pendingTransactions) {
+            const childTransaction = await promise;
+            if (!this.isRunning || state.complete || childTransaction == null) {
               break outer;
             }
 
@@ -1010,16 +998,16 @@ class TraceTransactionsScanner implements Scanner {
 
             transactionsQueue.push(childTransaction);
           }
+
+          this.pendingTransactions = undefined;
         }
       } catch (e: unknown) {
+        console.error(e);
         /* do nothing */
       } finally {
         this.queue.enqueue(async () => this.params.onEnd(state.complete));
         this.isRunning = false;
-
-        for (const stream of this.streams.values()) {
-          stream.stopProducer();
-        }
+        this.rejectPendingTransactions();
       }
     })();
   }
@@ -1038,8 +1026,11 @@ class TraceTransactionsScanner implements Scanner {
   }
 
   private rejectPendingTransactions() {
-    for (const pendingTransaction of this.pendingTransactions.values()) {
-      pendingTransaction.reject();
+    if (this.pendingTransactions != null) {
+      for (const pendingTransaction of this.pendingTransactions) {
+        pendingTransaction.reject();
+      }
+      this.pendingTransactions = undefined;
     }
   }
 }
