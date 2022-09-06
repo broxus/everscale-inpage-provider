@@ -139,6 +139,114 @@ export class DelayedTransactions {
 /**
  * @category Utils
  */
+export class Semaphore {
+  private tasks: (() => void)[] = [];
+  count: number;
+
+  constructor(count: number) {
+    this.count = count;
+  }
+
+  public acquire(): Promise<() => void> {
+    return new Promise<() => void>((res, _rej) => {
+      this.tasks.push(() => {
+        let released = false;
+        res(() => {
+          if (!released) {
+            released = true;
+            this.count++;
+            this.sched();
+          }
+        });
+      });
+      nextTick(this.sched);
+    });
+  }
+
+  public releaseAll() {
+    while (this.tasks.length > 0) {
+      this.tasks.shift()?.();
+    }
+  }
+
+  sched = () => {
+    if (this.count > 0 && this.tasks.length > 0) {
+      this.count--;
+      this.tasks.shift()?.();
+    }
+  };
+}
+
+function byObserver(Observer: any) {
+  const node = document.createTextNode('');
+  let queue: any, currentQueue: any, bit = 0, i = 0;
+  new Observer(function() {
+    let callback;
+    if (!queue) {
+      if (!currentQueue) return;
+      queue = currentQueue;
+    } else if (currentQueue) {
+      queue = currentQueue.slice(i).concat(queue);
+    }
+    currentQueue = queue;
+    queue = null;
+    i = 0;
+    if (typeof currentQueue === 'function') {
+      callback = currentQueue;
+      currentQueue = null;
+      callback();
+      return;
+    }
+    node.data = (bit = ++bit % 2) as any;
+    while (i < currentQueue.length) {
+      callback = currentQueue[i];
+      i++;
+      if (i === currentQueue.length) currentQueue = null;
+      callback();
+    }
+  }).observe(node, { characterData: true });
+
+  return function(fn: any) {
+    if (queue) {
+      if (typeof queue === 'function') queue = [queue, fn];
+      else queue.push(fn);
+      return;
+    }
+    queue = fn;
+    node.data = (bit = ++bit % 2) as any;
+  };
+}
+
+const nextTick = (function() {
+  // queueMicrotask
+  if (typeof queueMicrotask === 'function') {
+    return queueMicrotask;
+  }
+
+  // MutationObserver
+  if ((typeof document === 'object') && document) {
+    if (typeof MutationObserver === 'function') return byObserver(MutationObserver);
+    if (typeof (window as any).WebKitMutationObserver === 'function') return byObserver((window as any).WebKitMutationObserver);
+  }
+
+  /* @ts-ignore */
+  if (typeof setImmediate === 'function') {
+    /* @ts-ignore */
+    return setImmediate;
+  }
+
+  if ((typeof setTimeout === 'function') || (typeof setTimeout === 'object')) {
+    return function(cb: any) {
+      setTimeout(cb, 0);
+    };
+  }
+
+  throw new Error('No `nextTick` implementation found');
+}());
+
+/**
+ * @category Utils
+ */
 export const LT_COLLATOR: Intl.Collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 /**
