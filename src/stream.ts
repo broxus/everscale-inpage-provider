@@ -1,5 +1,5 @@
 import { ProviderEvent, ProviderEventData } from './api';
-import { Address, getUniqueId, LT_COLLATOR } from './utils';
+import { Address, Semaphore, getUniqueId, LT_COLLATOR } from './utils';
 import { TransactionId, Transaction, TransactionsBatchInfo, TransactionWithAccount, parseTransaction } from './models';
 import { ProviderRpcClient, Subscription } from './index';
 
@@ -895,6 +895,7 @@ class TraceTransactionsScanner implements Scanner {
   private promise?: Promise<void>;
   private isRunning = false;
   private pendingTransactions?: PendingTransaction[];
+  private semaphore = new Semaphore(10);
 
   constructor(
     private readonly provider: ProviderRpcClient,
@@ -922,9 +923,14 @@ class TraceTransactionsScanner implements Scanner {
           let timeout = 500;
 
           while (true) {
+            const release = await this.semaphore.acquire();
+            if (state.stopped) {
+              release();
+              return;
+            }
             const result = await provider.rawApi.findTransaction({
               inMessageHash: messageHash,
-            });
+            }).finally(() => release());
             if (state.stopped) {
               return;
             }
@@ -1032,6 +1038,7 @@ class TraceTransactionsScanner implements Scanner {
       }
       this.pendingTransactions = undefined;
     }
+    this.semaphore.releaseAll();
   }
 }
 
