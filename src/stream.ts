@@ -930,7 +930,7 @@ class TraceTransactionsScanner implements Scanner {
             }
             const result = await provider.rawApi.findTransaction({
               inMessageHash: messageHash,
-            }).finally(() => release());
+            }).catch(() => ({ transaction: undefined })).finally(() => release());
             if (state.stopped) {
               return;
             }
