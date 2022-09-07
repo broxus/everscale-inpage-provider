@@ -518,7 +518,8 @@ type InputTokenValue<T, C> =
             : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
                 : T extends `optional(${infer V})` ? (InputTokenValue<V, C> | null)
-                  : never;
+                  : T extends `ref(${infer V})` ? InputTokenValue<V, C>
+                    : never;
 
 type OutputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
@@ -529,7 +530,8 @@ type OutputTokenValue<T, C> =
             : T extends `${infer K}[]` ? OutputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
                 : T extends `optional(${infer V})` ? (OutputTokenValue<V, C> | null)
-                  : never;
+                  : T extends `ref(${infer V})` ? OutputTokenValue<V, C>
+                    : never;
 
 /**
  * @category Models
