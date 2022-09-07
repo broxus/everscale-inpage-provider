@@ -25,7 +25,7 @@ import {
   serializeTransaction,
 } from './models';
 import { Stream, Subscriber } from './stream';
-import { ProviderRpcClient } from './index';
+import { ProviderApiResponse, ProviderRpcClient } from './index';
 
 /**
  * @category Contract
@@ -80,6 +80,20 @@ export class Contract<Abi> {
 
   public get abi(): string {
     return this._abi;
+  }
+
+
+  /**
+   * Requests contract data
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async getFullState(): Promise<ProviderApiResponse<'getFullContractState'>> {
+    await this._provider.ensureInitialized();
+    return await this._provider.rawApi.getFullContractState({
+      address: this.address.toString(),
+    }) as ProviderApiResponse<'getFullContractState'>;
   }
 
   /**

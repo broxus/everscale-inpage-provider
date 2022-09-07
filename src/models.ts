@@ -364,6 +364,8 @@ type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindA
 
 type AbiParamOptional = `optional(${AbiParamKind})`
 type AbiParamRef = `ref(${AbiParamKind})`;
+type AbiParamOptionalRef = `optional(ref(${AbiParamKind}))`;
+type AbiParamRefOptional = `ref(optional(${AbiParamKind}))`;
 
 type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 type NonZeroDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
@@ -391,7 +393,7 @@ export type AbiParamKind =
  */
 export type AbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef | AbiParamOptionalRef | AbiParamRefOptional;
   components?: AbiParam[];
 };
 
@@ -400,7 +402,7 @@ export type AbiParam = {
  */
 export type ReadonlyAbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef | AbiParamOptionalRef | AbiParamRefOptional;
   components?: readonly ReadonlyAbiParam[];
 }
 
@@ -517,7 +519,7 @@ type InputTokenValue<T, C> =
           : T extends AbiParamKindTuple ? MergeInputObjectsArray<C>
             : T extends `${infer K}[]` ? InputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [InputTokenValue<K, undefined>, InputTokenValue<V, C>])[]
-                : T extends `optional(${infer V})` ? (InputTokenValue<V, C> | null)
+                : T extends `optional(${infer V})` | `ref(optional(${infer V}))` | `optional(ref(${infer V}))` ? (InputTokenValue<V, C> | null)
                   : T extends `ref(${infer V})` ? InputTokenValue<V, C>
                     : never;
 
@@ -529,7 +531,7 @@ type OutputTokenValue<T, C> =
           : T extends AbiParamKindTuple ? MergeOutputObjectsArray<C>
             : T extends `${infer K}[]` ? OutputTokenValue<K, C>[]
               : T extends `map(${infer K},${infer V})` ? (readonly [OutputTokenValue<K, undefined>, OutputTokenValue<V, C>])[]
-                : T extends `optional(${infer V})` ? (OutputTokenValue<V, C> | null)
+                : T extends `optional(${infer V})` | `ref(optional(${infer V}))` | `optional(ref(${infer V}))` ? (OutputTokenValue<V, C> | null)
                   : T extends `ref(${infer V})` ? OutputTokenValue<V, C>
                     : never;
 
