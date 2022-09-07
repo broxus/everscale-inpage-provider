@@ -363,6 +363,7 @@ type AbiParamKindArray = `${AbiParamKind}[]`;
 type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress},${AbiParamKind | `${AbiParamKind}[]`})`;
 
 type AbiParamOptional = `optional(${AbiParamKind})`
+type AbiParamRef = `ref(${AbiParamKind})`;
 
 type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 type NonZeroDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
@@ -390,7 +391,7 @@ export type AbiParamKind =
  */
 export type AbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef;
   components?: AbiParam[];
 };
 
@@ -399,7 +400,7 @@ export type AbiParam = {
  */
 export type ReadonlyAbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional;
+  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef;
   components?: readonly ReadonlyAbiParam[];
 }
 
