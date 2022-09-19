@@ -347,6 +347,8 @@ export type FunctionCall<Addr = Address> = {
 
 type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
 type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
+type AbiParamKindVarUint = 'varuint16' | 'varuint32';
+type AbiParamKindVarInt = 'varint16' | 'varint32';
 type AbiParamKindTuple = 'tuple';
 type AbiParamKindBool = 'bool';
 type AbiParamKindCell = 'cell';
@@ -360,7 +362,8 @@ type AbiParamKindExpire = 'expire';
 type AbiParamKindPublicKey = 'pubkey';
 type AbiParamKindArray = `${AbiParamKind}[]`;
 
-type AbiParamKindMap = `map(${AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress},${AbiParamKind | `${AbiParamKind}[]`})`;
+type AbiParamKindMapKey = AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress;
+type AbiParamKindMap = `map(${AbiParamKindMapKey},${AbiParamKind | `${AbiParamKind}[]`})`;
 
 type AbiParamOptional = `optional(${AbiParamKind})`
 type AbiParamRef = `ref(${AbiParamKind})`;
@@ -376,6 +379,8 @@ type NonZeroDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 export type AbiParamKind =
   | AbiParamKindUint
   | AbiParamKindInt
+  | AbiParamKindVarUint
+  | AbiParamKindVarInt
   | AbiParamKindTuple
   | AbiParamKindBool
   | AbiParamKindCell
@@ -512,7 +517,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
 }
 
 type InputTokenValue<T, C> =
-  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
+  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindVarUint | AbiParamKindVarInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
     : T extends AbiParamKindBool ? boolean
       : T extends AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
         : T extends AbiParamKindAddress ? Address
@@ -524,7 +529,7 @@ type InputTokenValue<T, C> =
                     : never;
 
 type OutputTokenValue<T, C> =
-  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
+  T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindVarUint | AbiParamKindVarInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
     : T extends AbiParamKindExpire ? number
       : T extends AbiParamKindBool ? boolean
         : T extends AbiParamKindAddress ? Address
