@@ -1084,7 +1084,20 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
   /**
    * Base64 encoded salt (as BOC) or params of boc encoder
    */
-  salt: string | { structure: P, data: MergeInputObjectsArray<P> }
+  salt: string | {
+    /**
+     * ABI version. 2.2 if not specified otherwise
+     */
+    abiVersion?: AbiVersion,
+    /**
+     * Cell structure
+     */
+    structure: P,
+    /**
+     * Cell data
+     */
+    data: MergeInputObjectsArray<P>,
+  }
 }
 
 /**
