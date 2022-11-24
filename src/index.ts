@@ -93,14 +93,14 @@ let ensurePageLoaded: Promise<void>;
 if (!isBrowser || document.readyState === 'complete') {
   ensurePageLoaded = Promise.resolve();
 } else {
-  ensurePageLoaded = new Promise<void>((resolve) => {
+  ensurePageLoaded = new Promise<void>(resolve => {
     window.addEventListener('load', () => {
       resolve();
     });
   });
 }
 
-const getProvider = (): Provider | undefined => isBrowser ? window.__ever || window.ton : undefined;
+const getProvider = (): Provider | undefined => (isBrowser ? window.__ever || window.ton : undefined);
 
 /**
  * @category Provider
@@ -161,26 +161,28 @@ export class ProviderRpcClient {
     this.Subscriber = ProviderSubscriber;
 
     // Wrap provider requests
-    this._api = new Proxy({}, {
-      get: <K extends ProviderMethod>(
-        _object: ProviderRpcClient,
-        method: K,
-      ) => (params: RawProviderApiRequestParams<K>) => {
-        if (this._provider != null) {
-          return this._provider.request({ method, params });
-        } else {
-          throw new ProviderNotInitializedException();
-        }
+    this._api = new Proxy(
+      {},
+      {
+        get:
+          <K extends ProviderMethod>(_object: ProviderRpcClient, method: K) =>
+          (params: RawProviderApiRequestParams<K>) => {
+            if (this._provider != null) {
+              return this._provider.request({ method, params });
+            } else {
+              throw new ProviderNotInitializedException();
+            }
+          },
       },
-    }) as unknown as RawProviderApiMethods;
+    ) as unknown as RawProviderApiMethods;
 
     if (properties.forceUseFallback === true) {
-      this._initializationPromise = properties.fallback != null
-        ? properties.fallback()
-          .then((provider) => {
-            this._provider = provider;
-          })
-        : Promise.resolve();
+      this._initializationPromise =
+        properties.fallback != null
+          ? properties.fallback().then(provider => {
+              this._provider = provider;
+            })
+          : Promise.resolve();
     } else {
       // Initialize provider with injected object by default
       this._provider = getProvider();
@@ -190,24 +192,27 @@ export class ProviderRpcClient {
       } else {
         // Wait until page is loaded and initialization complete
         this._initializationPromise = hasEverscaleProvider()
-          .then((hasProvider) => new Promise<void>((resolve) => {
-            if (!hasProvider) {
-              // Fully loaded page doesn't even contain provider flag
-              return resolve();
-            }
+          .then(
+            hasProvider =>
+              new Promise<void>(resolve => {
+                if (!hasProvider) {
+                  // Fully loaded page doesn't even contain provider flag
+                  return resolve();
+                }
 
-            // Wait injected provider initialization otherwise
-            this._provider = getProvider();
-            if (this._provider != null) {
-              resolve();
-            } else {
-              const eventName = window.__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
-              window.addEventListener(eventName, (_) => {
+                // Wait injected provider initialization otherwise
                 this._provider = getProvider();
-                resolve();
-              });
-            }
-          }))
+                if (this._provider != null) {
+                  resolve();
+                } else {
+                  const eventName = window.__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
+                  window.addEventListener(eventName, _ => {
+                    this._provider = getProvider();
+                    resolve();
+                  });
+                }
+              }),
+          )
           .then(async () => {
             if (this._provider == null && properties.fallback != null) {
               this._provider = await properties.fallback();
@@ -301,7 +306,9 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: none
    */
-  public async requestPermissions(args: ProviderApiRequestParams<'requestPermissions'>): Promise<ProviderApiResponse<'requestPermissions'>> {
+  public async requestPermissions(
+    args: ProviderApiRequestParams<'requestPermissions'>,
+  ): Promise<ProviderApiResponse<'requestPermissions'>> {
     await this.ensureInitialized();
     const result = await this._api.requestPermissions({
       permissions: args.permissions,
@@ -331,12 +338,18 @@ export class ProviderRpcClient {
   /**
    * Called every time contract state changes
    */
-  public subscribe(eventName: 'contractStateChanged', params: { address: Address }): Promise<Subscription<'contractStateChanged'>>;
+  public subscribe(
+    eventName: 'contractStateChanged',
+    params: { address: Address },
+  ): Promise<Subscription<'contractStateChanged'>>;
 
   /**
    * Called on each new transactions batch, received on subscription
    */
-  public subscribe(eventName: 'transactionsFound', params: { address: Address }): Promise<Subscription<'transactionsFound'>>;
+  public subscribe(
+    eventName: 'transactionsFound',
+    params: { address: Address },
+  ): Promise<Subscription<'transactionsFound'>>;
 
   /**
    * Called every time when provider connection is established
@@ -370,9 +383,13 @@ export class ProviderRpcClient {
    */
   public subscribe(eventName: 'loggedOut'): Promise<Subscription<'loggedOut'>>;
 
-  public async subscribe<T extends ProviderEvent>(eventName: T, params?: { address: Address }): Promise<Subscription<T>> {
-    type Handler<K extends SubscriptionEvent, T extends ProviderEvent> =
-      K extends 'data' ? (data: ProviderEventData<T>) => void : () => void;
+  public async subscribe<T extends ProviderEvent>(
+    eventName: T,
+    params?: { address: Address },
+  ): Promise<Subscription<T>> {
+    type Handler<K extends SubscriptionEvent, T extends ProviderEvent> = K extends 'data'
+      ? (data: ProviderEventData<T>) => void
+      : () => void;
 
     class SubscriptionImpl<T extends ProviderEvent> implements Subscription<T> {
       private readonly _listeners: { [K in SubscriptionEvent]: Handler<K, T>[] } = {
@@ -384,8 +401,8 @@ export class ProviderRpcClient {
 
       constructor(
         private readonly _subscribe: (s: SubscriptionImpl<T>) => Promise<void>,
-        private readonly _unsubscribe: () => Promise<void>) {
-      }
+        private readonly _unsubscribe: () => Promise<void>,
+      ) {}
 
       on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
       on(eventName: 'subscribed', listener: () => void): this;
@@ -437,16 +454,19 @@ export class ProviderRpcClient {
       case 'networkChanged':
       case 'permissionsChanged':
       case 'loggedOut': {
-        const subscription = new SubscriptionImpl<T>(async (subscription) => {
-          if (existingSubscriptions.has(id)) {
-            return;
-          }
-          existingSubscriptions.set(id, (data) => {
-            subscription.notify(data);
-          });
-        }, async () => {
-          existingSubscriptions.delete(id);
-        });
+        const subscription = new SubscriptionImpl<T>(
+          async subscription => {
+            if (existingSubscriptions.has(id)) {
+              return;
+            }
+            existingSubscriptions.set(id, data => {
+              subscription.notify(data);
+            });
+          },
+          async () => {
+            existingSubscriptions.delete(id);
+          },
+        );
         await subscription.subscribe();
         return subscription;
       }
@@ -460,60 +480,60 @@ export class ProviderRpcClient {
 
         const address = params.address.toString();
 
-        const subscription = new SubscriptionImpl<T>(async (subscription) => {
-          if (existingSubscriptions.has(id)) {
-            return;
-          }
-          existingSubscriptions.set(id, ((data: ProviderEventData<'transactionsFound' | 'contractStateChanged'>) => {
-            if (data.address.toString() === address) {
-              subscription.notify(data as ProviderEventData<T>);
+        const subscription = new SubscriptionImpl<T>(
+          async subscription => {
+            if (existingSubscriptions.has(id)) {
+              return;
             }
-          }) as (data: ProviderEventData<T>) => void);
+            existingSubscriptions.set(id, ((data: ProviderEventData<'transactionsFound' | 'contractStateChanged'>) => {
+              if (data.address.toString() === address) {
+                subscription.notify(data as ProviderEventData<T>);
+              }
+            }) as (data: ProviderEventData<T>) => void);
 
-          let contractSubscriptions = this._contractSubscriptions.get(address);
-          if (contractSubscriptions == null) {
-            contractSubscriptions = new Map();
-            this._contractSubscriptions.set(address, contractSubscriptions);
-          }
-
-          const subscriptionState = {
-            state: eventName === 'contractStateChanged',
-            transactions: eventName === 'transactionsFound',
-          };
-          contractSubscriptions.set(id, subscriptionState);
-
-          const {
-            total,
-            withoutExcluded,
-          } = foldSubscriptions(contractSubscriptions.values(), subscriptionState);
-
-          try {
-            if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
-              await this.rawApi.subscribe({ address, subscriptions: total });
+            let contractSubscriptions = this._contractSubscriptions.get(address);
+            if (contractSubscriptions == null) {
+              contractSubscriptions = new Map();
+              this._contractSubscriptions.set(address, contractSubscriptions);
             }
-          } catch (e) {
+
+            const subscriptionState = {
+              state: eventName === 'contractStateChanged',
+              transactions: eventName === 'transactionsFound',
+            };
+            contractSubscriptions.set(id, subscriptionState);
+
+            const { total, withoutExcluded } = foldSubscriptions(contractSubscriptions.values(), subscriptionState);
+
+            try {
+              if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
+                await this.rawApi.subscribe({ address, subscriptions: total });
+              }
+            } catch (e) {
+              existingSubscriptions.delete(id);
+              contractSubscriptions.delete(id);
+              throw e;
+            }
+          },
+          async () => {
             existingSubscriptions.delete(id);
+
+            const contractSubscriptions = this._contractSubscriptions.get(address);
+            if (contractSubscriptions == null) {
+              return;
+            }
+            const updates = contractSubscriptions.get(id);
+
+            const { total, withoutExcluded } = foldSubscriptions(contractSubscriptions.values(), updates);
             contractSubscriptions.delete(id);
-            throw e;
-          }
-        }, async () => {
-          existingSubscriptions.delete(id);
 
-          const contractSubscriptions = this._contractSubscriptions.get(address);
-          if (contractSubscriptions == null) {
-            return;
-          }
-          const updates = contractSubscriptions.get(id);
-
-          const { total, withoutExcluded } = foldSubscriptions(contractSubscriptions.values(), updates);
-          contractSubscriptions.delete(id);
-
-          if (!withoutExcluded.transactions && !withoutExcluded.state) {
-            await this.rawApi.unsubscribe({ address });
-          } else if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
-            await this.rawApi.subscribe({ address, subscriptions: withoutExcluded });
-          }
-        });
+            if (!withoutExcluded.transactions && !withoutExcluded.state) {
+              await this.rawApi.unsubscribe({ address });
+            } else if (total.transactions !== withoutExcluded.transactions || total.state !== withoutExcluded.state) {
+              await this.rawApi.subscribe({ address, subscriptions: withoutExcluded });
+            }
+          },
+        );
         await subscription.subscribe();
         return subscription;
       }
@@ -538,7 +558,6 @@ export class ProviderRpcClient {
     } as ProviderApiResponse<'getProviderState'>;
   }
 
-
   /**
    * Requests contract balance
    *
@@ -558,11 +577,13 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async getFullContractState(args: ProviderApiRequestParams<'getFullContractState'>): Promise<ProviderApiResponse<'getFullContractState'>> {
+  public async getFullContractState(
+    args: ProviderApiRequestParams<'getFullContractState'>,
+  ): Promise<ProviderApiResponse<'getFullContractState'>> {
     await this.ensureInitialized();
-    return await this._api.getFullContractState({
+    return (await this._api.getFullContractState({
       address: args.address.toString(),
-    }) as ProviderApiResponse<'getFullContractState'>;
+    })) as ProviderApiResponse<'getFullContractState'>;
   }
 
   /**
@@ -571,13 +592,15 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async getAccountsByCodeHash(args: ProviderApiRequestParams<'getAccountsByCodeHash'>): Promise<ProviderApiResponse<'getAccountsByCodeHash'>> {
+  public async getAccountsByCodeHash(
+    args: ProviderApiRequestParams<'getAccountsByCodeHash'>,
+  ): Promise<ProviderApiResponse<'getAccountsByCodeHash'>> {
     await this.ensureInitialized();
     const { accounts, continuation } = await this._api.getAccountsByCodeHash({
       ...args,
     });
     return {
-      accounts: accounts.map((address) => new Address(address)),
+      accounts: accounts.map(address => new Address(address)),
       continuation,
     } as ProviderApiResponse<'getAccountsByCodeHash'>;
   }
@@ -588,7 +611,9 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async getTransactions(args: ProviderApiRequestParams<'getTransactions'>): Promise<ProviderApiResponse<'getTransactions'>> {
+  public async getTransactions(
+    args: ProviderApiRequestParams<'getTransactions'>,
+  ): Promise<ProviderApiResponse<'getTransactions'>> {
     await this.ensureInitialized();
     const { transactions, continuation, info } = await this._api.getTransactions({
       ...args,
@@ -607,7 +632,9 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async getTransaction(args: ProviderApiRequestParams<'getTransaction'>): Promise<ProviderApiResponse<'getTransaction'>> {
+  public async getTransaction(
+    args: ProviderApiRequestParams<'getTransaction'>,
+  ): Promise<ProviderApiResponse<'getTransaction'>> {
     await this.ensureInitialized();
     const { transaction } = await this._api.getTransaction({
       ...args,
@@ -634,7 +661,10 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async getStateInit<Abi>(abi: Abi, args: GetExpectedAddressParams<Abi>): Promise<ProviderApiResponse<'getExpectedAddress'>> {
+  public async getStateInit<Abi>(
+    abi: Abi,
+    args: GetExpectedAddressParams<Abi>,
+  ): Promise<ProviderApiResponse<'getExpectedAddress'>> {
     await this.ensureInitialized();
     const { address, stateInit } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
@@ -655,9 +685,11 @@ export class ProviderRpcClient {
    */
   public async getBocHash(boc: string): Promise<string> {
     await this.ensureInitialized();
-    return await this._api.getBocHash({
-      boc,
-    }).then(({ hash }) => hash);
+    return await this._api
+      .getBocHash({
+        boc,
+      })
+      .then(({ hash }) => hash);
   }
 
   /**
@@ -667,16 +699,16 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async packIntoCell<P extends readonly ReadonlyAbiParam[]>(args: {
-    abiVersion?: AbiVersion,
-    structure: P,
-    data: MergeInputObjectsArray<P>
+    abiVersion?: AbiVersion;
+    structure: P;
+    data: MergeInputObjectsArray<P>;
   }): Promise<ProviderApiResponse<'packIntoCell'>> {
     await this.ensureInitialized();
-    return await this._api.packIntoCell({
+    return (await this._api.packIntoCell({
       abiVersion: args.abiVersion,
       structure: args.structure as unknown as AbiParam[],
       data: serializeTokensObject(args.data),
-    }) as ProviderApiResponse<'packIntoCell'>;
+    })) as ProviderApiResponse<'packIntoCell'>;
   }
 
   /**
@@ -686,10 +718,10 @@ export class ProviderRpcClient {
    * Required permissions: `basic`
    */
   public async unpackFromCell<P extends readonly ReadonlyAbiParam[]>(args: {
-    abiVersion?: AbiVersion,
-    structure: P,
-    boc: string,
-    allowPartial: boolean
+    abiVersion?: AbiVersion;
+    structure: P;
+    boc: string;
+    allowPartial: boolean;
   }): Promise<{ data: MergeOutputObjectsArray<P> }> {
     await this.ensureInitialized();
     const { data } = await this._api.unpackFromCell({
@@ -761,7 +793,9 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async setCodeSalt<P extends readonly ReadonlyAbiParam[]>(args: SetCodeSaltParams<P>): Promise<ProviderApiResponse<'setCodeSalt'>> {
+  public async setCodeSalt<P extends readonly ReadonlyAbiParam[]>(
+    args: SetCodeSaltParams<P>,
+  ): Promise<ProviderApiResponse<'setCodeSalt'>> {
     let salt;
     if (typeof args.salt === 'string') {
       await this.ensureInitialized();
@@ -814,7 +848,9 @@ export class ProviderRpcClient {
     });
   }
 
-  public async verifySignature(args: ProviderApiRequestParams<'verifySignature'>): Promise<ProviderApiResponse<'verifySignature'>> {
+  public async verifySignature(
+    args: ProviderApiRequestParams<'verifySignature'>,
+  ): Promise<ProviderApiResponse<'verifySignature'>> {
     await this.ensureInitialized();
     return await this._api.verifySignature(args);
   }
@@ -881,11 +917,13 @@ export class ProviderRpcClient {
       recipient: args.recipient.toString(),
       amount: args.amount,
       bounce: args.bounce,
-      payload: args.payload ? ({
-        abi: args.payload.abi,
-        method: args.payload.method,
-        params: serializeTokensObject(args.payload.params),
-      }) : undefined,
+      payload: args.payload
+        ? {
+            abi: args.payload.abi,
+            method: args.payload.method,
+            params: serializeTokensObject(args.payload.params),
+          }
+        : undefined,
     });
     return {
       transaction: parseTransaction(transaction),
@@ -901,33 +939,39 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `accountInteraction`
    */
-  public async sendMessageDelayed(args: ProviderApiRequestParams<'sendMessageDelayed'>): Promise<contract.DelayedMessageExecution> {
+  public async sendMessageDelayed(
+    args: ProviderApiRequestParams<'sendMessageDelayed'>,
+  ): Promise<contract.DelayedMessageExecution> {
     await this.ensureInitialized();
 
-    const transactions = new DelayedTransactions;
+    const transactions = new DelayedTransactions();
 
     const subscription = await this.subscribe('messageStatusUpdated');
-    subscription.on('data', (data) => {
+    subscription.on('data', data => {
       if (!data.address.equals(args.sender)) {
         return;
       }
       transactions.fillTransaction(data.hash, data.transaction);
     });
 
-    const { message } = await this._api.sendMessageDelayed({
-      sender: args.sender.toString(),
-      recipient: args.recipient.toString(),
-      amount: args.amount,
-      bounce: args.bounce,
-      payload: args.payload ? ({
-        abi: args.payload.abi,
-        method: args.payload.method,
-        params: serializeTokensObject(args.payload.params),
-      }) : undefined,
-    }).catch(e => {
-      subscription.unsubscribe().catch(console.error);
-      throw e;
-    });
+    const { message } = await this._api
+      .sendMessageDelayed({
+        sender: args.sender.toString(),
+        recipient: args.recipient.toString(),
+        amount: args.amount,
+        bounce: args.bounce,
+        payload: args.payload
+          ? {
+              abi: args.payload.abi,
+              method: args.payload.method,
+              params: serializeTokensObject(args.payload.params),
+            }
+          : undefined,
+      })
+      .catch(e => {
+        subscription.unsubscribe().catch(console.error);
+        throw e;
+      });
 
     const transaction = transactions
       .waitTransaction(args.sender, message.hash)
@@ -942,31 +986,31 @@ export class ProviderRpcClient {
 
   private _registerEventHandlers(provider: Provider) {
     const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
-      'connected': (data) => data,
-      'disconnected': (data) => data,
-      'transactionsFound': (data) => ({
+      connected: data => data,
+      disconnected: data => data,
+      transactionsFound: data => ({
         address: new Address(data.address),
         transactions: data.transactions.map(parseTransaction),
         info: data.info,
       }),
-      'contractStateChanged': (data) => ({
+      contractStateChanged: data => ({
         address: new Address(data.address),
         state: data.state,
       }),
-      'messageStatusUpdated': (data) => ({
+      messageStatusUpdated: data => ({
         address: new Address(data.address),
         hash: data.hash,
         transaction: data.transaction != null ? parseTransaction(data.transaction) : undefined,
       }),
-      'networkChanged': data => data,
-      'permissionsChanged': (data) => ({
+      networkChanged: data => data,
+      permissionsChanged: data => ({
         permissions: parsePermissions(data.permissions),
       }),
-      'loggedOut': data => data,
+      loggedOut: data => data,
     };
 
     for (const [eventName, extractor] of Object.entries(knownEvents)) {
-      provider.addListener(eventName as ProviderEvent, (data) => {
+      provider.addListener(eventName as ProviderEvent, data => {
         const handlers = this._subscriptions[eventName as ProviderEvent];
         const parsed = (extractor as any)(data);
         for (const handler of handlers.values()) {
@@ -1041,37 +1085,38 @@ export class ProviderNotInitializedException extends Error {
  */
 export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends undefined
   ? () => Promise<RawProviderApiResponse<P>>
-  : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>
+  : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>;
 
 /**
  * @category Provider
  */
 export type RawProviderApiMethods = {
-  [P in ProviderMethod]: RawRpcMethod<P>
-}
+  [P in ProviderMethod]: RawRpcMethod<P>;
+};
 
 /**
  * @category Provider
  */
-export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D } ?
-  {
-    /**
-     * Base64 encoded TVC file
-     */
-    tvc: string,
-    /**
-     * Contract workchain. 0 by default
-     */
-    workchain?: number,
-    /**
-     * Public key, which will be injected into the contract. 0 by default
-     */
-    publicKey?: string;
-    /**
-     * State init params
-     */
-    initParams: MergeInputObjectsArray<D>;
-  } : never;
+export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D }
+  ? {
+      /**
+       * Base64 encoded TVC file
+       */
+      tvc: string;
+      /**
+       * Contract workchain. 0 by default
+       */
+      workchain?: number;
+      /**
+       * Public key, which will be injected into the contract. 0 by default
+       */
+      publicKey?: string;
+      /**
+       * State init params
+       */
+      initParams: MergeInputObjectsArray<D>;
+    }
+  : never;
 
 /**
  * @category Provider
@@ -1080,25 +1125,27 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
   /**
    * Base64 encoded contract code
    */
-  code: string,
+  code: string;
   /**
    * Base64 encoded salt (as BOC) or params of boc encoder
    */
-  salt: string | {
-    /**
-     * ABI version. 2.2 if not specified otherwise
-     */
-    abiVersion?: AbiVersion,
-    /**
-     * Cell structure
-     */
-    structure: P,
-    /**
-     * Cell data
-     */
-    data: MergeInputObjectsArray<P>,
-  }
-}
+  salt:
+    | string
+    | {
+        /**
+         * ABI version. 2.2 if not specified otherwise
+         */
+        abiVersion?: AbiVersion;
+        /**
+         * Cell structure
+         */
+        structure: P;
+        /**
+         * Cell data
+         */
+        data: MergeInputObjectsArray<P>;
+      };
+};
 
 /**
  * @category Provider
@@ -1107,8 +1154,8 @@ export type GetCodeSaltParams = {
   /**
    * Base64 encoded contract code
    */
-  code: string,
-}
+  code: string;
+};
 
 /**
  * @category Provider
@@ -1118,21 +1165,21 @@ export type AddAssetParams<T extends AssetType> = {
    * Owner's wallet address.
    * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
    */
-  account: Address,
+  account: Address;
   /**
    * Which asset to add
    */
-  type: T,
+  type: T;
   /**
    * Asset parameters
    */
-  params: AssetTypeParams<T>,
+  params: AssetTypeParams<T>;
 };
 
 function foldSubscriptions(
   subscriptions: Iterable<ContractUpdatesSubscription>,
   except?: ContractUpdatesSubscription,
-): { total: ContractUpdatesSubscription, withoutExcluded: ContractUpdatesSubscription } {
+): { total: ContractUpdatesSubscription; withoutExcluded: ContractUpdatesSubscription } {
   const total = { state: false, transactions: false };
   const withoutExcluded = Object.assign({}, total);
 

@@ -73,7 +73,7 @@ export type ProviderEvents<Addr = Address> = {
     /**
      * Account address
      */
-    address: Addr,
+    address: Addr;
     /**
      * Message hash
      */
@@ -82,7 +82,7 @@ export type ProviderEvents<Addr = Address> = {
      * If not null, the transaction of the delivered message. Otherwise, the message has expired.
      */
     transaction?: Transaction<Addr>;
-  }
+  };
 
   /**
    * Called each time the user changes network
@@ -113,7 +113,7 @@ export type ProviderEvents<Addr = Address> = {
    * Called when the user logs out of the extension
    */
   loggedOut: Record<string, never>;
-}
+};
 
 /**
  * @category Provider Api
@@ -169,7 +169,7 @@ export type ProviderApi<Addr = Address> = {
        * Subscription changes
        */
       subscriptions: Partial<ContractUpdatesSubscription>;
-    }
+    };
     output: ContractUpdatesSubscription;
   };
 
@@ -285,7 +285,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * List of account addresses
        */
-      accounts: Addr[],
+      accounts: Addr[];
       /**
        * Last address from this batch. Should be used as a `continuation` for further requests
        */
@@ -467,7 +467,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded cell BOC
        */
-      boc: string
+      boc: string;
     };
     output: {
       /**
@@ -488,7 +488,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * ABI version. 2.2 if not specified otherwise
        */
-      abiVersion?: AbiVersion,
+      abiVersion?: AbiVersion;
       /**
        * Cell structure
        */
@@ -517,7 +517,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * ABI version. 2.2 if not specified otherwise
        */
-      abiVersion?: AbiVersion,
+      abiVersion?: AbiVersion;
       /**
        * Cell structure
        */
@@ -607,7 +607,7 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded state init
        */
       tvc: string;
-    }
+    };
   };
 
   /**
@@ -657,7 +657,7 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded contract code with salt
        */
       code: string;
-    }
+    };
   };
 
   /**
@@ -678,8 +678,8 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded salt (as BOC)
        */
       salt: string | undefined;
-    }
-  }
+    };
+  };
 
   /**
    * Creates internal message body
@@ -688,7 +688,7 @@ export type ProviderApi<Addr = Address> = {
    * Required permissions: `basic`
    */
   encodeInternalInput: {
-    input: FunctionCall<Addr>
+    input: FunctionCall<Addr>;
     output: {
       /**
        * Base64 encoded message body BOC
@@ -915,8 +915,8 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Returns true if message was signed with this key
        */
-      isValid: boolean,
-    }
+      isValid: boolean;
+    };
   };
 
   /**
@@ -943,7 +943,7 @@ export type ProviderApi<Addr = Address> = {
        * Whether to only run it locally (false by default)
        * Can be used as alternative `runLocal` method
        */
-      local?: boolean
+      local?: boolean;
     };
     output: {
       /**
@@ -973,19 +973,19 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Which asset to add
        */
-      type: AssetType,
+      type: AssetType;
       /**
        * Asset parameters
        */
-      params: AssetTypeParams<AssetType, Addr>,
+      params: AssetTypeParams<AssetType, Addr>;
     };
     output: {
       /**
        * Returns true if the account did not have this asset before
        */
       newAsset: boolean;
-    }
-  }
+    };
+  };
 
   /**
    * Signs arbitrary data.
@@ -1015,11 +1015,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)
        */
-      signature: string,
+      signature: string;
       /**
        * Hex encoded signature bytes (data is guaranteed to be 64 bytes long)
        */
-      signatureHex: string,
+      signatureHex: string;
       /**
        * Same signature, but split into two uint256 parts
        */
@@ -1032,8 +1032,8 @@ export type ProviderApi<Addr = Address> = {
          * Low 32 bytes of the signature as uint256
          */
         low: string;
-      }
-    }
+      };
+    };
   };
 
   /**
@@ -1058,11 +1058,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Base64 encoded signature bytes (data is guaranteed to be 64 bytes long)
        */
-      signature: string,
+      signature: string;
       /**
        * Hex encoded signature bytes (data is guaranteed to be 64 bytes long)
        */
-      signatureHex: string,
+      signatureHex: string;
       /**
        * Same signature, but split into two uint256 parts
        */
@@ -1075,8 +1075,8 @@ export type ProviderApi<Addr = Address> = {
          * Low 32 bytes of the signature as uint256
          */
         low: string;
-      }
-    }
+      };
+    };
   };
 
   /**
@@ -1099,7 +1099,7 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Encryption algorithm. Nonce will be generated for each recipient
        */
-      algorithm: EncryptionAlgorithm,
+      algorithm: EncryptionAlgorithm;
       /**
        * Base64 encoded data
        */
@@ -1109,9 +1109,9 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Encrypted data for each recipient public key
        */
-      encryptedData: EncryptedData[],
-    }
-  }
+      encryptedData: EncryptedData[];
+    };
+  };
 
   /**
    * Decrypts encrypted data
@@ -1124,15 +1124,15 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Encrypted data. The recipient's public key must match the public key of the current account.
        */
-      encryptedData: EncryptedData,
+      encryptedData: EncryptedData;
     };
     output: {
       /**
        * Base64 encoded decrypted data
        */
       data: string;
-    }
-  }
+    };
+  };
 
   /**
    * Calculates transaction fees
@@ -1159,6 +1159,12 @@ export type ProviderApi<Addr = Address> = {
        * Optional function call
        */
       payload?: FunctionCall<Addr>;
+      /**
+       * Optional base64 encoded TVC
+       *
+       * NOTE: If the selected contract do not support this, an error is returned
+       */
+      stateInit?: string;
     };
     output: {
       /**
@@ -1198,6 +1204,12 @@ export type ProviderApi<Addr = Address> = {
        * Optional function call
        */
       payload?: FunctionCall<Addr>;
+      /**
+       * Optional base64 encoded TVC
+       *
+       * NOTE: If the selected contract do not support this, an error is returned
+       */
+      stateInit?: string;
     };
     output: {
       /**
@@ -1278,7 +1290,7 @@ export type ProviderApi<Addr = Address> = {
        * Whether to only run it locally (false by default)
        * Can be used as alternative `runLocal` method but with user signature
        */
-      local?: boolean
+      local?: boolean;
     };
     output: {
       /**
@@ -1353,8 +1365,11 @@ export type ProviderMethod = keyof ProviderApi;
 /**
  * @category Provider Api
  */
-export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> =
-  ProviderApi<Addr>[T] extends { input: infer I } ? I : undefined;
+export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
+  input: infer I;
+}
+  ? I
+  : undefined;
 
 /**
  * @category Provider Api
@@ -1364,8 +1379,11 @@ export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiR
 /**
  * @category Provider Api
  */
-export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> =
-  ProviderApi<Addr>[T] extends { output: infer O } ? O : undefined;
+export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
+  output: infer O;
+}
+  ? O
+  : undefined;
 
 /**
  * @category Provider Api

@@ -1,9 +1,4 @@
-import {
-  Address,
-  UniqueArray,
-  DelayedTransactions,
-  LT_COLLATOR,
-} from './utils';
+import { Address, UniqueArray, DelayedTransactions, LT_COLLATOR } from './utils';
 import {
   AbiParam,
   FullContractState,
@@ -33,7 +28,7 @@ import { ProviderApiResponse, ProviderRpcClient } from './index';
 export class Contract<Abi> {
   private readonly _provider: ProviderRpcClient;
   private readonly _abi: string;
-  private readonly _functions: { [name: string]: { inputs: AbiParam[], outputs: AbiParam[] } };
+  private readonly _functions: { [name: string]: { inputs: AbiParam[]; outputs: AbiParam[] } };
   private readonly _events: { [name: string]: { inputs: AbiParam[] } };
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
@@ -60,14 +55,16 @@ export class Contract<Abi> {
 
     this._address = address;
 
-    this._methods = new Proxy({}, {
-      get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
-        const rawAbi = this._functions[method];
-        return (params: TokensObject = {}) => new ContractMethodImpl(
-          this._provider, rawAbi, this._abi, this._address, method, params,
-        );
+    this._methods = new Proxy(
+      {},
+      {
+        get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
+          const rawAbi = this._functions[method];
+          return (params: TokensObject = {}) =>
+            new ContractMethodImpl(this._provider, rawAbi, this._abi, this._address, method, params);
+        },
       },
-    }) as unknown as ContractMethods<Abi>;
+    ) as unknown as ContractMethods<Abi>;
   }
 
   public get methods(): ContractMethods<Abi> {
@@ -82,7 +79,6 @@ export class Contract<Abi> {
     return this._abi;
   }
 
-
   /**
    * Requests contract data
    *
@@ -91,9 +87,9 @@ export class Contract<Abi> {
    */
   public async getFullState(): Promise<ProviderApiResponse<'getFullContractState'>> {
     await this._provider.ensureInitialized();
-    return await this._provider.rawApi.getFullContractState({
+    return (await this._provider.rawApi.getFullContractState({
       address: this.address.toString(),
-    }) as ProviderApiResponse<'getFullContractState'>;
+    })) as ProviderApiResponse<'getFullContractState'>;
   }
 
   /**
@@ -102,8 +98,7 @@ export class Contract<Abi> {
    * @param subscriber
    */
   public transactions(subscriber: Subscriber): Stream<unknown, Transaction> {
-    return subscriber.transactions(this._address)
-      .flatMap(({ transactions }) => transactions);
+    return subscriber.transactions(this._address).flatMap(({ transactions }) => transactions);
   }
 
   /**
@@ -112,21 +107,25 @@ export class Contract<Abi> {
    * @param subscriber
    */
   public events(subscriber: Subscriber): Stream<unknown, DecodedEventWithTransaction<Abi, AbiEventName<Abi>>> {
-    return subscriber.transactions(this._address)
+    return subscriber
+      .transactions(this._address)
       .flatMap(({ transactions }) => transactions)
-      .flatMap((tx) => this.decodeTransactionEvents({ transaction: tx }).then((events) => {
-        events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
-        return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
-      }));
+      .flatMap(tx =>
+        this.decodeTransactionEvents({ transaction: tx }).then(events => {
+          events.forEach(event => ((event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx));
+          return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
+        }),
+      );
   }
 
   public async waitForEvent<E extends AbiEventName<Abi> = AbiEventName<Abi>>(
     args: WaitForEventParams<Abi, E> = {},
   ): Promise<DecodedEvent<Abi, E> | undefined> {
     const { range, filter } = args;
-    const filterFn = typeof filter === 'string'
-      ? ({ event }: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>) => event === filter
-      : filter;
+    const filterFn =
+      typeof filter === 'string'
+        ? ({ event }: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>) => event === filter
+        : filter;
 
     let subscriber = args.subscriber;
     const hasTempSubscriber = subscriber == null;
@@ -134,23 +133,25 @@ export class Contract<Abi> {
       subscriber = new this._provider.Subscriber();
     }
 
-    const event = await (
-      (range?.fromLt != null || range?.fromUtime != null)
-        ? subscriber.oldTransactions(this._address, range)
-          .merge(subscriber.transactions(this._address))
-        : subscriber.transactions(this.address)
-    ).flatMap(item => item.transactions)
-      .takeWhile(item => range == null ||
-        (range.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
-        (range.fromUtime == null || item.createdAt > range.fromUtime) &&
-        (range.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
-        (range.toUtime == null || item.createdAt < range.toUtime),
+    const event = await (range?.fromLt != null || range?.fromUtime != null
+      ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
+      : subscriber.transactions(this.address)
+    )
+      .flatMap(item => item.transactions)
+      .takeWhile(
+        item =>
+          range == null ||
+          ((range.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
+            (range.fromUtime == null || item.createdAt > range.fromUtime) &&
+            (range.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
+            (range.toUtime == null || item.createdAt < range.toUtime)),
       )
-      .flatMap(tx => this.decodeTransactionEvents({ transaction: tx })
-        .then((events) => {
-          events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
+      .flatMap(tx =>
+        this.decodeTransactionEvents({ transaction: tx }).then(events => {
+          events.forEach(event => ((event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx));
           return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
-        }))
+        }),
+      )
       .filterMap(async event => {
         if (filterFn == null || (await filterFn(event))) {
           return event;
@@ -169,9 +170,10 @@ export class Contract<Abi> {
     args: GetPastEventParams<Abi, E>,
   ): Promise<EventsBatch<Abi, E>> {
     const { range, filter, limit } = args;
-    const filterFn = typeof filter === 'string'
-      ? ({ event }: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>) => event === filter
-      : filter;
+    const filterFn =
+      typeof filter === 'string'
+        ? ({ event }: DecodedEventWithTransaction<Abi, AbiEventName<Abi>>) => event === filter
+        : filter;
 
     const result: DecodedEventWithTransaction<Abi, E>[] = [];
     let currentContinuation = args?.continuation;
@@ -185,32 +187,33 @@ export class Contract<Abi> {
         break;
       }
 
-      const filteredTransactions = transactions.filter((item) => (
-        (range?.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
-        (range?.fromUtime == null || item.createdAt > range.fromUtime) &&
-        (range?.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
-        (range?.toUtime == null || item.createdAt < range.toUtime)
-      ));
+      const filteredTransactions = transactions.filter(
+        item =>
+          (range?.fromLt == null || LT_COLLATOR.compare(item.id.lt, range.fromLt) > 0) &&
+          (range?.fromUtime == null || item.createdAt > range.fromUtime) &&
+          (range?.toLt == null || LT_COLLATOR.compare(item.id.lt, range.toLt) < 0) &&
+          (range?.toUtime == null || item.createdAt < range.toUtime),
+      );
 
       if (filteredTransactions.length > 0) {
-        const parsedEvents = await Promise.all(filteredTransactions.map(async tx => {
-          return {
-            tx, events: await this.decodeTransactionEvents({ transaction: tx }).then((events) => {
-              events.forEach((event) => (event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx);
-              return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
-            }),
-          };
-        }));
+        const parsedEvents = await Promise.all(
+          filteredTransactions.map(async tx => {
+            return {
+              tx,
+              events: await this.decodeTransactionEvents({ transaction: tx }).then(events => {
+                events.forEach(
+                  event => ((event as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>).transaction = tx),
+                );
+                return events as DecodedEventWithTransaction<Abi, AbiEventName<Abi>>[];
+              }),
+            };
+          }),
+        );
 
         for (let { tx, events } of parsedEvents) {
           if (filterFn != null) {
-            events = await Promise.all(
-              events.map(async event =>
-                (await filterFn(event)) ? event : undefined,
-              ),
-            ).then(events =>
-              events.filter((event): event is Awaited<DecodedEventWithTransaction<Abi, E>> =>
-                event != null),
+            events = await Promise.all(events.map(async event => ((await filterFn(event)) ? event : undefined))).then(
+              events => events.filter((event): event is Awaited<DecodedEventWithTransaction<Abi, E>> => event != null),
             );
           }
 
@@ -238,7 +241,9 @@ export class Contract<Abi> {
     return { events: result, continuation: currentContinuation };
   }
 
-  public async decodeTransaction(args: DecodeTransactionParams<Abi>): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
+  public async decodeTransaction(
+    args: DecodeTransactionParams<Abi>,
+  ): Promise<DecodedTransaction<Abi, AbiFunctionName<Abi>> | undefined> {
     await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeTransaction({
@@ -264,7 +269,9 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeTransactionEvents(args: DecodeTransactionEventsParams): Promise<DecodedEvent<Abi, AbiEventName<Abi>>[]> {
+  public async decodeTransactionEvents(
+    args: DecodeTransactionEventsParams,
+  ): Promise<DecodedEvent<Abi, AbiEventName<Abi>>[]> {
     await this._provider.ensureInitialized();
     try {
       const { events } = await this._provider.rawApi.decodeTransactionEvents({
@@ -289,7 +296,9 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeInputMessage(args: DecodeInputParams<Abi>): Promise<DecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
+  public async decodeInputMessage(
+    args: DecodeInputParams<Abi>,
+  ): Promise<DecodedInput<Abi, AbiFunctionName<Abi>> | undefined> {
     await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeInput({
@@ -315,7 +324,9 @@ export class Contract<Abi> {
     }
   }
 
-  public async decodeOutputMessage(args: DecodeOutputParams<Abi>): Promise<DecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
+  public async decodeOutputMessage(
+    args: DecodeOutputParams<Abi>,
+  ): Promise<DecodedOutput<Abi, AbiFunctionName<Abi>> | undefined> {
     await this._provider.ensureInitialized();
     try {
       const result = await this._provider.rawApi.decodeOutput({
@@ -397,8 +408,10 @@ export type DelayedMessageExecution = {
  * @category Contract
  */
 export type ContractMethods<C> = {
-  [K in AbiFunctionName<C>]: (params: AbiFunctionInputsWithDefault<C, K>) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
-}
+  [K in AbiFunctionName<C>]: (
+    params: AbiFunctionInputsWithDefault<C, K>,
+  ) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
+};
 
 /**
  * @category Contract
@@ -431,7 +444,9 @@ export interface ContractMethod<I, O> {
    *
    * @param args
    */
-  sendWithResult(args: SendInternalParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: O }>;
+  sendWithResult(
+    args: SendInternalParams,
+  ): Promise<{ parentTransaction: Transaction; childTransaction: Transaction; output?: O }>;
 
   /**
    * Estimates wallet fee for calling this method as an internal message
@@ -445,7 +460,7 @@ export interface ContractMethod<I, O> {
    *
    * @param args
    */
-  sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: O }>;
+  sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction; output?: O }>;
 
   /**
    * Sends external message without waiting for the transaction
@@ -470,12 +485,14 @@ export interface ContractMethod<I, O> {
 class ContractMethodImpl implements ContractMethod<any, any> {
   readonly params: RawTokensObject;
 
-  constructor(readonly provider: ProviderRpcClient,
-              readonly functionAbi: { inputs: AbiParam[], outputs: AbiParam[] },
-              readonly abi: string,
-              readonly address: Address,
-              readonly method: string,
-              params: TokensObject) {
+  constructor(
+    readonly provider: ProviderRpcClient,
+    readonly functionAbi: { inputs: AbiParam[]; outputs: AbiParam[] },
+    readonly abi: string,
+    readonly address: Address,
+    readonly method: string,
+    params: TokensObject,
+  ) {
     this.params = serializeTokensObject(params);
   }
 
@@ -491,6 +508,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         method: this.method,
         params: this.params,
       },
+      stateInit: args.stateInit,
     });
     return parseTransaction(transaction);
   }
@@ -498,30 +516,32 @@ class ContractMethodImpl implements ContractMethod<any, any> {
   async sendDelayed(args: SendInternalParams): Promise<DelayedMessageExecution> {
     await this.provider.ensureInitialized();
 
-    const transactions = new DelayedTransactions;
+    const transactions = new DelayedTransactions();
 
     const subscription = await this.provider.subscribe('messageStatusUpdated');
-    subscription.on('data', (data) => {
+    subscription.on('data', data => {
       if (!data.address.equals(args.from)) {
         return;
       }
       transactions.fillTransaction(data.hash, data.transaction);
     });
 
-    const { message } = await this.provider.rawApi.sendMessageDelayed({
-      sender: args.from.toString(),
-      recipient: this.address.toString(),
-      amount: args.amount,
-      bounce: args.bounce == null ? true : args.bounce,
-      payload: {
-        abi: this.abi,
-        method: this.method,
-        params: this.params,
-      },
-    }).catch(e => {
-      subscription.unsubscribe().catch(console.error);
-      throw e;
-    });
+    const { message } = await this.provider.rawApi
+      .sendMessageDelayed({
+        sender: args.from.toString(),
+        recipient: this.address.toString(),
+        amount: args.amount,
+        bounce: args.bounce == null ? true : args.bounce,
+        payload: {
+          abi: this.abi,
+          method: this.method,
+          params: this.params,
+        },
+      })
+      .catch(e => {
+        subscription.unsubscribe().catch(console.error);
+        throw e;
+      });
 
     const transaction = transactions
       .waitTransaction(this.address, message.hash)
@@ -534,7 +554,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
     };
   }
 
-  async sendWithResult(args: SendInternalWithResultParams): Promise<{ parentTransaction: Transaction, childTransaction: Transaction, output?: any }> {
+  async sendWithResult(
+    args: SendInternalWithResultParams,
+  ): Promise<{ parentTransaction: Transaction; childTransaction: Transaction; output?: any }> {
     await this.provider.ensureInitialized();
     let subscriber = args.subscriber;
     const hasTempSubscriber = subscriber == null;
@@ -544,27 +566,28 @@ class ContractMethodImpl implements ContractMethod<any, any> {
 
     try {
       // Parent transaction from wallet
-      let parentTransaction: { transaction: Transaction, possibleMessages: Message[] } | undefined = undefined;
+      let parentTransaction: { transaction: Transaction; possibleMessages: Message[] } | undefined = undefined;
 
       // Child transaction promise
       let resolveChildTransactionPromise: ((transaction: Transaction) => void) | undefined;
-      const childTransactionPromise = new Promise<Transaction>((resolve) => {
-        resolveChildTransactionPromise = (tx) => resolve(tx);
+      const childTransactionPromise = new Promise<Transaction>(resolve => {
+        resolveChildTransactionPromise = tx => resolve(tx);
       });
 
       // Array for collecting transactions on target before parent transaction promise resolution
       const possibleChildren: Transaction[] = [];
 
       // Subscribe to this account
-      subscriber.transactions(this.address)
+      subscriber
+        .transactions(this.address)
         .flatMap(batch => batch.transactions)
         // Listen only messages from sender
         .filter(item => item.inMessage.src?.equals(args.from) || false)
-        .on((tx) => {
+        .on(tx => {
           if (parentTransaction == null) {
             // If we don't known whether the message was sent just collect all transactions from the sender
             possibleChildren.push(tx);
-          } else if (parentTransaction.possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0) {
+          } else if (parentTransaction.possibleMessages.findIndex(msg => msg.hash == tx.inMessage.hash) >= 0) {
             // Resolve promise if transaction was found
             resolveChildTransactionPromise?.(tx);
           }
@@ -582,8 +605,8 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       };
 
       // Check whether child transaction was already found
-      const alreadyReceived = possibleChildren.find((tx) => {
-        return possibleMessages.findIndex((msg) => msg.hash == tx.inMessage.hash) >= 0;
+      const alreadyReceived = possibleChildren.find(tx => {
+        return possibleMessages.findIndex(msg => msg.hash == tx.inMessage.hash) >= 0;
       });
       if (alreadyReceived != null) {
         resolveChildTransactionPromise?.(alreadyReceived);
@@ -600,9 +623,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
           method: this.method,
         });
         if (result != null) {
-          output = this.functionAbi.outputs != null
-            ? parseTokensObject(this.functionAbi.outputs, result.output)
-            : {};
+          output = this.functionAbi.outputs != null ? parseTokensObject(this.functionAbi.outputs, result.output) : {};
         }
       } catch (e) {
         console.error(e);
@@ -630,15 +651,17 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         method: this.method,
         params: this.params,
       },
+      stateInit: args.stateInit,
     });
     return fees;
   }
 
-  async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction, output?: any }> {
+  async sendExternal(args: SendExternalParams): Promise<{ transaction: Transaction; output?: any }> {
     await this.provider.ensureInitialized();
-    const method = args.withoutSignature === true
-      ? this.provider.rawApi.sendUnsignedExternalMessage
-      : this.provider.rawApi.sendExternalMessage;
+    const method =
+      args.withoutSignature === true
+        ? this.provider.rawApi.sendUnsignedExternalMessage
+        : this.provider.rawApi.sendExternalMessage;
 
     const { transaction, output } = await method({
       publicKey: args.publicKey,
@@ -661,29 +684,31 @@ class ContractMethodImpl implements ContractMethod<any, any> {
   async sendExternalDelayed(args: SendExternalDelayedParams): Promise<DelayedMessageExecution> {
     await this.provider.ensureInitialized();
 
-    const transactions = new DelayedTransactions;
+    const transactions = new DelayedTransactions();
 
     const subscription = await this.provider.subscribe('messageStatusUpdated');
-    subscription.on('data', (data) => {
+    subscription.on('data', data => {
       if (!data.address.equals(this.address)) {
         return;
       }
       transactions.fillTransaction(data.hash, data.transaction);
     });
 
-    const { message } = await this.provider.rawApi.sendExternalMessageDelayed({
-      publicKey: args.publicKey,
-      recipient: this.address.toString(),
-      stateInit: args.stateInit,
-      payload: {
-        abi: this.abi,
-        method: this.method,
-        params: this.params,
-      },
-    }).catch(e => {
-      subscription.unsubscribe().catch(console.error);
-      throw e;
-    });
+    const { message } = await this.provider.rawApi
+      .sendExternalMessageDelayed({
+        publicKey: args.publicKey,
+        recipient: this.address.toString(),
+        stateInit: args.stateInit,
+        payload: {
+          abi: this.abi,
+          method: this.method,
+          params: this.params,
+        },
+      })
+      .catch(e => {
+        subscription.unsubscribe().catch(console.error);
+        throw e;
+      });
 
     const transaction = transactions
       .waitTransaction(this.address, message.hash)
@@ -730,18 +755,32 @@ class ContractMethodImpl implements ContractMethod<any, any> {
 /**
  * @category Contract
  */
-export type ContractFunction = { name: string, inputs?: AbiParam[], outputs?: AbiParam[] };
+export type ContractFunction = { name: string; inputs?: AbiParam[]; outputs?: AbiParam[] };
 
 /**
  * @category Contract
  */
 export type SendInternalParams = {
+  /**
+   * Preferred wallet address.
+   * It is the same address as the `accountInteraction.address`, but it must be explicitly provided
+   */
   from: Address;
+  /**
+   * Amount of nano EVER to send
+   */
   amount: string;
   /**
    * @default true
    */
   bounce?: boolean;
+  /**
+   * Optional base64 encoded TVC
+   *
+   * NOTE: If the selected contract do not support stateInit in the internal message,
+   * an error is returned
+   */
+  stateInit?: string;
 };
 
 /**
@@ -758,7 +797,14 @@ export type SendInternalWithResultParams = SendInternalParams & {
  * @category Contract
  */
 export type SendExternalParams = {
+  /**
+   * The public key of the preferred account.
+   * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+   */
   publicKey: string;
+  /**
+   * Optional base64 encoded TVC
+   */
   stateInit?: string;
   /**
    * Whether to run this message locally. Default: false
@@ -774,7 +820,14 @@ export type SendExternalParams = {
  * @category Contract
  */
 export type SendExternalDelayedParams = {
+  /**
+   * The public key of the preferred account.
+   * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+   */
   publicKey: string;
+  /**
+   * Optional base64 encoded TVC
+   */
   stateInit?: string;
 };
 
@@ -798,50 +851,52 @@ export type CallParams = {
  * @category Contract
  */
 export type GetPastEventParams<Abi, E extends AbiEventName<Abi>> = {
-  filter?: E | EventsFilter<Abi, AbiEventName<Abi>>,
-  range?: EventsRange,
-  limit?: number,
-  continuation?: TransactionId
-}
+  filter?: E | EventsFilter<Abi, AbiEventName<Abi>>;
+  range?: EventsRange;
+  limit?: number;
+  continuation?: TransactionId;
+};
 
 /**
  * @category Contract
  */
 export type WaitForEventParams<Abi, E extends AbiEventName<Abi>> = {
-  filter?: E | EventsFilter<Abi, E>,
-  range?: EventsRange,
-  subscriber?: Subscriber,
+  filter?: E | EventsFilter<Abi, E>;
+  range?: EventsRange;
+  subscriber?: Subscriber;
 };
 
 /**
  * @category Contract
  */
 export type EventsBatch<Abi, E extends AbiEventName<Abi>> = {
-  events: DecodedEventWithTransaction<Abi, E>[],
-  continuation?: TransactionId
-}
+  events: DecodedEventWithTransaction<Abi, E>[];
+  continuation?: TransactionId;
+};
 
 /**
  * @category Contract
  */
-export type EventsFilter<Abi, E extends AbiEventName<Abi> =
-  AbiEventName<Abi>> = (event: DecodedEventWithTransaction<Abi, E>) => (Promise<boolean> | boolean);
+export type EventsFilter<Abi, E extends AbiEventName<Abi> = AbiEventName<Abi>> = (
+  event: DecodedEventWithTransaction<Abi, E>,
+) => Promise<boolean> | boolean;
 
 /**
  * @category Contract
  */
-export type DecodedEventWithTransaction<Abi, E extends AbiEventName<Abi>> =
-  DecodedEvent<Abi, E> & { transaction: Transaction };
+export type DecodedEventWithTransaction<Abi, E extends AbiEventName<Abi>> = DecodedEvent<Abi, E> & {
+  transaction: Transaction;
+};
 
 /**
  * @category Contract
  */
 export type EventsRange = {
-  fromLt?: string,
-  fromUtime?: number,
-  toLt?: string,
-  toUtime?: number
-}
+  fromLt?: string;
+  fromUtime?: number;
+  toLt?: string;
+  toUtime?: number;
+};
 
 /**
  * @category Contract
@@ -854,8 +909,9 @@ export type DecodeTransactionParams<Abi> = {
 /**
  * @category Contract
  */
-export type DecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi> ?
-  { method: T, input: DecodedAbiFunctionInputs<Abi, T>, output: DecodedAbiFunctionOutputs<Abi, T> } : never;
+export type DecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi>
+  ? { method: T; input: DecodedAbiFunctionInputs<Abi, T>; output: DecodedAbiFunctionOutputs<Abi, T> }
+  : never;
 
 /**
  * @category Contract
@@ -869,7 +925,9 @@ export type DecodeInputParams<Abi> = {
 /**
  * @category Contract
  */
-export type DecodedInput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, input: DecodedAbiFunctionInputs<Abi, T> } : never;
+export type DecodedInput<Abi, T> = T extends AbiFunctionName<Abi>
+  ? { method: T; input: DecodedAbiFunctionInputs<Abi, T> }
+  : never;
 
 /**
  * @category Contract
@@ -891,12 +949,14 @@ export type DecodeEventParams<Abi> = {
    */
   body: string;
   events: UniqueArray<AbiEventName<Abi>[]>;
-}
+};
 
 /**
  * @category Contract
  */
-export type DecodedOutput<Abi, T> = T extends AbiFunctionName<Abi> ? { method: T, output: DecodedAbiFunctionOutputs<Abi, T> } : never;
+export type DecodedOutput<Abi, T> = T extends AbiFunctionName<Abi>
+  ? { method: T; output: DecodedAbiFunctionOutputs<Abi, T> }
+  : never;
 
 /**
  * @category Contract
@@ -908,4 +968,6 @@ export type DecodeTransactionEventsParams = {
 /**
  * @category Contract
  */
-export type DecodedEvent<Abi, T> = T extends AbiEventName<Abi> ? { event: T, data: DecodedAbiEventData<Abi, T> } : never;
+export type DecodedEvent<Abi, T> = T extends AbiEventName<Abi>
+  ? { event: T; data: DecodedAbiEventData<Abi, T> }
+  : never;
