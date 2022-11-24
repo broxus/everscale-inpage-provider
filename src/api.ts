@@ -1251,6 +1251,12 @@ export type ProviderApi<Addr = Address> = {
        * Optional function call
        */
       payload?: FunctionCall<Addr>;
+      /**
+       * Optional base64 encoded TVC
+       *
+       * NOTE: If the selected contract do not support this, an error is returned
+       */
+      stateInit?: string;
     };
     output: {
       /**

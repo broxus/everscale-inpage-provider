@@ -924,6 +924,7 @@ export class ProviderRpcClient {
             params: serializeTokensObject(args.payload.params),
           }
         : undefined,
+      stateInit: args.stateInit,
     });
     return {
       transaction: parseTransaction(transaction),
@@ -967,6 +968,7 @@ export class ProviderRpcClient {
               params: serializeTokensObject(args.payload.params),
             }
           : undefined,
+        stateInit: args.stateInit,
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);

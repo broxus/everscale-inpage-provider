@@ -537,6 +537,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
           method: this.method,
           params: this.params,
         },
+        stateInit: args.stateInit,
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);
