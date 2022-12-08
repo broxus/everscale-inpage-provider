@@ -99,8 +99,26 @@ export type RawTransaction = Transaction<string>;
  * @category Models
  */
 export function serializeTransaction(transaction: Transaction): RawTransaction {
+  // NOTE: deep copy to prevent sending objects with prototypes through the channel
   return {
-    ...transaction,
+    id: {
+      hash: transaction.id.hash,
+      lt: transaction.id.lt,
+    },
+    prevTransactionId:
+      transaction.prevTransactionId != null
+        ? {
+            hash: transaction.prevTransactionId.hash,
+            lt: transaction.prevTransactionId.lt,
+          }
+        : undefined,
+    createdAt: transaction.createdAt,
+    aborted: transaction.aborted,
+    exitCode: transaction.exitCode,
+    resultCode: transaction.resultCode,
+    origStatus: transaction.origStatus,
+    endStatus: transaction.endStatus,
+    totalFees: transaction.totalFees,
     inMessage: serializeMessage(transaction.inMessage),
     outMessages: transaction.outMessages.map(serializeMessage),
   };
@@ -140,10 +158,16 @@ export type RawMessage = Message<string>;
  * @category Models
  */
 export function serializeMessage(message: Message): RawMessage {
+  // NOTE: deep copy to prevent sending objects with prototypes through the channel
   return {
-    ...message,
+    hash: message.hash,
     src: message.src ? message.src.toString() : undefined,
     dst: message.dst ? message.dst.toString() : undefined,
+    value: message.value,
+    bounce: message.bounce,
+    bounced: message.bounced,
+    body: message.body,
+    bodyHash: message.bodyHash,
   };
 }
 
@@ -169,12 +193,12 @@ export type DelayedMessage<Addr = Address> = {
   /**
    * Destination account address (`sender` for `sendMessageDelayed`, `recipient` for `sendExternalMessageDelayed`)
    */
-  account: Addr,
+  account: Addr;
   /**
    * Message expiration timestamp
    */
   expireAt: number;
-}
+};
 
 /**
  * @category Models
@@ -209,7 +233,7 @@ export type Permissions<Addr = Address> = {
     address: Addr;
     publicKey: string;
     contractType: WalletContractType;
-  }
+  };
 };
 
 /**
@@ -223,14 +247,18 @@ export type RawPermissions = Permissions<string>;
 export function parsePermissions(permissions: Partial<RawPermissions>): Partial<Permissions> {
   return {
     ...permissions,
-    accountInteraction: permissions.accountInteraction ? parseAccountInteraction(permissions.accountInteraction) : undefined,
+    accountInteraction: permissions.accountInteraction
+      ? parseAccountInteraction(permissions.accountInteraction)
+      : undefined,
   };
 }
 
 /**
  * @category Models
  */
-export function parseAccountInteraction(accountInteraction: Required<RawPermissions>['accountInteraction']): Required<Permissions>['accountInteraction'] {
+export function parseAccountInteraction(
+  accountInteraction: Required<RawPermissions>['accountInteraction'],
+): Required<Permissions>['accountInteraction'] {
   return {
     ...accountInteraction,
     address: new Address(accountInteraction.address),
@@ -252,22 +280,21 @@ export type PermissionData<T extends Permission, Addr = Address> = Permissions<A
 /**
  * @category Models
  */
-export type AssetType =
-  | 'tip3_token';
+export type AssetType = 'tip3_token';
 
 /**
  * @category Models
  */
-export type AssetTypeParams<T extends AssetType, Addr = Address> =
-  T extends 'tip3_token' ? {
-    rootContract: Addr,
-  } : never;
+export type AssetTypeParams<T extends AssetType, Addr = Address> = T extends 'tip3_token'
+  ? {
+      rootContract: Addr;
+    }
+  : never;
 
 /**
  * @category Models
  */
-export type EncryptionAlgorithm =
-  | 'ChaCha20Poly1305'
+export type EncryptionAlgorithm = 'ChaCha20Poly1305';
 
 /**
  * @category Models
@@ -290,7 +317,7 @@ export type EncryptedData = {
    * Base64 encoded nonce
    */
   nonce: string;
-}
+};
 
 /* ABI stuff */
 
@@ -343,7 +370,7 @@ export type FunctionCall<Addr = Address> = {
    * Method arguments
    */
   params: TokensObject<Addr>;
-}
+};
 
 type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
 type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
@@ -365,7 +392,7 @@ type AbiParamKindArray = `${AbiParamKind}[]`;
 type AbiParamKindMapKey = AbiParamKindInt | AbiParamKindUint | AbiParamKindAddress;
 type AbiParamKindMap = `map(${AbiParamKindMapKey},${AbiParamKind | `${AbiParamKind}[]`})`;
 
-type AbiParamOptional = `optional(${AbiParamKind})`
+type AbiParamOptional = `optional(${AbiParamKind})`;
 type AbiParamRef = `ref(${AbiParamKind})`;
 type AbiParamOptionalRef = `optional(ref(${AbiParamKind}))`;
 type AbiParamRefOptional = `ref(optional(${AbiParamKind}))`;
@@ -398,7 +425,14 @@ export type AbiParamKind =
  */
 export type AbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef | AbiParamOptionalRef | AbiParamRefOptional;
+  type:
+    | AbiParamKind
+    | AbiParamKindMap
+    | AbiParamKindArray
+    | AbiParamOptional
+    | AbiParamRef
+    | AbiParamOptionalRef
+    | AbiParamRefOptional;
   components?: AbiParam[];
 };
 
@@ -407,9 +441,16 @@ export type AbiParam = {
  */
 export type ReadonlyAbiParam = {
   name: string;
-  type: AbiParamKind | AbiParamKindMap | AbiParamKindArray | AbiParamOptional | AbiParamRef | AbiParamOptionalRef | AbiParamRefOptional;
+  type:
+    | AbiParamKind
+    | AbiParamKindMap
+    | AbiParamKindArray
+    | AbiParamOptional
+    | AbiParamRef
+    | AbiParamOptionalRef
+    | AbiParamRefOptional;
   components?: readonly ReadonlyAbiParam[];
-}
+};
 
 /**
  * @category Models
@@ -457,11 +498,7 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
     const isOptional = !isArray && param.type.startsWith('optional');
 
     const rawType = (
-      isArray ?
-        param.type.slice(0, -2) :
-        isOptional ?
-          param.type.slice(9, -1) :
-          param.type
+      isArray ? param.type.slice(0, -2) : isOptional ? param.type.slice(9, -1) : param.type
     ) as AbiParamKind;
 
     if (isArray) {
@@ -503,19 +540,29 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
 
     const result: TokenValueMap<Address> = [];
     for (const [key, value] of token as unknown as TokenValueMap<string>) {
-      result.push([parseTokenValue({
-        name: '',
-        type: keyType as AbiParamKind,
-      }, key), parseTokenValue({
-        name: '',
-        type: valueType as AbiParamKind,
-        components: param.components,
-      }, value)]);
+      result.push([
+        parseTokenValue(
+          {
+            name: '',
+            type: keyType as AbiParamKind,
+          },
+          key,
+        ),
+        parseTokenValue(
+          {
+            name: '',
+            type: valueType as AbiParamKind,
+            components: param.components,
+          },
+          value,
+        ),
+      ]);
     }
     return result;
   }
 }
 
+// prettier-ignore
 type InputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindVarUint | AbiParamKindVarInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindExpire ? string | number
     : T extends AbiParamKindBool ? boolean
@@ -528,6 +575,7 @@ type InputTokenValue<T, C> =
                   : T extends `ref(${infer V})` ? InputTokenValue<V, C>
                     : never;
 
+// prettier-ignore
 type OutputTokenValue<T, C> =
   T extends AbiParamKindUint | AbiParamKindInt | AbiParamKindVarUint | AbiParamKindVarInt | AbiParamKindGram | AbiParamKindTime | AbiParamKindCell | AbiParamKindBytes | AbiParamKindFixedBytes | AbiParamKindString | AbiParamKindPublicKey ? string
     : T extends AbiParamKindExpire ? number
@@ -543,33 +591,49 @@ type OutputTokenValue<T, C> =
 /**
  * @category Models
  */
-export type InputTokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ?
-  K extends string ? { [P in K]: InputTokenValue<T, C> } : never : never;
+export type InputTokenObject<O> = O extends { name: infer K; type: infer T; components?: infer C }
+  ? K extends string
+    ? { [P in K]: InputTokenValue<T, C> }
+    : never
+  : never;
 
 /**
  * @category Models
  */
-export type OutputTokenObject<O> = O extends { name: infer K, type: infer T, components?: infer C } ?
-  K extends string ? { [P in K]: OutputTokenValue<T, C> } : never : never;
+export type OutputTokenObject<O> = O extends { name: infer K; type: infer T; components?: infer C }
+  ? K extends string
+    ? { [P in K]: OutputTokenValue<T, C> }
+    : never
+  : never;
 
 /**
  * @category Models
  */
-export type MergeInputObjectsArray<A> =
-  A extends readonly [infer T, ...infer Ts]
-    ? (InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? InputTokenObject<T> : A extends readonly [] ? {} : never;
+export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
+  ? InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>
+  : A extends readonly [infer T]
+  ? InputTokenObject<T>
+  : A extends readonly []
+  ? {}
+  : never;
 
 /**
  * @category Models
  */
-export type MergeOutputObjectsArray<A> =
-  A extends readonly [infer T, ...infer Ts]
-    ? (OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>)
-    : A extends readonly [infer T] ? OutputTokenObject<T> : A extends readonly [] ? {} : never;
+export type MergeOutputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
+  ? OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>
+  : A extends readonly [infer T]
+  ? OutputTokenObject<T>
+  : A extends readonly []
+  ? {}
+  : never;
 
-type AbiFunction<C> = C extends { functions: infer F } ? F extends readonly unknown[] ? ArrayItemType<F> : never : never;
-type AbiEvent<C> = C extends { events: infer E } ? E extends readonly unknown[] ? ArrayItemType<E> : never : never;
+type AbiFunction<C> = C extends { functions: infer F }
+  ? F extends readonly unknown[]
+    ? ArrayItemType<F>
+    : never
+  : never;
+type AbiEvent<C> = C extends { events: infer E } ? (E extends readonly unknown[] ? ArrayItemType<E> : never) : never;
 
 /**
  * @category Models
@@ -591,19 +655,25 @@ export type AbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeInputObjec
 /**
  * @category Models
  */
-export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> =
-  PickFunction<C, T>['inputs'] extends readonly []
-    ? void | Record<string, never>
-    : AbiFunctionInputs<C, T>;
+export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> = PickFunction<
+  C,
+  T
+>['inputs'] extends readonly []
+  ? void | Record<string, never>
+  : AbiFunctionInputs<C, T>;
 
 /**
  * @category Models
  */
-export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<PickFunction<C, T>['inputs']>;
+export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<
+  PickFunction<C, T>['inputs']
+>;
 /**
  * @category Models
  */
-export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<PickFunction<C, T>['outputs']>;
+export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<
+  PickFunction<C, T>['outputs']
+>;
 /**
  * @category Models
  */
