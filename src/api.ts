@@ -944,6 +944,19 @@ export type ProviderApi<Addr = Address> = {
        * Can be used as alternative `runLocal` method
        */
       local?: boolean;
+      /**
+       * Optional executor parameters used during local contract execution
+       */
+      executorParams?: {
+        /**
+         * If `true`, signature verification always succeds
+         */
+        disableSignatureCheck?: boolean;
+        /**
+         * Explicit account balance in nano EVER
+         */
+        overrideBalance?: string | number;
+      };
     };
     output: {
       /**
@@ -1297,6 +1310,19 @@ export type ProviderApi<Addr = Address> = {
        * Can be used as alternative `runLocal` method but with user signature
        */
       local?: boolean;
+      /**
+       * Optional executor parameters used during local contract execution
+       */
+      executorParams?: {
+        /**
+         * If `true`, signature verification always succeds
+         */
+        disableSignatureCheck?: boolean;
+        /**
+         * Explicit account balance in nano EVER
+         */
+        overrideBalance?: string | number;
+      };
     };
     output: {
       /**

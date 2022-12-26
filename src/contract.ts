@@ -674,6 +674,12 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         params: this.params,
       },
       local: args.local,
+      executorParams: args.executorParams
+        ? {
+            disableSignatureCheck: args.executorParams.disableSignatureCheck,
+            overrideBalance: args.executorParams.overrideBalance,
+          }
+        : undefined,
     });
 
     return {
@@ -811,6 +817,19 @@ export type SendExternalParams = {
    * Whether to run this message locally. Default: false
    */
   local?: boolean;
+  /**
+   * Optional executor parameters used during local contract execution
+   */
+  executorParams?: {
+    /**
+     * If `true`, signature verification always succeds
+     */
+    disableSignatureCheck?: boolean;
+    /**
+     * Explicit account balance in nano EVER
+     */
+    overrideBalance?: string | number;
+  };
   /**
    * Whether to prepare this message without signature. Default: false
    */
