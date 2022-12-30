@@ -839,7 +839,7 @@ class UnorderedTransactionsScanner implements Scanner {
           } as TransactionsBatchInfo;
 
           this.queue.enqueue(async () => {
-            const isRunning = this.params.onData({
+            const isRunning = await this.params.onData({
               address: this.params.address,
               transactions: filteredTransactions,
               info,
@@ -994,7 +994,7 @@ class TraceTransactionsScanner implements Scanner {
             }
 
             this.queue.enqueue(async () => {
-              const isRunning = this.params.onData(childTransaction);
+              const isRunning = await this.params.onData(childTransaction);
               if (!isRunning) {
                 state.complete = true;
                 this.isRunning = false;
