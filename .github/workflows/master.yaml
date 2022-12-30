@@ -29,3 +29,29 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+
+  vanilla:
+    name: Build minified dist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build:vanilla
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: vanilla-dist
+          path: |
+            vanilla
+            !vanilla/**/*.d.ts

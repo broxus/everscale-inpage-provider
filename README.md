@@ -31,10 +31,10 @@ npm install --save everscale-inpage-provider
 ### Example
 
 ```typescript
-import { 
-  Address, 
-  ProviderRpcClient, 
-  TvmException 
+import {
+  Address,
+  ProviderRpcClient,
+  TvmException
 } from 'everscale-inpage-provider';
 
 const ever = new ProviderRpcClient();
@@ -104,22 +104,22 @@ const DePoolAbi = {
       { 'name': 'stakes', 'type': 'map(uint64,uint64)' },
       {
         'components': [
-          { 'name': 'remainingAmount', 'type': 'uint64' }, 
-          { 'name': 'lastWithdrawalTime', 'type': 'uint64' }, 
-          { 'name': 'withdrawalPeriod', 'type': 'uint32' }, 
-          { 'name': 'withdrawalValue', 'type': 'uint64' }, 
+          { 'name': 'remainingAmount', 'type': 'uint64' },
+          { 'name': 'lastWithdrawalTime', 'type': 'uint64' },
+          { 'name': 'withdrawalPeriod', 'type': 'uint32' },
+          { 'name': 'withdrawalValue', 'type': 'uint64' },
           { 'name': 'owner', 'type': 'address',
-        }], 
+        }],
         'name': 'vestings', 'type': 'map(uint64,tuple)',
       },
       {
         'components': [
-          { 'name': 'remainingAmount', 'type': 'uint64' }, 
-          { 'name': 'lastWithdrawalTime', 'type': 'uint64' }, 
-          { 'name': 'withdrawalPeriod', 'type': 'uint32' }, 
-          { 'name': 'withdrawalValue', 'type': 'uint64' }, 
+          { 'name': 'remainingAmount', 'type': 'uint64' },
+          { 'name': 'lastWithdrawalTime', 'type': 'uint64' },
+          { 'name': 'withdrawalPeriod', 'type': 'uint32' },
+          { 'name': 'withdrawalValue', 'type': 'uint64' },
           { 'name': 'owner', 'type': 'address',
-        }], 
+        }],
         'name': 'locks', 'type': 'map(uint64,tuple)',
       },
       { 'name': 'vestingDonor', 'type': 'address' },
@@ -137,5 +137,12 @@ myApp().catch(console.error);
 
 ```shell
 npm install
+
+# Build as ts library
+# (output will be in the `dist` folder)
 npm run build
+
+# Build as js library to use directly in <script> tags
+# (output will be in the `vanilla` folder)
+npm run build:vanilla
 ```
