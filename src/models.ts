@@ -31,18 +31,6 @@ export type GenTimings = {
 /**
  * @category Models
  */
-export type WalletContractType =
-  | 'SafeMultisigWallet'
-  | 'SafeMultisigWallet24h'
-  | 'SetcodeMultisigWallet'
-  | 'SetcodeMultisigWallet24h'
-  | 'BridgeMultisigWallet'
-  | 'SurfWallet'
-  | 'WalletV3';
-
-/**
- * @category Models
- */
 export type ContractUpdatesSubscription = {
   /**
    * Whether to listen contract state updates
@@ -232,7 +220,7 @@ export type Permissions<Addr = Address> = {
   accountInteraction: {
     address: Addr;
     publicKey: string;
-    contractType: WalletContractType;
+    contractType: string;
   };
 };
 
