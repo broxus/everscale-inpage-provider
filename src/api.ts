@@ -910,6 +910,13 @@ export type ProviderApi<Addr = Address> = {
        * Base64 or hex encoded signature bytes (data must be 64 bytes long)
        */
       signature: string;
+      /**
+       * Whether to use the signature id during verification (true by default).
+       * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+       * - If `false`, forces signature check to ignore any signature id.
+       * - If `number`, uses the specified number as a signature id.
+      */
+      withSignatureId?: boolean | number;
     };
     output: {
       /**
@@ -1019,6 +1026,13 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded arbitrary bytes
        */
       data: string;
+      /**
+       * Whether to use the signature id for signing (true by default).
+       * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+       * - If `false`, forces signature check to ignore any signature id.
+       * - If `number`, uses the specified number as a signature id.
+      */
+      withSignatureId?: boolean | number;
     };
     output: {
       /**
@@ -1066,6 +1080,13 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded arbitrary bytes
        */
       data: string;
+      /**
+       * Whether to use the signature id for signing (true by default).
+       * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+       * - If `false`, forces signature check to ignore any signature id.
+       * - If `number`, uses the specified number as a signature id.
+      */
+      withSignatureId?: boolean | number;
     };
     output: {
       /**
