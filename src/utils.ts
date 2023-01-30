@@ -46,12 +46,24 @@ export class Address {
   public equals = (other: Address | string): boolean => this._equals(other);
 
   private _equals(other: Address | string): boolean {
-    if (other instanceof Address) {
-      return this._address === other._address;
-    } else {
+    if (typeof other === 'string') {
       return this._address === other;
+    } else {
+      return this._address === other?._address;
     }
   }
+}
+
+/**
+ * Check whether the provider object is instance of `Address`,
+ * handling the case of duplicated dependencies.
+ */
+export function isAddressObject(address: object | null): boolean {
+  return (
+    address != null &&
+    (address instanceof Address ||
+      Object.getPrototypeOf(address).constructor.name === Address.prototype.constructor.name)
+  );
 }
 
 /**

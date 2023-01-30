@@ -40,6 +40,7 @@ export {
   UniqueArray,
   MessageExpiredException,
   mergeTransactions,
+  isAddressObject,
   LT_COLLATOR,
 } from './utils';
 

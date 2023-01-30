@@ -1,4 +1,4 @@
-import { Address, ArrayItemType } from './utils';
+import { Address, ArrayItemType, isAddressObject } from './utils';
 
 /* Account stuff */
 
@@ -448,8 +448,8 @@ export function serializeTokensObject(object: TokensObject): RawTokensObject {
 }
 
 function serializeTokenValue(token: TokenValue): RawTokenValue {
-  if (token instanceof Address) {
-    return token.toString();
+  if (typeof token === 'object' && isAddressObject(token)) {
+    return token!.toString();
   }
 
   if (Array.isArray(token)) {
