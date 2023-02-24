@@ -377,7 +377,7 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
-   * Executes external message locally
+   * Executes only a compute phase locally
    *
    * ---
    * Required permissions: `basic`
@@ -412,6 +412,100 @@ export type ProviderApi<Addr = Address> = {
        * TVM execution code
        */
       code: number;
+    };
+  };
+
+  /**
+   * Executes all transaction phases locally, producing a new state
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  executeLocal: {
+    input: {
+      /**
+       * Contract address
+       */
+      address: Addr;
+      /**
+       * Cached contract state
+       */
+      cachedState?: FullContractState;
+      /**
+       * Optional base64 encoded `.tvc` file
+       */
+      stateInit?: string;
+      /**
+       * Function call
+       */
+      payload?: string | FunctionCall<Addr>;
+
+      /**
+       * Message header
+       */
+      messageHeader: {
+        /**
+         * External message header
+         */
+        type: 'external',
+        /**
+         * The public key of the signer.
+         */
+        publicKey: string;
+        /**
+         * Whether to prepare this message without signature. Default: false
+         */
+        withoutSignature?: boolean;
+      } | {
+        /**
+         * Internal message header
+         */
+        type: 'internal',
+        /**
+         * Message source address
+         */
+        sender: Addr;
+        /**
+         * Amount of nano EVER to attach to the message
+         */
+        amount: string;
+        /**
+         * Whether to bounce message back on error
+         */
+        bounce: boolean;
+        /**
+         * Whether the constructed message is bounced. Default: false
+         */
+        bounced?: boolean;
+      };
+
+      /**
+       * Optional executor parameters used during local contract execution
+       */
+      executorParams?: {
+        /**
+         * If `true`, signature verification always succeeds
+         */
+        disableSignatureCheck?: boolean;
+        /**
+         * Explicit account balance in nano EVER
+         */
+        overrideBalance?: string | number;
+      };
+    };
+    output: {
+      /**
+       * Executed transaction
+       */
+      transaction: Transaction<Addr>;
+      /**
+       * Contract state after the executed transaction
+       */
+      newState: FullContractState | undefined;
+      /**
+       * Parsed function call output
+       */
+      output: TokensObject<Addr> | undefined;
     };
   };
 
@@ -915,7 +1009,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
-      */
+       */
       withSignatureId?: boolean | number;
     };
     output: {
@@ -1031,7 +1125,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
-      */
+       */
       withSignatureId?: boolean | number;
     };
     output: {
@@ -1085,7 +1179,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
-      */
+       */
       withSignatureId?: boolean | number;
     };
     output: {
@@ -1419,8 +1513,8 @@ export type ProviderMethod = keyof ProviderApi;
  * @category Provider Api
  */
 export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
-  input: infer I;
-}
+    input: infer I;
+  }
   ? I
   : undefined;
 
@@ -1433,8 +1527,8 @@ export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiR
  * @category Provider Api
  */
 export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
-  output: infer O;
-}
+    output: infer O;
+  }
   ? O
   : undefined;
 

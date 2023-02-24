@@ -134,8 +134,8 @@ export class Contract<Abi> {
     }
 
     const event = await (range?.fromLt != null || range?.fromUtime != null
-      ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
-      : subscriber.transactions(this.address)
+        ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
+        : subscriber.transactions(this.address)
     )
       .flatMap(item => item.transactions)
       .takeWhile(
@@ -470,11 +470,23 @@ export interface ContractMethod<I, O> {
   sendExternalDelayed(args: SendExternalDelayedParams): Promise<DelayedMessageExecution>;
 
   /**
-   * Runs message locally
+   * Executes only a compute phase locally
    *
    * @param args
    */
   call(args?: CallParams): Promise<O>;
+
+  /**
+   * Encodes this method as an external message and
+   * executes all transaction phases locally, producing a new state
+   */
+  executeExternal(args: ExecuteExternalParams): Promise<ExecutorOutput<O>>;
+
+  /**
+   * Encodes this method as an internal message and
+   * executes all transaction phases locally, producing a new state
+   */
+  executeInternal(args: ExecuteInternalParams): Promise<ExecutorOutput<O>>;
 
   /**
    * Encodes method call as BOC
@@ -676,9 +688,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       local: args.local,
       executorParams: args.executorParams
         ? {
-            disableSignatureCheck: args.executorParams.disableSignatureCheck,
-            overrideBalance: args.executorParams.overrideBalance,
-          }
+          disableSignatureCheck: args.executorParams.disableSignatureCheck,
+          overrideBalance: args.executorParams.overrideBalance,
+        }
         : undefined,
     });
 
@@ -746,6 +758,74 @@ class ContractMethodImpl implements ContractMethod<any, any> {
     } else {
       return parseTokensObject(this.functionAbi.outputs, output);
     }
+  }
+
+  /**
+   * Encodes this method as an external message and
+   * executes all transaction phases locally, producing a new state
+   */
+  async executeExternal(args: ExecuteExternalParams): Promise<ExecutorOutput<any>> {
+    await this.provider.ensureInitialized();
+    const { transaction, newState, output } = await this.provider.rawApi.executeLocal({
+      address: this.address.toString(),
+      cachedState: args.cachedState,
+      stateInit: args.stateInit,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+      messageHeader: {
+        type: 'external',
+        publicKey: args.publicKey,
+        withoutSignature: args.withoutSignature,
+      },
+      executorParams: args.executorParams != null ? {
+        disableSignatureCheck: args.executorParams.disableSignatureCheck,
+        overrideBalance: args.executorParams.overrideBalance,
+      } : undefined,
+    });
+
+    return {
+      transaction: parseTransaction(transaction),
+      newState,
+      output: output !== undefined ? parseTokensObject(this.functionAbi.outputs, output) : undefined,
+    } as ExecutorOutput<any>;
+  }
+
+  /**
+   * Encodes this method as an internal message and
+   * executes all transaction phases locally, producing a new state
+   */
+  async executeInternal(args: ExecuteInternalParams): Promise<ExecutorOutput<any>> {
+    await this.provider.ensureInitialized();
+    const { transaction, newState, output } = await this.provider.rawApi.executeLocal({
+      address: this.address.toString(),
+      cachedState: args.cachedState,
+      stateInit: args.stateInit,
+      payload: {
+        abi: this.abi,
+        method: this.method,
+        params: this.params,
+      },
+      messageHeader: {
+        type: 'internal',
+        sender: args.sender.toString(),
+        amount: args.amount,
+        bounce: args.bounce != null ? args.bounce : false,
+        bounced: args.bounced,
+      },
+      executorParams: args.executorParams != null ? {
+        disableSignatureCheck: args.executorParams.disableSignatureCheck,
+        overrideBalance: args.executorParams.overrideBalance,
+      } : undefined,
+    });
+
+    return {
+      transaction: parseTransaction(transaction),
+      newState,
+      output: output !== undefined ? parseTokensObject(this.functionAbi.outputs, output) : undefined,
+    } as ExecutorOutput<any>;
   }
 
   async encodeInternal(): Promise<string> {
@@ -866,6 +946,84 @@ export type CallParams = {
    */
   responsible?: boolean;
 };
+
+/**
+ * @category Contract
+ */
+export type ExecuteExternalParams = {
+  /**
+   * Cached contract state
+   */
+  cachedState?: FullContractState;
+  /**
+   * The public key of the signer.
+   */
+  publicKey: string;
+  /**
+   * Optional base64 encoded TVC
+   */
+  stateInit?: string;
+  /**
+   * Optional executor parameters used during local contract execution
+   */
+  executorParams?: {
+    /**
+     * If `true`, signature verification always succeeds
+     */
+    disableSignatureCheck?: boolean;
+    /**
+     * Explicit account balance in nano EVER
+     */
+    overrideBalance?: string | number;
+  };
+  /**
+   * Whether to prepare this message without signature. Default: false
+   */
+  withoutSignature?: boolean;
+};
+
+/**
+ * @category Contract
+ */
+export type ExecuteInternalParams = {
+  /**
+   * Cached contract state
+   */
+  cachedState?: FullContractState;
+  /**
+   * Optional base64 encoded TVC
+   */
+  stateInit?: string;
+  /**
+   * Message source address
+   */
+  sender: Address;
+  /**
+   * Amount of nano EVER to attach to the message
+   */
+  amount: string;
+  /**
+   * Whether to bounce message back on error. Default: false
+   */
+  bounce?: boolean;
+  /**
+   * Whether the constructed message is bounced. Default: false
+   */
+  bounced?: boolean;
+  /**
+   * Optional executor parameters used during local contract execution
+   */
+  executorParams?: {
+    /**
+     * If `true`, signature verification always succeeds
+     */
+    disableSignatureCheck?: boolean;
+    /**
+     * Explicit account balance in nano EVER
+     */
+    overrideBalance?: string | number;
+  };
+}
 
 /**
  * @category Contract
@@ -991,3 +1149,21 @@ export type DecodeTransactionEventsParams = {
 export type DecodedEvent<Abi, T> = T extends AbiEventName<Abi>
   ? { event: T; data: DecodedAbiEventData<Abi, T> }
   : never;
+
+/**
+ * @category Contract
+ */
+export type ExecutorOutput<O> = {
+  /**
+   * Executed transaction
+   */
+  transaction: Transaction;
+  /**
+   * Contract state after the executed transaction
+   */
+  newState: FullContractState | undefined;
+  /**
+   * Parsed function call output
+   */
+  output: O | undefined;
+};
