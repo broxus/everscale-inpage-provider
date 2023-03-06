@@ -1,16 +1,16 @@
 <p align="center">
-    <h3 align="center">Everscale inpage provider</h3>
-    <p align="center">Web3-like interface to the Everscale blockchain.</p>
-    <p align="center">
-        <a href="/LICENSE">
-            <img alt="GitHub" src="https://img.shields.io/github/license/broxus/everscale-inpage-provider" />
-        </a>
-        <a href="https://www.npmjs.com/package/everscale-inpage-provider">
-            <img alt="npm" src="https://img.shields.io/npm/v/everscale-inpage-provider">
-        </a>
-    </p>
-    <p align="center"><b><a href="https://broxus.github.io/everscale-inpage-provider/index.html">Documentation</a></b></p>
+  <a href="https://github.com/venom-blockchain/developer-program">
+    <img src="https://raw.githubusercontent.com/venom-blockchain/developer-program/main/vf-dev-program.png" alt="Logo" width="366.8" height="146.4">
+  </a>
 </p>
+
+# Everscale inpage provider &emsp;  [![Latest Version]][npmjs.com] [![Docs badge]][docs]
+
+## About
+
+Web3-like interface to the Everscale blockchain.
+
+## Usage
 
 ### How to install
 
@@ -133,7 +133,7 @@ const DePoolAbi = {
 myApp().catch(console.error);
 ```
 
-### How to build
+### Build
 
 ```shell
 npm install
@@ -146,3 +146,16 @@ npm run build
 # (output will be in the `vanilla` folder)
 npm run build:vanilla
 ```
+
+## Contributing
+
+We welcome contributions to the project! If you notice any issues or errors, feel free to open an issue or submit a pull request.
+
+## License
+
+Licensed under GPL-3.0 license ([LICENSE](/LICENSE) or https://opensource.org/license/gpl-3-0/).
+
+[latest version]: https://img.shields.io/npm/v/everscale-inpage-provider
+[npmjs.com]: https://www.npmjs.com/package/everscale-inpage-provider
+[docs badge]: https://img.shields.io/badge/docs-latest-brightgreen
+[docs]: https://broxus.github.io/everscale-inpage-provider/index.html
