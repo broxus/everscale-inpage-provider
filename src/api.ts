@@ -547,6 +547,10 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded state init
        */
       stateInit: string;
+      /**
+       * Hex encoded state init hash
+       */
+      hash: string;
     };
   };
 
@@ -709,6 +713,10 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded state init
        */
       tvc: string;
+      /**
+       * Hex encoded cell hash
+       */
+      hash: string;
     };
   };
 
@@ -734,6 +742,10 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded state init
        */
       tvc: string;
+      /**
+       * Hex encoded cell hash
+       */
+      hash: string;
     };
   };
 
@@ -784,6 +796,10 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded contract code with salt
        */
       code: string;
+      /**
+       * Hex encoded cell hash
+       */
+      hash: string;
     };
   };
 

@@ -670,7 +670,7 @@ export class ProviderRpcClient {
     args: GetExpectedAddressParams<Abi>,
   ): Promise<ProviderApiResponse<'getExpectedAddress'>> {
     await this.ensureInitialized();
-    const { address, stateInit } = await this._api.getExpectedAddress({
+    const { address, stateInit, hash } = await this._api.getExpectedAddress({
       abi: JSON.stringify(abi),
       ...args,
       initParams: serializeTokensObject(args.initParams),
@@ -678,6 +678,7 @@ export class ProviderRpcClient {
     return {
       address: new Address(address),
       stateInit,
+      hash,
     };
   }
 
