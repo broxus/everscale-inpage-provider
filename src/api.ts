@@ -551,6 +551,35 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Decodes initial contract data using the specified ABI
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  unpackInitData: {
+    input: {
+      /**
+       * Contract ABI
+       */
+      abi: string;
+      /**
+       * Base64 encoded init data BOC.
+       */
+      data: string;
+    };
+    output: {
+      /**
+       * Optional hex encoded public key
+       */
+      publicKey: string | undefined,
+      /**
+       * State init params
+       */
+      initParams: TokensObject<Addr>,
+    };
+  };
+
+  /**
    * Computes hash of base64 encoded BOC
    *
    * ---
@@ -597,6 +626,10 @@ export type ProviderApi<Addr = Address> = {
        * Base64 encoded cell BOC
        */
       boc: string;
+      /**
+       * Hex encoded cell hash
+       */
+      hash: string;
     };
   };
 

@@ -96,9 +96,9 @@ export function serializeTransaction(transaction: Transaction): RawTransaction {
     prevTransactionId:
       transaction.prevTransactionId != null
         ? {
-            hash: transaction.prevTransactionId.hash,
-            lt: transaction.prevTransactionId.lt,
-          }
+          hash: transaction.prevTransactionId.hash,
+          lt: transaction.prevTransactionId.lt,
+        }
         : undefined,
     createdAt: transaction.createdAt,
     aborted: transaction.aborted,
@@ -275,8 +275,8 @@ export type AssetType = 'tip3_token';
  */
 export type AssetTypeParams<T extends AssetType, Addr = Address> = T extends 'tip3_token'
   ? {
-      rootContract: Addr;
-    }
+    rootContract: Addr;
+  }
   : never;
 
 /**
@@ -480,6 +480,19 @@ export function parseTokensObject(params: AbiParam[], object: RawTokensObject): 
   return result;
 }
 
+/**
+ * @category Models
+ */
+export function parsePartialTokensObject(params: AbiParam[], object: Partial<RawTokensObject>): TokensObject {
+  const result: TokensObject = {};
+  for (const param of params) {
+    if (Object.prototype.hasOwnProperty.call(object, param.name)) {
+      result[param.name] = parseTokenValue(param, !object[param.name]);
+    }
+  }
+  return result;
+}
+
 function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
   if (!param.type.startsWith('map')) {
     const isArray = param.type.endsWith('[]');
@@ -600,10 +613,10 @@ export type OutputTokenObject<O> = O extends { name: infer K; type: infer T; com
 export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-  ? InputTokenObject<T>
-  : A extends readonly []
-  ? {}
-  : never;
+    ? InputTokenObject<T>
+    : A extends readonly []
+      ? {}
+      : never;
 
 /**
  * @category Models
@@ -611,10 +624,10 @@ export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts
 export type MergeOutputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-  ? OutputTokenObject<T>
-  : A extends readonly []
-  ? {}
-  : never;
+    ? OutputTokenObject<T>
+    : A extends readonly []
+      ? {}
+      : never;
 
 type AbiFunction<C> = C extends { functions: infer F }
   ? F extends readonly unknown[]
@@ -666,3 +679,8 @@ export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOu
  * @category Models
  */
 export type DecodedAbiEventData<C, T extends AbiEventName<C>> = MergeOutputObjectsArray<PickEvent<C, T>['inputs']>;
+
+/**
+ * @category Models
+ */
+export type DecodedAbiInitData<C> = C extends { data: infer D } ? Partial<MergeOutputObjectsArray<D>> : never;
