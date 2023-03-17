@@ -554,6 +554,12 @@ export type ProviderApi<Addr = Address> = {
     };
   };
 
+  /**
+   * Unpacks all fields from the contract state using the specified ABI
+   *
+   * ---
+   * Required permissions: `basic`
+   */
   getContractFields: {
     input: {
       /**
@@ -568,6 +574,10 @@ export type ProviderApi<Addr = Address> = {
        * Cached contract state
        */
       cachedState?: FullContractState;
+      /**
+       * Don't fail if something is left in a cell after unpacking
+       */
+      allowPartial: boolean;
     };
     output: {
       /**

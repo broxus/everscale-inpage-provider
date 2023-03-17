@@ -93,6 +93,12 @@ export class Contract<Abi> {
     })) as ProviderApiResponse<'getFullContractState'>;
   }
 
+  /**
+   * Unpacks all fields from the contract state using the specified ABI
+   *
+   * ---
+   * Required permissions: `basic`
+   */
   public async getFields(args: GetContractFieldsParams = {}): Promise<{
     fields?: DecodedAbiFields<Abi>,
     state?: FullContractState,
@@ -102,6 +108,7 @@ export class Contract<Abi> {
       address: this.address.toString(),
       abi: this._abi,
       cachedState: args.cachedState,
+      allowPartial: args.allowPartial == null ? false : args.allowPartial,
     });
     return {
       fields: fields != null ? parseTokensObject((this._abi as any).fields as AbiParam[], fields) as DecodedAbiFields<Abi> : undefined,
@@ -864,6 +871,10 @@ export type GetContractFieldsParams = {
    * Cached contract state
    */
   cachedState?: FullContractState;
+  /**
+   * Don't fail if something is left in a cell after unpacking
+   */
+  allowPartial?: boolean;
 };
 
 /**
