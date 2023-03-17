@@ -684,3 +684,8 @@ export type DecodedAbiEventData<C, T extends AbiEventName<C>> = MergeOutputObjec
  * @category Models
  */
 export type DecodedAbiInitData<C> = C extends { data: infer D } ? Partial<MergeOutputObjectsArray<D>> : never;
+
+/**
+ * @category Models
+ */
+export type DecodedAbiFields<C> = C extends { fields: infer F } ? MergeOutputObjectsArray<F> : never;

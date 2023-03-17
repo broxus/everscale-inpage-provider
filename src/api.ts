@@ -554,6 +554,33 @@ export type ProviderApi<Addr = Address> = {
     };
   };
 
+  getContractFields: {
+    input: {
+      /**
+       * Contract address
+       */
+      address: Addr;
+      /**
+       * Contract ABI
+       */
+      abi: string;
+      /**
+       * Cached contract state
+       */
+      cachedState?: FullContractState;
+    };
+    output: {
+      /**
+       * Parsed contracts fields
+       */
+      fields?: TokensObject<Addr>;
+      /**
+       * Contract state or `undefined` if it doesn't exist
+       */
+      state: FullContractState | undefined;
+    };
+  };
+
   /**
    * Decodes initial contract data using the specified ABI
    *

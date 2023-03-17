@@ -11,6 +11,7 @@ import {
   AbiFunctionInputs,
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
+  DecodedAbiFields,
   AbiFunctionInputsWithDefault,
   DecodedAbiEventData,
   TransactionId,
@@ -90,6 +91,22 @@ export class Contract<Abi> {
     return (await this._provider.rawApi.getFullContractState({
       address: this.address.toString(),
     })) as ProviderApiResponse<'getFullContractState'>;
+  }
+
+  public async getFields(args: GetContractFieldsParams = {}): Promise<{
+    fields?: DecodedAbiFields<Abi>,
+    state?: FullContractState,
+  }> {
+    await this._provider.ensureInitialized();
+    const { fields, state } = await this._provider.rawApi.getContractFields({
+      address: this.address.toString(),
+      abi: this._abi,
+      cachedState: args.cachedState,
+    });
+    return {
+      fields: fields != null ? parseTokensObject((this._abi as any).fields as AbiParam[], fields) as DecodedAbiFields<Abi> : undefined,
+      state,
+    };
   }
 
   /**
@@ -838,6 +855,16 @@ class ContractMethodImpl implements ContractMethod<any, any> {
     return boc;
   }
 }
+
+/**
+ * @category Contract
+ */
+export type GetContractFieldsParams = {
+  /**
+   * Cached contract state
+   */
+  cachedState?: FullContractState;
+};
 
 /**
  * @category Contract
