@@ -31,6 +31,7 @@ export class Contract<Abi> {
   private readonly _abi: string;
   private readonly _functions: { [name: string]: { inputs: AbiParam[]; outputs: AbiParam[] } };
   private readonly _events: { [name: string]: { inputs: AbiParam[] } };
+  private readonly _fields: AbiParam[];
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
 
@@ -53,6 +54,7 @@ export class Contract<Abi> {
       events[item.name] = { inputs: item.inputs || [] };
       return events;
     }, {} as typeof Contract.prototype._events);
+    this._fields = (abi as any).fields;
 
     this._address = address;
 
@@ -111,7 +113,7 @@ export class Contract<Abi> {
       allowPartial: args.allowPartial == null ? false : args.allowPartial,
     });
     return {
-      fields: fields != null ? parseTokensObject((this._abi as any).fields as AbiParam[], fields) as DecodedAbiFields<Abi> : undefined,
+      fields: fields != null ? parseTokensObject(this._fields, fields) as DecodedAbiFields<Abi> : undefined,
       state,
     };
   }
