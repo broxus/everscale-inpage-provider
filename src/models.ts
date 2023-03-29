@@ -644,6 +644,10 @@ export type AbiFunctionName<C> = AbiFunction<C>['name'];
  * @category Models
  */
 export type AbiEventName<C> = AbiEvent<C>['name'];
+/**
+ * @category Models
+ */
+export type AbiFieldName<C> = keyof DecodedAbiFields<C>;
 
 type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>;
 type PickEvent<C, T extends AbiEventName<C>> = Extract<AbiEvent<C>, { name: T }>;

@@ -8,6 +8,7 @@ import {
   Message,
   AbiFunctionName,
   AbiEventName,
+  AbiFieldName,
   AbiFunctionInputs,
   DecodedAbiFunctionOutputs,
   DecodedAbiFunctionInputs,
@@ -29,11 +30,12 @@ import { ProviderApiResponse, ProviderRpcClient } from './index';
 export class Contract<Abi> {
   private readonly _provider: ProviderRpcClient;
   private readonly _abi: string;
-  private readonly _functions: { [name: string]: { inputs: AbiParam[]; outputs: AbiParam[] } };
-  private readonly _events: { [name: string]: { inputs: AbiParam[] } };
-  private readonly _fields: AbiParam[];
+  private readonly _functionsAbi: { [name: string]: { inputs: AbiParam[]; outputs: AbiParam[] } };
+  private readonly _eventsAbi: { [name: string]: { inputs: AbiParam[] } };
+  private readonly _fieldsAbi: AbiParam[];
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
+  private readonly _fields: ContractFields<Abi>;
 
   constructor(provider: ProviderRpcClient, abi: Abi, address: Address) {
     if (!Array.isArray((abi as any).functions)) {
@@ -45,16 +47,16 @@ export class Contract<Abi> {
 
     this._provider = provider;
     this._abi = JSON.stringify(abi);
-    this._functions = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
+    this._functionsAbi = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
       functions[item.name] = { inputs: item.inputs || [], outputs: item.outputs || [] };
       return functions;
-    }, {} as typeof Contract.prototype._functions);
+    }, {} as typeof Contract.prototype._functionsAbi);
 
-    this._events = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
+    this._eventsAbi = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
       events[item.name] = { inputs: item.inputs || [] };
       return events;
-    }, {} as typeof Contract.prototype._events);
-    this._fields = (abi as any).fields;
+    }, {} as typeof Contract.prototype._eventsAbi);
+    this._fieldsAbi = (abi as any).fields;
 
     this._address = address;
 
@@ -62,16 +64,51 @@ export class Contract<Abi> {
       {},
       {
         get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
-          const rawAbi = this._functions[method];
+          const rawAbi = this._functionsAbi[method];
           return (params: TokensObject = {}) =>
             new ContractMethodImpl(this._provider, rawAbi, this._abi, this._address, method, params);
         },
       },
     ) as unknown as ContractMethods<Abi>;
+
+    this._fields = new Proxy(
+      {},
+      {
+        get: <K extends AbiFieldName<Abi>>(_object: Record<string, unknown>, field: K) => {
+          return async (params: GetContractFieldsParams = {}) => {
+            await this._provider.ensureInitialized();
+            const { fields, state } = await this._provider.rawApi.getContractFields({
+              address: this._address.toString(),
+              abi: this._abi,
+              cachedState: params?.cachedState,
+              allowPartial: params?.allowPartial == null ? false : params.allowPartial,
+            });
+            if (fields == null) {
+              if (state == null) {
+                throw new Error('Account does not exist');
+              } else if (!state.isDeployed) {
+                throw new Error('Account is not deployed');
+              } else {
+                throw new Error('Invalid account data');
+              }
+            }
+            const parsedFields = parseTokensObject(this._fieldsAbi, fields) as DecodedAbiFields<Abi>;
+            if (parsedFields == null || !Object.prototype.hasOwnProperty.call(parsedFields, field)) {
+              throw new Error('Unknown field');
+            }
+            return parsedFields[field];
+          };
+        },
+      },
+    ) as unknown as ContractFields<Abi>;
   }
 
   public get methods(): ContractMethods<Abi> {
     return this._methods;
+  }
+
+  public get fields(): ContractFields<Abi> {
+    return this._fields;
   }
 
   public get address(): Address {
@@ -113,7 +150,7 @@ export class Contract<Abi> {
       allowPartial: args.allowPartial == null ? false : args.allowPartial,
     });
     return {
-      fields: fields != null ? parseTokensObject(this._fields, fields) as DecodedAbiFields<Abi> : undefined,
+      fields: fields != null ? parseTokensObject(this._fieldsAbi, fields) as DecodedAbiFields<Abi> : undefined,
       state,
     };
   }
@@ -283,7 +320,7 @@ export class Contract<Abi> {
 
       const { method, input, output } = result;
 
-      const rawAbi = this._functions[method];
+      const rawAbi = this._functionsAbi[method];
 
       return {
         method,
@@ -308,7 +345,7 @@ export class Contract<Abi> {
       const result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
 
       for (const { event, data } of events) {
-        const rawAbi = this._events[event];
+        const rawAbi = this._eventsAbi[event];
 
         result.push({
           event,
@@ -339,7 +376,7 @@ export class Contract<Abi> {
 
       const { method, input } = result;
 
-      const rawAbi = this._functions[method];
+      const rawAbi = this._functionsAbi[method];
 
       return {
         method,
@@ -366,7 +403,7 @@ export class Contract<Abi> {
 
       const { method, output } = result;
 
-      const rawAbi = this._functions[method];
+      const rawAbi = this._functionsAbi[method];
 
       return {
         method,
@@ -391,7 +428,7 @@ export class Contract<Abi> {
 
       const { event, data } = result;
 
-      const rawAbi = this._events[event];
+      const rawAbi = this._eventsAbi[event];
 
       return {
         event,
@@ -437,6 +474,15 @@ export type ContractMethods<C> = {
   [K in AbiFunctionName<C>]: (
     params: AbiFunctionInputsWithDefault<C, K>,
   ) => ContractMethod<AbiFunctionInputs<C, K>, DecodedAbiFunctionOutputs<C, K>>;
+};
+
+/**
+ * @category Contract
+ */
+export type ContractFields<C> = {
+  [K in AbiFieldName<C>]: (
+    params?: GetContractFieldsParams,
+  ) => Promise<DecodedAbiFields<C>[K]>;
 };
 
 /**
