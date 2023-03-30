@@ -1,24 +1,17 @@
 {
-  "entryPoints": [
-    "src/index.ts"
-  ],
-  "out": "docs",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/.build",
   "readme": "none",
   "excludePrivate": true,
   "includeVersion": true,
   "categorizeByGroup": false,
-  "categoryOrder": [
-    "Provider",
-    "Contract",
-    "Stream",
-    "Models",
-    "Provider Api",
-    "Utils",
-    "*"
-  ],
-  "sort": [
-    "source-order"
-  ],
+  "categoryOrder": ["Provider", "Contract", "Stream", "Models", "Provider Api", "Utils", "*"],
+  "sort": ["source-order"],
   "hideGenerator": true,
-  "customCss": "typedoc.css"
+  "customCss": "typedoc.css",
+  "plugin": ["typedoc-plugin-markdown"],
+  "excludeExternals": true,
+  "markedOptions": {
+    "codeBlock": "fenced"
+  }
 }

@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "build:vanilla": "rollup --config rollup.config.ts --configPlugin typescript",
-    "build:docs": "typedoc",
+    "docs:clean": "rm -rf docs/build",
+    "build:docs": "npm run docs:clean && typedoc && node docs/scripts/post-process-typedoc.js",
     "lint": "npx eslint ."
   },
   "author": "",
@@ -21,10 +22,14 @@
     "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "markdown-it-attrs": "^4.1.6",
+    "markdown-it-include": "^2.0.0",
     "rollup": "^3.9.0",
     "typedoc": "^0.23.10",
+    "typedoc-plugin-markdown": "^3.14.0",
     "typedoc-plugin-missing-exports": "^0.23.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "vitepress": "^1.0.0-alpha.63"
   },
   "files": [
     "/dist"
