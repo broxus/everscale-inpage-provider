@@ -1,24 +1,13 @@
 {
-  "entryPoints": [
-    "src/index.ts"
-  ],
-  "out": "docs",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/build",
   "readme": "none",
   "excludePrivate": true,
   "includeVersion": true,
   "categorizeByGroup": false,
-  "categoryOrder": [
-    "Provider",
-    "Contract",
-    "Stream",
-    "Models",
-    "Provider Api",
-    "Utils",
-    "*"
-  ],
-  "sort": [
-    "source-order"
-  ],
+  "categoryOrder": ["Provider", "Contract", "Stream", "Models", "Provider Api", "Utils", "*"],
+  "sort": ["source-order"],
   "hideGenerator": true,
+  "excludeExternals": false,
   "customCss": "typedoc.css"
 }
