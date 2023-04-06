@@ -9,5 +9,8 @@
   "sort": ["source-order"],
   "hideGenerator": true,
   "excludeExternals": false,
-  "customCss": "typedoc.css"
+  "customCss": "typedoc.css",
+  "markedOptions": {
+    "codeBlock": "fenced"
+  }
 }
