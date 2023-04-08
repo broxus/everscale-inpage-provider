@@ -7,7 +7,7 @@ import {
   DeclarationReflection,
 } from 'typedoc';
 //import { SignatureReflection } from 'typedoc/dist/lib/serialization/schema';
-import { findAllNodesOfType } from '../../scripts/find-ast';
+import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import {
   SignatureDescription,
   extractSignatureDescription,
@@ -60,7 +60,7 @@ export interface Constructor {
 }
 interface Accessor {
   name: string;
-  comment: string;
+  comment?: string;
   type: string;
   returnType?: string;
   returnComment?: string;
@@ -70,7 +70,7 @@ interface Accessor {
 
 interface Method {
   name: string;
-  comment: string;
+  comment?: string;
   type: string;
   returnType?: string;
   returnComment?: string;
@@ -152,7 +152,7 @@ function extractAccessors(reflection: ContainerReflection): Accessor[] {
   reflection.children?.forEach(child => {
     if (child.kind === ReflectionKind.Accessor) {
       const getSignature = child.getSignature;
-      const comment = getSignature ? formatComment(getSignature.comment) : '';
+      const comment = getSignature ? formatComment(getSignature.comment) : undefined;
       const description = extractSignatureDescription([getSignature!]);
       const accessor: Accessor = {
         name: child.name,
@@ -227,17 +227,14 @@ function extractProperties(reflection: ContainerReflection): Property[] {
   return properties;
 }
 
-export async function findClassesWithMembers(project: ProjectReflection): Promise<ClassInfo[]> {
-  const classes = findAllNodesOfType(project, 'Class');
+export async function findClasses(project: ProjectReflection, category?: string): Promise<ClassInfo[]> {
+  const classes = category
+    ? getNodesByCategoryTitle(project, category, ReflectionKind.Class)
+    : findAllNodesOfType(project, ReflectionKind.Class);
 
   const result: ClassInfo[] = [];
 
   function processClass(classNode: Reflection) {
-    //const constructorNodes = findAllNodesOfType(classNode, 'Constructor');
-    // const accessorsNodes = findAllNodesOfType(classNode, 'Accessor');
-    // const methodNodes = findAllNodesOfType(classNode, 'Method');
-    // const propertyNodes = findAllNodesOfType(classNode, 'Property');
-
     result.push({
       name: classNode.name,
       constructors: extractConstructors(classNode as ContainerReflection),

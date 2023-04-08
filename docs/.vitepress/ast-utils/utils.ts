@@ -22,7 +22,7 @@ export type returnT = {
 };
 
 export interface SignatureDescription {
-  comment: string;
+  comment?: string;
   tags: Record<string, string[]>;
   returns: returnT[];
   typeParameter: typeParam[];
@@ -61,7 +61,7 @@ export function extractSignatureDescription(signatures: SignatureReflection[]): 
   signatures.forEach(sig => {
     const typeParams: typeParam[] = [];
 
-    (sig as any).typeParameter?.forEach(tp => {
+    (sig as any).typeParameter?.forEach((tp: { name: any; flags: any; type: any }) => {
       typeParams.push({
         name: tp.name,
         flags: tp.flags,
@@ -93,12 +93,9 @@ export function extractSignatureDescription(signatures: SignatureReflection[]): 
   return result;
 }
 
-export function formatComment(comment: Comment | undefined): string {
-  if (!comment) {
-    return '';
-  }
-  if (!comment.summary) {
-    return '';
+export function formatComment(comment: Comment | undefined): string | undefined {
+  if (!comment || !comment.summary) {
+    return undefined;
   }
 
   const displayParts: CommentDisplayPart[] = [...comment.summary];
@@ -141,7 +138,7 @@ export function formatReturnType(rawType: any | undefined, returnTypeComment: st
   if (rawType.type === 'reference') {
     let typeArgumentsString = '';
     if (rawType.typeArguments) {
-      const formattedTypeArguments = rawType.typeArguments.map(typeArg => formatReturnType(typeArg, undefined));
+      const formattedTypeArguments = rawType.typeArguments.map((typeArg: any) => formatReturnType(typeArg, undefined));
       typeArgumentsString = `<${formattedTypeArguments.join(', ')}>`;
     }
     returnTypeString = `<a href="${rawType.name}.md">${rawType.name}</a>${typeArgumentsString}`;

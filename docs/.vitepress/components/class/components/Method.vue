@@ -5,20 +5,7 @@
     <p v-if="methodData.comment">{{ methodData.comment }}</p>
     <div class="method-parameters" v-if="methodData.parameters && methodData.parameters.length > 0">
       <h6>Parameters</h6>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="param in methodData.parameters" :key="param.name">
-            <td>{{ param.name }}</td>
-            <td v-html="param.type"></td>
-          </tr>
-        </tbody>
-      </table>
+      <PropertyTable :properties="methodData.parameters" />
     </div>
     <div class="method-returns">
       <h6>Returns</h6>
@@ -32,6 +19,8 @@
 </template>
 
 <script>
+import PropertyTable from './../../shared/PropertyTable.vue';
+
 export default {
   name: 'MethodComponent',
   props: {
@@ -39,6 +28,9 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  components: {
+    PropertyTable,
   },
 };
 </script>

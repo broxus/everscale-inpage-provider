@@ -1,5 +1,5 @@
 import { ContainerReflection, ProjectReflection, Reflection, DeclarationReflection, SomeType } from 'typedoc';
-import { findAllNodesOfType } from '../../scripts/find-ast';
+import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import { ReflectionKind } from './Class';
 import { formatComment, formatType, hasDeclaration } from './utils';
 
@@ -19,11 +19,13 @@ export interface TypeAliasInfo {
   definedInUrl?: string;
 }
 
-export async function findTypeAliases(project: ProjectReflection): Promise<TypeAliasInfo[]> {
-  const typeAliasNodes = findAllNodesOfType(project, 'Type alias');
+export async function findTypeAliases(project: ProjectReflection, category?: string): Promise<TypeAliasInfo[]> {
+  const typeAliasNodes = category
+    ? getNodesByCategoryTitle(project, category, ReflectionKind.TypeAlias)
+    : findAllNodesOfType(project, ReflectionKind.TypeAlias);
 
   const result: TypeAliasInfo[] = [];
-  //console.log(12312, typeAliasNodes);
+
   function processTypeAlias(typeAliasNode: DeclarationReflection): TypeAliasInfo {
     const node = typeAliasNode as any;
     let typeDeclaration;
@@ -51,7 +53,6 @@ export async function findTypeAliases(project: ProjectReflection): Promise<TypeA
   }
 
   for (const node of typeAliasNodes) {
-    console.log(JSON.stringify(processTypeAlias(node as DeclarationReflection).typeDeclaration));
     result.push(processTypeAlias(node as DeclarationReflection));
   }
 

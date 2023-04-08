@@ -16,6 +16,7 @@
             <td>{{ param.name }}</td>
             <td v-html="param.type"></td>
             <td v-if="param.comment">{{ param.comment }}</td>
+            <td v-else-if="typeAliasData.typeParameters && typeAliasData.typeParameters.length > 0">&nbsp;</td>
           </tr>
         </tbody>
       </table>
@@ -46,24 +47,15 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { findClassesWithMembers, ClassInfo, findTypeAliases, TypeAliasInfo } from './../../ast-utils';
-import { ProjectReflection, Reflection, ContainerReflection, ReflectionKind } from 'typedoc';
+import { TypeAliasInfo } from './../../ast-utils';
 
 export default defineComponent({
   name: 'TypeAliasComponent',
   props: {
-    typeAliasData: {
-      type: Object,
+    typeAliases: {
+      type: Array as () => TypeAliasInfo[],
       required: true,
     },
-  },
-  async setup() {
-    const ast = (await import(/* @vite-ignore */ './../../../build/typedoc-ast.json').then(
-      module => module.default,
-    )) as ProjectReflection;
-    const typeAliases: TypeAliasInfo[] = await findTypeAliases(ast);
-
-    return { typeAliases };
   },
 });
 </script>

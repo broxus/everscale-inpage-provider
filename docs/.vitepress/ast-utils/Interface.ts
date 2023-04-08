@@ -1,5 +1,5 @@
 import { ContainerReflection, ProjectReflection, Reflection, DeclarationReflection, SomeType } from 'typedoc';
-import { findAllNodesOfType } from '../../scripts/find-ast';
+import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import { ReflectionKind } from './Class';
 import { formatComment, formatType, hasDeclaration } from './utils';
 
@@ -24,8 +24,10 @@ export interface InterfaceInfo {
   definedInUrl?: string;
 }
 
-export async function findInterfaces(project: ProjectReflection): Promise<InterfaceInfo[]> {
-  const interfaceNodes = findAllNodesOfType(project, 'Interface');
+export async function findInterfaces(project: ProjectReflection, category?: string): Promise<InterfaceInfo[]> {
+  const interfaceNodes = category
+    ? getNodesByCategoryTitle(project, category, ReflectionKind.Interface)
+    : findAllNodesOfType(project, ReflectionKind.Interface);
 
   const result: InterfaceInfo[] = [];
 
@@ -42,7 +44,7 @@ export async function findInterfaces(project: ProjectReflection): Promise<Interf
       })),
       methods: methods.map(method => ({
         name: method.name,
-        comment: formatComment(method.comment),
+        comment: method.signatures ? formatComment(method.signatures[0].comment) : undefined,
         parameters: method.signatures?.[0]?.parameters?.map(param => ({
           name: param.name,
           type: formatType(param.type),

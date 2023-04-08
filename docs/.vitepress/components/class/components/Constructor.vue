@@ -24,14 +24,17 @@
           <tr>
             <th>Name</th>
             <th>Type</th>
-            <th>Description</th>
+            <th v-if="hasComments()">Description</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(param, paramName) in constructorData.formattedParameters" :key="paramName">
             <td>{{ paramName }}</td>
             <td v-html="param"></td>
-            <td>{{ constructorData.formattedParameterComments[paramName] }}</td>
+            <td v-if="constructorData.formattedParameterComments[paramName]">
+              {{ constructorData.formattedParameterComments[paramName] }}
+            </td>
+            <td v-else-if="hasComments()">&nbsp;</td>
           </tr>
         </tbody>
       </table>
@@ -50,6 +53,11 @@ export default {
     constructorData: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    hasComments() {
+      return Object.keys(this.constructorData.formattedParameterComments).length > 0;
     },
   },
 };

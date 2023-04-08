@@ -36,8 +36,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { findClassesWithMembers, ClassInfo } from './../../ast-utils';
-import { ProjectReflection } from 'typedoc';
+import { ClassInfo } from './../../ast-utils';
 import ConstructorComponent from './components/Constructor.vue';
 import AccessorComponent from './components/Accessor.vue';
 import MethodComponent from './components/Method.vue';
@@ -45,24 +44,17 @@ import PropertyComponent from './components/Property.vue';
 
 export default defineComponent({
   name: 'classComponent',
+  props: {
+    classes: {
+      type: Array as () => ClassInfo[],
+      required: true,
+    },
+  },
   components: {
     ConstructorComponent,
     AccessorComponent,
     MethodComponent,
     PropertyComponent,
-  },
-  async setup() {
-    const classesLoaded = ref(false);
-
-    const ast = (await import(/* @vite-ignore */ './../../../build/typedoc-ast.json').then(
-      module => module.default,
-    )) as ProjectReflection;
-
-    const classes: ClassInfo[] = await findClassesWithMembers(ast);
-
-    classesLoaded.value = true;
-
-    return { classes, classesLoaded };
   },
 });
 </script>

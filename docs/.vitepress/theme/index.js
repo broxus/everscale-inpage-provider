@@ -6,6 +6,10 @@ import MethodComponent from './../components/class/components/Method.vue';
 import PropertyComponent from './../components/class/components/Property.vue';
 import TypeAliasComponent from './../components/type-alias/TypeAlias.vue';
 import InterfaceComponent from './../components/interface/Interface.vue';
+import FunctionComponent from './../components/function/Function.vue';
+import TableOfContentComponent from './../components/shared/TableOfContent.vue';
+import PropertyTableComponent from './../components/shared/PropertyTable.vue';
+import DefinedInLinkComponent from './../components/shared/DefinedInLink.vue';
 
 export default {
   ...DefaultTheme,
@@ -18,5 +22,9 @@ export default {
     app.component('PropertyComponent', PropertyComponent);
     app.component('TypeAliasComponent', TypeAliasComponent);
     app.component('InterfaceComponent', InterfaceComponent);
+    app.component('FunctionComponent', FunctionComponent);
+    app.component('TableOfContentComponent', TableOfContentComponent);
+    app.component('PropertyTableComponent', PropertyTableComponent);
+    app.component('DefinedInLinkComponent', DefinedInLinkComponent);
   },
 };
