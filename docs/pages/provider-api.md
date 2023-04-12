@@ -45,6 +45,6 @@
 
 ## Table of Contents
 
-<!-- <TableOfContentComponent :tocData="tableOfContent" /> -->
+<TableOfContentComponent :tocData="tableOfContent" />
 
 <PageContentComponent :page="pageContent" />
