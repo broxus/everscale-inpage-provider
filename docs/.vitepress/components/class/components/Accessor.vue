@@ -1,6 +1,6 @@
 <template>
   <section class="accessor-container">
-    <h3 class="name">{{ accessorData.name.toLowerCase() }}</h3>
+    <h3 :id="accessorData.name" class="name">{{ accessorData.name.toLowerCase() }}</h3>
     <code class="code-block">• get {{ accessorData.name }}(): <code v-html="accessorData.type"></code></code>
     <p v-if="accessorData.comment">{{ accessorData.comment }}</p>
     <div v-if="accessorData.returnComment" class="return-table">

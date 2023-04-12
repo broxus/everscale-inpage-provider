@@ -1,6 +1,6 @@
 <template>
   <div class="property">
-    <h4>{{ propertyData.name }}</h4>
+    <h4 :id="propertyData.name">{{ propertyData.name }}</h4>
     <code class="code-block">
       ▸ {{ propertyData.isOptional ? 'Optional' : '' }} {{ propertyData.name }}:
       <code v-html="propertyData.type"></code>

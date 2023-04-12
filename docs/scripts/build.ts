@@ -283,7 +283,8 @@ export function buildTableOfContent(
 ): TableOfContent {
   const toc: TableOfContent = { sections: [] };
   const sectionMap = new Map<number, TableOfContentElement[]>();
-
+  let lastId = 0;
+  const undefinedSections: DeclarationReflection[] = [];
   for (const node of project.children!) {
     if (!project.categories?.find(cat => cat.title === category)) continue;
     if (
@@ -295,7 +296,7 @@ export function buildTableOfContent(
 
     let sectionTag = node.comment?.blockTags?.find(tag => tag.tag === '@tocSection');
     let refTag = node.comment?.blockTags?.find(tag => tag.tag === '@tocRef');
-    let subCategories = extractCategories(node);
+    const subCategories = extractCategories(node);
 
     if (node.kind === ReflectionKind.Function) {
       sectionTag = node.signatures?.[0].comment?.blockTags?.find(tag => tag.tag === '@tocSection');
@@ -304,10 +305,12 @@ export function buildTableOfContent(
 
     if (sectionTag) {
       const sectionId = Number(sectionTag.content[0]?.text.split(sectionIdDl)[0]);
+
       const sectionTitle = sectionTag.content[0]?.text.substring(sectionTag.content[0].text.indexOf(' ') + 1);
 
       sectionMap.set(sectionId, [{ id: node.id, title: node.name, categories: subCategories }]);
       toc.sections.push({ id: sectionId, title: sectionTitle, elements: sectionMap.get(sectionId)! });
+      lastId = sectionId;
     } else if (refTag) {
       const sectionId = Number(refTag.content[0].text);
       const sectionElements = sectionMap.get(sectionId);
@@ -315,23 +318,34 @@ export function buildTableOfContent(
       if (sectionElements) {
         sectionElements.push({ id: node.id, title: node.name, categories: subCategories });
       }
+      lastId = sectionId;
     } else {
-      const otherSection = toc.sections.find(section => section.title === 'Other');
-      if (otherSection) {
-        if (!otherSection.elements) {
-          otherSection.elements = [];
+      undefinedSections.push(node);
+    }
+  }
+
+  if (undefinedSections.length > 0) {
+    for (const node of undefinedSections) {
+      const sectionName = getCategoryName(node);
+
+      const section = toc.sections.find(section => section.title === sectionName);
+
+      const subCategories = extractCategories(node);
+      if (section) {
+        if (!section.elements) {
+          section.elements = [];
         }
-        otherSection.elements.push({ id: node.id, title: node.name, categories: subCategories });
+        section.elements.push({ id: node.id, title: node.name, categories: subCategories });
       } else {
+        lastId++;
         toc.sections.push({
-          id: 9999,
-          title: 'Other',
+          id: lastId,
+          title: sectionName,
           elements: [{ id: node.id, title: node.name, categories: subCategories }],
         });
       }
     }
   }
-
   (project as any)['tableOfContent'] = toc;
 
   //fs.writeFileSync('./docs/build/typedoc-ast.json', JSON.stringify(project, null, 2));

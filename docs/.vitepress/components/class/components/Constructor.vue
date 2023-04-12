@@ -1,6 +1,6 @@
 <template>
   <div class="class-constructor">
-    <h4 v-if="constructorData.title">{{ constructorData.title }}</h4>
+    <h4 :id="constructorData.title" v-if="constructorData.title">{{ constructorData.title }}</h4>
     <p v-if="constructorData.signatureDescription">{{ constructorData.signatureDescription.comment }}</p>
     <div class="constuctor-type-params" v-if="constructorData.signatureDescription.typeParameter.length > 0">
       <h5>Type parameters</h5>

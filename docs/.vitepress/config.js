@@ -1,6 +1,7 @@
 import vue from '@vitejs/plugin-vue';
 // import enchanceApp from './theme';
 // import resolveExtensionVue from 'vite-plugin-resolve-extension-vue';
+import { resolve } from 'path';
 
 module.exports = {
   title: 'Everscale Inpage Provider',
@@ -34,5 +35,14 @@ module.exports = {
         ],
       },
     ],
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        lightTheme: resolve(__dirname, 'styles/light-theme.css'),
+        darkTheme: resolve(__dirname, 'styles/dark-theme.css'),
+      },
+    },
   },
 };

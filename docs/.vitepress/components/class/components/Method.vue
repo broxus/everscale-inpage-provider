@@ -1,6 +1,6 @@
 <template>
   <div class="method">
-    <h4>{{ methodData.name }}</h4>
+    <h4 :id="methodData.name">{{ methodData.name }}</h4>
     <code class="code-block">▸ {{ methodData.name }}(): <code v-html="methodData.type"></code></code>
     <p v-if="methodData.comment">{{ methodData.comment }}</p>
     <div class="method-parameters" v-if="methodData.parameters && methodData.parameters.length > 0">
