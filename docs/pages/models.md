@@ -6,10 +6,10 @@
     module => module.default,
   )) as ProjectReflection;
 
-  // console.log(await buildPage(project, 'Provider', await buildTableOfContent(project, 'Provider')))
+  // console.log(await buildPage(project, 'Models', await buildTableOfContent(project, 'Models')))
 
   export default {
-    name: 'Provider',
+    name: 'Models',
     data() {
       return {
         classes: [],
@@ -25,23 +25,23 @@
       };
     },
     async created() {
-      this.classes = await findClasses(project, 'Provider');
+      this.classes = await findClasses(project, 'Models');
       this.classesNames = this.classes.map((c: ClassInfo) => c.name);
-      this.interfaces = await findInterfaces(project, 'Provider');
+      this.interfaces = await findInterfaces(project, 'Models');
 
       this.interfacesNames = this.interfaces.map((c: ClassInfo) => c.name);
-      this.typeAliases = await findTypeAliases(project, 'Provider');
+      this.typeAliases = await findTypeAliases(project, 'Models');
       this.typeAliasesNames = this.typeAliases.map((c: ClassInfo) => c.name);
-      this.functions = await findFunctions(project, 'Provider');
+      this.functions = await findFunctions(project, 'Models');
       this.functionsNames = this.functions.map((c: ClassInfo) => c.name);
-      this.tableOfContent = await buildTableOfContent(project, 'Provider');
-      this.pageContent = await buildPage(project, 'Provider', this.tableOfContent);
+      this.tableOfContent = await buildTableOfContent(project, 'Models');
+      this.pageContent = await buildPage(project, 'Models', this.tableOfContent);
 
     },
   };
 </script>
 
-# Provider
+# Models
 
 ## Table of Contents
 

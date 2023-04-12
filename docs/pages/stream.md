@@ -6,10 +6,10 @@
     module => module.default,
   )) as ProjectReflection;
 
-  // console.log(await buildPage(project, 'Provider', await buildTableOfContent(project, 'Provider')))
+  // console.log(await buildPage(project, 'Stream', await buildTableOfContent(project, 'Stream')))
 
   export default {
-    name: 'Provider',
+    name: 'Stream',
     data() {
       return {
         classes: [],
@@ -25,23 +25,23 @@
       };
     },
     async created() {
-      this.classes = await findClasses(project, 'Provider');
+      this.classes = await findClasses(project, 'Stream');
       this.classesNames = this.classes.map((c: ClassInfo) => c.name);
-      this.interfaces = await findInterfaces(project, 'Provider');
+      this.interfaces = await findInterfaces(project, 'Stream');
 
       this.interfacesNames = this.interfaces.map((c: ClassInfo) => c.name);
-      this.typeAliases = await findTypeAliases(project, 'Provider');
+      this.typeAliases = await findTypeAliases(project, 'Stream');
       this.typeAliasesNames = this.typeAliases.map((c: ClassInfo) => c.name);
-      this.functions = await findFunctions(project, 'Provider');
+      this.functions = await findFunctions(project, 'Stream');
       this.functionsNames = this.functions.map((c: ClassInfo) => c.name);
-      this.tableOfContent = await buildTableOfContent(project, 'Provider');
-      this.pageContent = await buildPage(project, 'Provider', this.tableOfContent);
+      this.tableOfContent = await buildTableOfContent(project, 'Stream');
+      this.pageContent = await buildPage(project, 'Stream', this.tableOfContent);
 
     },
   };
 </script>
 
-# Provider
+# Stream
 
 ## Table of Contents
 
