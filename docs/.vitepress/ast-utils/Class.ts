@@ -48,6 +48,7 @@ export enum ReflectionKind {
 }
 
 export interface Constructor {
+  id: number;
   title?: string;
   signatureDescription?: SignatureDescription;
   parameters?: ParameterReflection[];
@@ -59,6 +60,7 @@ export interface Constructor {
   definedInUrl?: string;
 }
 interface Accessor {
+  id: number;
   name: string;
   comment?: string;
   type: string;
@@ -69,6 +71,7 @@ interface Accessor {
 }
 
 interface Method {
+  id: number;
   name: string;
   comment?: string;
   type: string;
@@ -83,6 +86,7 @@ interface Method {
 }
 
 interface Property {
+  id: number;
   name: string;
   comment?: string;
   type?: string;
@@ -91,143 +95,173 @@ interface Property {
   definedInUrl?: string;
   inheritedFrom?: string;
 }
-
-export interface ClassInfo {
+export enum ComponentKind {
+  Class = 1,
+  Interface = 2,
+  Enum = 3,
+  Function = 4,
+  TypeAlias = 5,
+  Variable = 6,
+}
+export interface IClassInfo {
+  id: number;
   name: string;
+  kind: ComponentKind;
   constructors?: Constructor[];
   accessors?: Accessor[];
   methods?: Method[];
   properties?: Property[];
 }
 
-/**
- * @category Class/Extractors
- */
+export class ClassInfo implements IClassInfo {
+  id: number;
+  name: string;
+  kind: ComponentKind;
+  constructors?: Constructor[];
+  accessors?: Accessor[];
+  methods?: Method[];
+  properties?: Property[];
 
-function extractConsturctorParams(signatures: SignatureReflection[]): ParameterReflection[] {
-  const params = [] as ParameterReflection[];
-  signatures.forEach(sig => {
-    sig.parameters?.forEach(param => {
-      params.push(param);
-    });
-  });
-  return params;
-}
+  constructor(reflection: DeclarationReflection) {
+    this.id = reflection.id;
+    this.name = reflection.name;
+    this.kind = ComponentKind.Class;
 
-function extractConstructors(reflection: ContainerReflection): Constructor[] {
-  const constructors = [] as Constructor[];
+    const containerReflection = reflection as ContainerReflection;
+    this.constructors = this.extractConstructors(containerReflection);
+    this.accessors = this.extractAccessors(containerReflection);
+    this.methods = this.extractMethods(containerReflection);
+    this.properties = this.extractProperties(containerReflection);
+  }
 
-  reflection.children?.forEach(child => {
-    if (child.kind === ReflectionKind.Constructor) {
-      const parameters = extractConsturctorParams(child.signatures!);
-      //const comments = extractConstructorComments(child.signatures!);
-      const description = extractSignatureDescription(child.signatures!);
-      const formattedParameterComments = {} as Record<string, string>;
-
-      const formattedParameters = {} as Record<string, string>;
-      parameters.forEach(param => {
-        formattedParameterComments[param.name] = formatComment(param.comment) || '';
-        formattedParameters[param.name] = formatType(param.type);
+  private extractConsturctorParams(signatures: SignatureReflection[]): ParameterReflection[] {
+    const params = [] as ParameterReflection[];
+    signatures.forEach(sig => {
+      sig.parameters?.forEach(param => {
+        params.push(param);
       });
-      const constructor: Constructor = {
-        title: child.name,
-        signatureDescription: description,
-        parameters: parameters,
-        formattedParameters: formattedParameters,
-        formattedParameterComments: formattedParameterComments,
-        returnType: 'void', // Assuming constructor always returns void
-        definedIn: child.sources?.[0]?.fileName,
-        definedInUrl: child.sources?.[0]?.url,
-      };
-      constructors.push(constructor);
-    }
-  });
+    });
+    return params;
+  }
 
-  return constructors;
+  extractConstructors(reflection: ContainerReflection): Constructor[] {
+    const constructors = [] as Constructor[];
+
+    reflection.children?.forEach(child => {
+      if (child.kind === ReflectionKind.Constructor) {
+        const parameters = this.extractConsturctorParams(child.signatures!);
+        //const comments = extractConstructorComments(child.signatures!);
+        const description = extractSignatureDescription(child.signatures!);
+        const formattedParameterComments = {} as Record<string, string>;
+
+        const formattedParameters = {} as Record<string, string>;
+        parameters.forEach(param => {
+          formattedParameterComments[param.name] = formatComment(param.comment) || '';
+          formattedParameters[param.name] = formatType(param.type);
+        });
+        const constructor: Constructor = {
+          id: child.id,
+          title: child.name,
+          signatureDescription: description,
+          parameters: parameters,
+          formattedParameters: formattedParameters,
+          formattedParameterComments: formattedParameterComments,
+          returnType: 'void', // Assuming constructor always returns void
+          definedIn: child.sources?.[0]?.fileName,
+          definedInUrl: child.sources?.[0]?.url,
+        };
+        constructors.push(constructor);
+      }
+    });
+
+    return constructors;
+  }
+
+  extractAccessors(reflection: ContainerReflection): Accessor[] {
+    const accessors = [] as Accessor[];
+
+    reflection.children?.forEach(child => {
+      if (child.kind === ReflectionKind.Accessor) {
+        const getSignature = child.getSignature;
+        const comment = getSignature ? formatComment(getSignature.comment) : undefined;
+        const description = extractSignatureDescription([getSignature!]);
+        const accessor: Accessor = {
+          id: child.id,
+          name: child.name,
+          comment: comment,
+          type: getSignature ? formatType(getSignature.type) : '',
+          returnType: getSignature ? formatType(getSignature.type) : '',
+          returnComment: description?.returns[0]?.description,
+          definedIn: child.sources?.[0]?.fileName,
+          definedInUrl: child.sources?.[0]?.url,
+        };
+        accessors.push(accessor);
+      }
+    });
+
+    return accessors;
+  }
+  extractMethods(reflection: ContainerReflection): Method[] {
+    const methods = [] as Method[];
+
+    reflection.children?.forEach(child => {
+      if (child.kind === ReflectionKind.Method) {
+        const signature = child.signatures?.[0];
+        const comment = signature ? formatComment(signature.comment) : '';
+        const description = extractSignatureDescription([signature!]);
+        const parameters = signature?.parameters?.map(param => ({
+          name: param.name,
+          type: formatType(param.type),
+        }));
+
+        const method: Method = {
+          id: child.id,
+          name: child.name,
+          comment: comment,
+          type: signature ? formatType(signature.type) : '',
+          returnType: signature ? formatType(signature.type) : '',
+          returnComment: description?.returns[0]?.description,
+          definedIn: child.sources?.[0]?.fileName,
+          definedInUrl: child.sources?.[0]?.url,
+          parameters: parameters,
+        };
+
+        methods.push(method);
+      }
+    });
+
+    return methods;
+  }
+  extractProperties(reflection: ContainerReflection): Property[] {
+    const properties = [] as Property[];
+
+    reflection.children?.forEach(child => {
+      if (child.kind === ReflectionKind.Property) {
+        const comment = formatComment(child.comment);
+        const type = formatType(child.type);
+        const isOptional = child.flags?.isOptional || false;
+        const inheritedFrom = child.inheritedFrom ? formatType(child.inheritedFrom) : undefined;
+
+        const property: Property = {
+          id: child.id,
+          name: child.name,
+          comment: comment,
+          type: type,
+          isOptional: isOptional,
+          definedIn: child.sources?.[0]?.fileName,
+          definedInUrl: child.sources?.[0]?.url,
+          inheritedFrom: inheritedFrom,
+        };
+
+        properties.push(property);
+      }
+    });
+
+    return properties;
+  }
 }
 
-function extractAccessors(reflection: ContainerReflection): Accessor[] {
-  const accessors = [] as Accessor[];
-
-  reflection.children?.forEach(child => {
-    if (child.kind === ReflectionKind.Accessor) {
-      const getSignature = child.getSignature;
-      const comment = getSignature ? formatComment(getSignature.comment) : undefined;
-      const description = extractSignatureDescription([getSignature!]);
-      const accessor: Accessor = {
-        name: child.name,
-        comment: comment,
-        type: getSignature ? formatType(getSignature.type) : '',
-        returnType: getSignature ? formatType(getSignature.type) : '',
-        returnComment: description?.returns[0]?.description,
-        definedIn: child.sources?.[0]?.fileName,
-        definedInUrl: child.sources?.[0]?.url,
-      };
-      accessors.push(accessor);
-    }
-  });
-
-  return accessors;
-}
-function extractMethods(reflection: ContainerReflection): Method[] {
-  const methods = [] as Method[];
-
-  reflection.children?.forEach(child => {
-    if (child.kind === ReflectionKind.Method) {
-      const signature = child.signatures?.[0];
-      const comment = signature ? formatComment(signature.comment) : '';
-      const description = extractSignatureDescription([signature!]);
-      const parameters = signature?.parameters?.map(param => ({
-        name: param.name,
-        type: formatType(param.type),
-      }));
-
-      const method: Method = {
-        name: child.name,
-        comment: comment,
-        type: signature ? formatType(signature.type) : '',
-        returnType: signature ? formatType(signature.type) : '',
-        returnComment: description?.returns[0]?.description,
-        definedIn: child.sources?.[0]?.fileName,
-        definedInUrl: child.sources?.[0]?.url,
-        parameters: parameters,
-      };
-
-      methods.push(method);
-    }
-  });
-
-  return methods;
-}
-
-function extractProperties(reflection: ContainerReflection): Property[] {
-  const properties = [] as Property[];
-
-  reflection.children?.forEach(child => {
-    if (child.kind === ReflectionKind.Property) {
-      const comment = formatComment(child.comment);
-      const type = formatType(child.type);
-      const isOptional = child.flags?.isOptional || false;
-      const inheritedFrom = child.inheritedFrom ? formatType(child.inheritedFrom) : undefined;
-
-      const property: Property = {
-        name: child.name,
-        comment: comment,
-        type: type,
-        isOptional: isOptional,
-        definedIn: child.sources?.[0]?.fileName,
-        definedInUrl: child.sources?.[0]?.url,
-        inheritedFrom: inheritedFrom,
-      };
-
-      properties.push(property);
-    }
-  });
-
-  return properties;
-}
-
-export async function findClasses(project: ProjectReflection, category?: string): Promise<ClassInfo[]> {
+export function findClasses(project: ProjectReflection, category?: string): ClassInfo[] {
   const classes = category
     ? getNodesByCategoryTitle(project, category, ReflectionKind.Class)
     : findAllNodesOfType(project, ReflectionKind.Class);
@@ -235,13 +269,8 @@ export async function findClasses(project: ProjectReflection, category?: string)
   const result: ClassInfo[] = [];
 
   function processClass(classNode: Reflection) {
-    result.push({
-      name: classNode.name,
-      constructors: extractConstructors(classNode as ContainerReflection),
-      accessors: extractAccessors(classNode as ContainerReflection),
-      methods: extractMethods(classNode as ContainerReflection),
-      properties: extractProperties(classNode as ContainerReflection),
-    });
+    const classInfo = new ClassInfo(classNode as DeclarationReflection);
+    result.push(classInfo);
   }
 
   for (const classNode of classes) {

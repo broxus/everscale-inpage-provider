@@ -1,65 +1,90 @@
-import { ContainerReflection, ProjectReflection, Reflection, DeclarationReflection, SomeType } from 'typedoc';
+import { DeclarationReflection, ProjectReflection } from 'typedoc';
 import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
-import { ReflectionKind } from './Class';
-import { formatComment, formatType, hasDeclaration } from './utils';
+import { ComponentKind, ReflectionKind } from './Class';
+import { extractSignatureDescription, formatComment, formatType } from './utils';
 
-export interface InterfaceInfo {
+export interface IParameter {
+  id: number;
   name: string;
-  properties?: {
-    name: string;
-    type: string;
-    comment?: string;
-  }[];
-  methods?: {
-    name: string;
-    comment?: string;
-    parameters?: {
-      name: string;
-      type: string;
-      comment?: string;
-    }[];
-    returnType?: string;
-  }[];
+  type: string;
+  comment?: string;
+}
+
+export interface IMethod {
+  id: number;
+  name: string;
+  comment?: string;
+  parameters?: IParameter[];
+  returnType?: string;
+}
+
+export interface IProperty {
+  id: number;
+  name: string;
+  type: string;
+  comment?: string;
+}
+
+export interface IInterfaceInfo {
+  id: number;
+  name: string;
+  kind: ComponentKind;
+  properties?: IProperty[];
+  methods?: IMethod[];
   definedIn?: string;
   definedInUrl?: string;
 }
 
-export async function findInterfaces(project: ProjectReflection, category?: string): Promise<InterfaceInfo[]> {
+export class InterfaceInfo implements IInterfaceInfo {
+  id: number;
+  name: string;
+  kind: ComponentKind;
+  properties?: IProperty[];
+  methods?: IMethod[];
+  definedIn?: string;
+  definedInUrl?: string;
+
+  constructor(reflection: DeclarationReflection) {
+    this.id = reflection.id;
+    this.name = reflection.name;
+    this.kind = ComponentKind.Interface;
+
+    const properties = reflection.children?.filter(child => child.kindString === 'Property') || [];
+    const methods = reflection.children?.filter(child => child.kindString === 'Method') || [];
+
+    this.properties = properties.map(property => ({
+      id: property.id,
+      name: property.name,
+      comment: formatComment(property.comment),
+      type: formatType(property.type),
+    }));
+
+    this.methods = methods.map(method => {
+      const signature = method.signatures?.[0];
+
+      return {
+        id: method.id,
+        name: method.name,
+        comment: signature ? formatComment(signature.comment) : undefined,
+        parameters: signature?.parameters?.map(param => ({
+          id: param.id,
+          name: param.name,
+          type: formatType(param.type),
+          comment: formatComment(param.comment),
+        })),
+        returnType: signature ? formatType(signature.type) : undefined,
+      };
+    });
+
+    this.definedIn = reflection.sources?.[0]?.fileName;
+    this.definedInUrl = reflection.sources?.[0]?.url;
+  }
+}
+
+export function findInterfaces(project: ProjectReflection, category?: string): InterfaceInfo[] {
   const interfaceNodes = category
     ? getNodesByCategoryTitle(project, category, ReflectionKind.Interface)
     : findAllNodesOfType(project, ReflectionKind.Interface);
 
-  const result: InterfaceInfo[] = [];
-
-  function processInterface(interfaceNode: DeclarationReflection): InterfaceInfo {
-    const properties = interfaceNode.children?.filter(child => child.kindString === 'Property') || [];
-    const methods = interfaceNode.children?.filter(child => child.kindString === 'Method') || [];
-
-    return {
-      name: interfaceNode.name,
-      properties: properties.map(property => ({
-        name: property.name,
-        comment: formatComment(property.comment),
-        type: formatType(property.type),
-      })),
-      methods: methods.map(method => ({
-        name: method.name,
-        comment: method.signatures ? formatComment(method.signatures[0].comment) : undefined,
-        parameters: method.signatures?.[0]?.parameters?.map(param => ({
-          name: param.name,
-          type: formatType(param.type),
-          сomment: formatComment(param.comment),
-        })),
-        returnType: formatType(method.signatures?.[0]?.type),
-      })),
-      definedIn: interfaceNode.sources?.[0]?.fileName,
-      definedInUrl: interfaceNode.sources?.[0]?.url,
-    };
-  }
-
-  for (const node of interfaceNodes) {
-    result.push(processInterface(node as DeclarationReflection));
-  }
-
-  return result;
+  return interfaceNodes.map(node => new InterfaceInfo(node as DeclarationReflection));
 }
