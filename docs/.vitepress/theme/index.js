@@ -15,9 +15,6 @@ import PageContentComponent from './../components/page-content/PageContent.vue';
 import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
 import ArrowComponent from './../components/shared/Arrow.vue';
 
-import lightThemeStyle from './../styles/light-theme.css?inline';
-import darkThemeStyle from './../styles/dark-theme.css?inline';
-
 export default {
   ...DefaultTheme,
   enhanceApp({ app }) {
@@ -37,8 +34,5 @@ export default {
     app.component('PageContentComponent', PageContentComponent);
     app.component('LinkComponent', AnchorLinkComponent);
     app.component('ArrowComponent', ArrowComponent);
-
-    app.provide('lightThemeStyle', lightThemeStyle);
-    app.provide('darkThemeStyle', darkThemeStyle);
   },
 };
