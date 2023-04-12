@@ -1,10 +1,11 @@
 import { ProjectReflection, Reflection, ContainerReflection } from 'typedoc';
+import { ReflectionKind } from '../.vitepress/ast-utils/Class';
 
-export function findAllNodesOfType(node: Reflection, type: string): Reflection[] {
+export function findAllNodesOfType(node: Reflection, type: ReflectionKind): Reflection[] {
   const result: Reflection[] = [];
 
   function searchChildren(childNode: Reflection) {
-    if (childNode.kindString === type) {
+    if (childNode.kind === type) {
       result.push(childNode);
     }
 
@@ -42,8 +43,13 @@ export function findNodeByName(node: Reflection, name: string): Reflection | nul
   return null;
 }
 
+function isContainerReflection(reflection: Reflection): reflection is ContainerReflection {
+  return (reflection as ContainerReflection).children !== undefined;
+}
+
 export function getAllNodes(project: ProjectReflection): Reflection[] {
   const result: Reflection[] = [];
+  project.categories;
 
   function searchChildren(childNode: Reflection) {
     result.push(childNode);
@@ -53,22 +59,97 @@ export function getAllNodes(project: ProjectReflection): Reflection[] {
     }
   }
 
-  function isContainerReflection(reflection: Reflection): reflection is ContainerReflection {
-    return (reflection as ContainerReflection).children !== undefined;
-  }
-
   searchChildren(project);
   return result;
 }
 
-// const typedocJson = require('./../build/typedoc-ast.json');
-// const projectReflection: ProjectReflection = typedocJson as ProjectReflection;
+// export function getNodesByCategoryTitle(project: ProjectReflection, categoryTitle: string, kind?: string): Reflection[] {
+//   const category = project.categories?.find(c => c.title === categoryTitle);
+//   if (!category) return [];
 
-// const nodes = getAllNodes(projectReflection);
-// console.log(nodes.length);
+//   const nodes = category.children?.map(ref => project.getReflectionById(ref.id)).filter(Boolean) as Reflection[];
+//   const result: Reflection[] = [];
 
-// for (const node of nodes) {
-//   console.log(node.name);
+//   function searchChildren(childNode: Reflection) {
+//     result.push(childNode);
+
+//     if (isContainerReflection(childNode)) {
+//       childNode.children!.forEach(node => {
+//         const child = project.getReflectionById(node.id);
+//         if (child) searchChildren(child);
+//       });
+//     }
+//   }
+
+//   nodes.forEach(searchChildren);
+//   return result;
 // }
-// const allClasses = findAllNodesOfType(projectReflection, 'Class');
-// const specificClass = findNodeByName(projectReflection, 'MyClassName');
+
+function getReflectionById(project: ProjectReflection, id: number): Reflection | undefined {
+  function searchChildren(children: Reflection[]): Reflection | undefined {
+    for (const child of children) {
+      if (child.id === id) {
+        return child;
+      }
+      if (isContainerReflection(child)) {
+        const result = searchChildren(child.children || []);
+        if (result) return result;
+      }
+    }
+    return undefined;
+  }
+
+  return searchChildren(project.children || []);
+}
+
+function getReflectionsByKind(project: ProjectReflection, kind: ReflectionKind): Reflection[] {
+  const result: Reflection[] = [];
+
+  function searchChildren(children: Reflection[]) {
+    for (const child of children) {
+      if (child.kind === kind) {
+        result.push(child);
+      }
+      if (isContainerReflection(child)) {
+        searchChildren(child.children || []);
+      }
+    }
+  }
+
+  searchChildren(project.children || []);
+  return result;
+}
+
+export function getNodesByCategoryTitle(
+  project: ProjectReflection,
+  categoryTitle: string,
+  kind?: ReflectionKind,
+): Reflection[] {
+  const category = project.categories?.find(c => c.title === categoryTitle);
+  if (!category) return [];
+
+  const nodes = category.children
+    ?.map(id => getReflectionById(project, id as any as number))
+    .filter(Boolean) as Reflection[];
+
+  let filteredNodes = nodes;
+  if (kind) {
+    filteredNodes = getReflectionsByKind(project, kind).filter(node => nodes.includes(node));
+  }
+
+  const result: Reflection[] = [];
+
+  function searchChildren(childNode: Reflection) {
+    result.push(childNode);
+
+    if (isContainerReflection(childNode)) {
+      childNode.children!.forEach(node => {
+        const child = getReflectionById(project, node.id);
+        if (child && filteredNodes.includes(child)) searchChildren(child);
+      });
+    }
+  }
+
+  filteredNodes.forEach(searchChildren);
+  return result;
+}
