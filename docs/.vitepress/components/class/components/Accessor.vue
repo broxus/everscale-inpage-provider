@@ -20,18 +20,13 @@
         </tbody>
       </table>
     </div>
-    <div v-else class="return code-block">
-      <h6>Returns</h6>
-      <a v-html="accessorData.returnType"></a>
-    </div>
-    <h6>Defined in</h6>
-    <p v-if="accessorData.definedIn">
-      <a :href="accessorData.definedInUrl" target="_blank" rel="noopener">{{ accessorData.definedIn }}</a>
-    </p>
+    <DefinedInLink :definedIn="accessorData.definedIn" :definedInUrl="accessorData.definedInUrl" />
   </section>
 </template>
 
 <script>
+import DefinedInLink from './../../shared/DefinedInLink.vue';
+
 export default {
   name: 'AccessorComponent',
   props: {
@@ -39,6 +34,9 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  components: {
+    DefinedInLink,
   },
 };
 </script>

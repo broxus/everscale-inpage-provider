@@ -39,14 +39,13 @@
         </tbody>
       </table>
     </div>
-    <h5>Defined in</h5>
-    <p v-if="constructorData.definedIn">
-      <a :href="constructorData.definedInUrl" target="_blank" rel="noopener">{{ constructorData.definedIn }}</a>
-    </p>
+    <DefinedInLink :definedIn="constructorData.definedIn" :definedInUrl="constructorData.definedInUrl" />
   </div>
 </template>
 
 <script>
+import DefinedInLink from './../../shared/DefinedInLink.vue';
+
 export default {
   name: 'ConstructorComponent',
   props: {
@@ -59,6 +58,9 @@ export default {
     hasComments() {
       return Object.keys(this.constructorData.formattedParameterComments).length > 0;
     },
+  },
+  components: {
+    DefinedInLink,
   },
 };
 </script>

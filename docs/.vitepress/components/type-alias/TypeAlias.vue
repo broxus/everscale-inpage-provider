@@ -1,27 +1,27 @@
 <template>
-  <section class="type-alias" v-for="typeAliasData in typeAliases" :key="typeAliasData.name">
-    <h2 :id="typeAliasData.name">{{ typeAliasData.name }}</h2>
-    <div v-if="typeAliasData.typeParameters && typeAliasData.typeParameters.length > 0">
+  <section class="type-alias">
+    <h2 :id="item.name">{{ item.name }}</h2>
+    <div v-if="item.typeParameters && item.typeParameters.length > 0">
       <h6 id="type-parameters">Type parameters</h6>
       <table>
         <thead>
           <tr>
             <th>Name</th>
             <th>Type</th>
-            <th v-if="typeAliasData.typeParameters && typeAliasData.typeParameters.length > 0">Description</th>
+            <th v-if="item.typeParameters && item.typeParameters.length > 0">Description</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="param in typeAliasData.typeParameters" :key="param.name">
+          <tr v-for="param in item.typeParameters" :key="param.name">
             <td>{{ param.name }}</td>
             <td v-html="param.type"></td>
             <td v-if="param.comment">{{ param.comment }}</td>
-            <td v-else-if="typeAliasData.typeParameters && typeAliasData.typeParameters.length > 0">&nbsp;</td>
+            <td v-else-if="item.typeParameters && item.typeParameters.length > 0">&nbsp;</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div v-if="typeAliasData.typeDeclaration">
+    <div v-if="item.typeDeclaration">
       <h6 id="type-declaration">Type declaration</h6>
       <table>
         <thead>
@@ -32,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="property in typeAliasData.typeDeclaration" :key="property.name">
+          <tr v-for="property in item.typeDeclaration" :key="property.name">
             <td>{{ property.name }}</td>
             <td v-html="property.type"></td>
             <td v-if="property.comment">{{ property.comment }}</td>
@@ -40,22 +40,25 @@
         </tbody>
       </table>
     </div>
-    <h6>Defined in</h6>
-    <a :href="typeAliasData.definedInUrl" target="_blank" rel="noopener">{{ typeAliasData.definedIn }}</a>
+    <DefinedInLink :definedIn="item.definedIn" :definedInUrl="item.definedInUrl" />
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { TypeAliasInfo } from './../../ast-utils';
+import DefinedInLink from '../shared/DefinedInLink.vue';
 
 export default defineComponent({
   name: 'TypeAliasComponent',
   props: {
-    typeAliases: {
-      type: Array as () => TypeAliasInfo[],
+    item: {
+      type: Object as () => TypeAliasInfo,
       required: true,
     },
+  },
+  components: {
+    DefinedInLink,
   },
 });
 </script>

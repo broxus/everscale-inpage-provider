@@ -11,15 +11,13 @@
       <h6>Returns</h6>
       <code v-html="methodData.returnType"></code>
     </div>
-    <h6>Defined in</h6>
-    <p>
-      <a :href="methodData.definedInUrl" target="_blank" rel="noopener">{{ methodData.definedIn }}</a>
-    </p>
+    <!-- <DefinedInLink :definedIn="methodData.definedIn" :definedInUrl="methodData.definedInUrl" /> -->
   </div>
 </template>
 
 <script>
 import PropertyTable from './../../shared/PropertyTable.vue';
+import DefinedInLink from './../../shared/DefinedInLink.vue';
 
 export default {
   name: 'MethodComponent',
@@ -31,6 +29,7 @@ export default {
   },
   components: {
     PropertyTable,
+    DefinedInLink,
   },
 };
 </script>

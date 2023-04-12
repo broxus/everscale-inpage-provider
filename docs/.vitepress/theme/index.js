@@ -10,6 +10,8 @@ import FunctionComponent from './../components/function/Function.vue';
 import TableOfContentComponent from './../components/shared/TableOfContent.vue';
 import PropertyTableComponent from './../components/shared/PropertyTable.vue';
 import DefinedInLinkComponent from './../components/shared/DefinedInLink.vue';
+import ComponentSwitcher from './../components/component-switcher/ComponentSwitcher.vue';
+import PageContentComponent from './../components/page-content/PageContent.vue';
 
 export default {
   ...DefaultTheme,
@@ -26,5 +28,7 @@ export default {
     app.component('TableOfContentComponent', TableOfContentComponent);
     app.component('PropertyTableComponent', PropertyTableComponent);
     app.component('DefinedInLinkComponent', DefinedInLinkComponent);
+    app.component('ComponentSwitcher', ComponentSwitcher);
+    app.component('PageContentComponent', PageContentComponent);
   },
 };

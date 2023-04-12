@@ -1,43 +1,42 @@
 <template>
-  <section class="interface-info" v-for="interfaceData in interfaces" :key="interfaceData.name">
-    <h2 :id="interfaceData.name">{{ interfaceData.name }}</h2>
-    <div v-if="interfaceData.properties && interfaceData.properties.length > 0">
+  <section class="interface-component">
+    <h3 :id="item.name">{{ item.name }}</h3>
+    <div v-if="item.properties && item.properties.length > 0">
       <h6 id="properties">Properties</h6>
-      <PropertyTable :properties="interfaceData.properties" />
+      <PropertyTable :properties="item.properties" />
     </div>
-    <div v-if="interfaceData.methods && interfaceData.methods.length > 0">
+    <div v-if="item.methods && item.methods.length > 0">
       <h6 id="methods">Methods</h6>
-      <PropertyTable :properties="interfaceData.methods" />
+      <PropertyTable :properties="item.methods" />
     </div>
-    <h6>Defined in</h6>
-    <a :href="interfaceData.definedInUrl" target="_blank" rel="noopener">{{ interfaceData.definedIn }}</a>
+    <DefinedInLink :definedIn="item.definedIn" :definedInUrl="item.definedInUrl" />
   </section>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watchEffect } from 'vue';
 import { InterfaceInfo } from './../../ast-utils';
 import PropertyTable from './../shared/PropertyTable.vue';
+import DefinedInLink from './../shared/DefinedInLink.vue';
 
 export default defineComponent({
   name: 'InterfaceComponent',
   props: {
-    interfaces: {
-      type: Array as () => InterfaceInfo[],
+    item: {
+      type: Object as () => InterfaceInfo,
       required: true,
     },
   },
   components: {
     PropertyTable,
+    DefinedInLink,
   },
   methods: {
     hasComments() {
-      return this.interfaces.some(interfaceData => {
-        const hasPropertyComments =
-          interfaceData.properties && interfaceData.properties.some(property => property.comment);
-        const hasMethodComments = interfaceData.methods && interfaceData.methods.some(method => method.comment);
-        return hasPropertyComments || hasMethodComments;
-      });
+      return (
+        (this.item.properties && this.item.properties.some(prop => prop.comment)) ||
+        (this.item.methods && this.item.methods.some(method => method.comment))
+      );
     },
   },
 });
