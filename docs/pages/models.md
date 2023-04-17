@@ -1,12 +1,6 @@
 <script lang="ts">
   import { buildTableOfContent, buildPage } from './../scripts/build';
 
-  const project = (await import(/* @vite-ignore */ './../build/typedoc-ast.json').then(
-    module => module.default,
-  )) as ProjectReflection;
-
-  // console.log(await buildPage(project, 'Models', await buildTableOfContent(project, 'Models')))
-
   export default {
     name: 'Models',
     data() {
@@ -16,6 +10,10 @@
       };
     },
     async created() {
+      const project = (await import(/* @vite-ignore */ './../build/typedoc-ast.json').then(
+        module => module.default,
+      )) as ProjectReflection;
+
       this.tableOfContent = await buildTableOfContent(project, 'Models');
       this.pageContent = await buildPage(project, 'Models', this.tableOfContent);
 
