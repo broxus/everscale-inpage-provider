@@ -9,10 +9,11 @@ module.exports = {
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Documentation', link: '/pages/hello.md' },
+      { text: 'Documentation', link: '/pages/overview.md' },
       // { text: 'Guide', link: '/pages/guide.md' },
     ],
     sidebar: [
+      { text: 'Overview', link: '/pages/overview.md' },
       {
         text: 'Guide',
         collapsable: false,

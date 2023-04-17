@@ -1,4 +1,4 @@
-Welcome to the Inpage Provider documentation for the Everscale blockchain! This library streamlines interactions between web applications and the Everscale blockchain, providing developers with convenient tools for working with smart contracts, transaction streams, events, and user permissions management.
+# Everscale Inpage Provider
 
 The Inpage Provider's main features include:
 
@@ -12,9 +12,9 @@ The Inpage Provider library plays an important role in the Everscale ecosystem b
 
 ## Table of Contents
 
-- provider: the main file that combines all modules into one library.
-- api: describes the API class for sending requests to the server and interacting with the blockchain.
-- models: defines the main data structures, such as transactions and smart contracts.
-- contract: contains functionality for working with smart contracts, including their creation and submission.
-- stream: implements functionality for working with transaction streams and events.
-- utils: auxiliary functions and classes needed for library operation.
+- [provider](provider.md#Provider): the main file that combines all modules into one library.
+- [provider-api](provider-api.md#provider-api): describes the API class for sending requests to the server and interacting with the blockchain.
+- [models](models.md#models) : defines the main data structures, such as transactions and smart contracts.
+- [contract](contract.md#contract): contains functionality for working with smart contracts, including their creation and submission.
+- [stream](stream.md#stream): implements functionality for working with transaction streams and events.
+- [utils](utils.md#utils): auxiliary functions and classes needed for library operation.
