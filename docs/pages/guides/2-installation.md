@@ -58,10 +58,6 @@ Depending on your use case, you can use different kinds of providers:
 
 - **Extension only:**
 
-  ```shell
-  npm install --save everscale-inpage-provider
-  ```
-
   This default usage pattern requires injected provider object. This means extension must be
   installed or website is opened inside some webview with prepared runtime. Library will
   wait until this object is ready and will not require any other assets to load.
