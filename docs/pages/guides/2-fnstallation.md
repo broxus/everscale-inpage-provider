@@ -35,8 +35,8 @@ onUnmounted(async () => {
 });
 
 const requestPermissions = async () => {
-  await ever.requestPermissions({ 
-    permissions: ['basic', 'accountInteraction'] 
+  await ever.requestPermissions({
+    permissions: ['basic', 'accountInteraction']
   });
 };
 
