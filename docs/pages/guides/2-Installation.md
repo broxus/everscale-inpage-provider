@@ -13,14 +13,7 @@ const getProviderState = async () => {
 
 
 const permissions = ref();
-// const getSnippets = async () => {
-//     return (await import(/* @vite-ignore */ './../../snippets/snippets.json').then(
-//      module => module.default,
-//   ));
-// };
-const snippetMap = {
-  "has-everscale-provider": "import { hasEverscaleProvider } from 'everscale-inpage-provider';\n\n(async () => {\n  const isWeb3Supported = await hasEverscaleProvider();\n  if (isWeb3Supported) {\n    console.log('Browser supports Web3');\n  } else {\n    console.log('Browser does not support Web3');\n  }\n})();\n"
-}
+
 let permissionsSubscription = undefined;
 onMounted(async () => {
 
@@ -54,23 +47,6 @@ const disconnect = async () => {
 const changeAccount = async () => {
   await ever.changeAccount()
 };
-
-import { hasEverscaleProvider } from "everscale-inpage-provider";
-
-(async () => {
-  const isWeb3Supported = await hasEverscaleProvider();
-  if (isWeb3Supported) {
-    console.log("Браузер поддерживает Web3");
-  } else {
-    console.log("Браузер не поддерживает Web3");
-  }
-})();
-
-if (window.__ever || window.__hasEverscaleProvider || window.ton || window.hasTonProvider) {
-  console.log('Everscale provider is detected');
-} else {
-  console.log('Everscale provider is not detected');
-}
 
 </script>
 
