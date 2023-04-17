@@ -86,7 +86,6 @@ export default defineComponent({
   },
   computed: {
     arrowColor() {
-      // Определите цвет стрелки на основе текущей темы
       return this.theme.value === 'dark' ? 'white' : 'black';
     },
   },

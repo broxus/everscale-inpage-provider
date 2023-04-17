@@ -6,6 +6,7 @@ import {
   SignatureReflection,
   DeclarationReflection,
 } from 'typedoc';
+// import { ReflectionKind } from 'typedoc-web';
 //import { SignatureReflection } from 'typedoc/dist/lib/serialization/schema';
 import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import {
@@ -20,6 +21,7 @@ import {
  *  @category Class/Interfaces and Types
  */
 
+// export { ReflectionKind };
 export enum ReflectionKind {
   Project = 1,
   Module = 2,
@@ -262,6 +264,7 @@ export class ClassInfo implements IClassInfo {
 }
 
 export function findClasses(project: ProjectReflection, category?: string): ClassInfo[] {
+  category = undefined;
   const classes = category
     ? getNodesByCategoryTitle(project, category, ReflectionKind.Class)
     : findAllNodesOfType(project, ReflectionKind.Class);

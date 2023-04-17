@@ -28,6 +28,18 @@ export interface SignatureDescription {
   typeParameter: typeParam[];
 }
 
+export type SignatureParam = {
+  name: string;
+  type: string;
+};
+
+export type FunctionSignature = {
+  name: string;
+  generic?: string;
+  params: SignatureParam[];
+  returnType: string;
+};
+
 export function formatComments(comments: Comment[]) {
   return comments.map(comment => formatComment(comment));
 }
@@ -111,21 +123,61 @@ export function formatComment(comment: Comment | undefined): string | undefined 
     .join('');
 }
 
+// export function formatType(rawType: any | undefined): string {
+//   if (!rawType) {
+//     return '';
+//   }
+//   if (rawType.type === 'reference') {
+//     //TODO logic for create link url
+//     let typeArgumentsString = '';
+//     if (rawType.typeArguments) {
+//       const formattedTypeArguments = rawType.typeArguments.map(formatType);
+//       typeArgumentsString = `<${formattedTypeArguments.join(', ')}>`;
+//     }
+//     return `<a href="${rawType.name}.md">${rawType.name}</a>${typeArgumentsString}`;
+//   } else {
+//     return rawType.name;
+//   }
+// }
 export function formatType(rawType: any | undefined): string {
   if (!rawType) {
     return '';
   }
-  if (rawType.type === 'reference') {
-    //TODO logic for create link url
-    let typeArgumentsString = '';
-    if (rawType.typeArguments) {
-      const formattedTypeArguments = rawType.typeArguments.map(formatType);
-      typeArgumentsString = `<${formattedTypeArguments.join(', ')}>`;
-    }
-    return `<a href="${rawType.name}.md">${rawType.name}</a>${typeArgumentsString}`;
-  } else {
-    return rawType.name;
+
+  switch (rawType.type) {
+    case 'reference':
+      let typeArgumentsString = '';
+      if (rawType.typeArguments) {
+        const formattedTypeArguments = rawType.typeArguments.map(formatType);
+        typeArgumentsString = `<${formattedTypeArguments.join(', ')}>`;
+      }
+      return `<a href="${rawType.name}.md">${rawType.name}</a>${typeArgumentsString}`;
+    case 'array':
+      return `${formatType(rawType.elementType)}[]`;
+    case 'union':
+      return rawType.types.map(formatType).join(' | ');
+    case 'intersection':
+      return rawType.types.map(formatType).join(' & ');
+    case 'tuple':
+      return `[${rawType.elements.map(formatType).join(', ')}]`;
+
+    default:
+      return rawType.name;
   }
+}
+
+export function getMethodSignature(signature: any): string {
+  const typeParameters = signature.typeParameter
+    ? `<${signature.typeParameter.map((tp: any) => tp.name).join(', ')}>`
+    : '';
+
+  const parameters = signature.parameters
+    ? signature.parameters.map((param: any) => `${param.name}: ${formatType(param.type)}`).join(', ')
+    : '';
+
+  const returnType = formatType(signature.type);
+
+  return `${signature.name}${typeParameters}(${parameters}): ${returnType}`;
 }
 
 export function formatReturnType(rawType: any | undefined, returnTypeComment: string | undefined): string {

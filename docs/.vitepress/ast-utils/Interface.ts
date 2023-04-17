@@ -1,7 +1,7 @@
 import { DeclarationReflection, ProjectReflection } from 'typedoc';
 import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import { ComponentKind, ReflectionKind } from './Class';
-import { extractSignatureDescription, formatComment, formatType } from './utils';
+import { formatComment, formatType } from './utils';
 
 export interface IParameter {
   id: number;
@@ -16,6 +16,7 @@ export interface IMethod {
   comment?: string;
   parameters?: IParameter[];
   returnType?: string;
+  signature?: string;
 }
 
 export interface IProperty {
@@ -44,13 +45,13 @@ export class InterfaceInfo implements IInterfaceInfo {
   definedIn?: string;
   definedInUrl?: string;
 
-  constructor(reflection: DeclarationReflection) {
+  constructor(reflection: any) {
     this.id = reflection.id;
     this.name = reflection.name;
     this.kind = ComponentKind.Interface;
 
-    const properties = reflection.children?.filter(child => child.kindString === 'Property') || [];
-    const methods = reflection.children?.filter(child => child.kindString === 'Method') || [];
+    const properties = reflection.children?.filter(child => child.kind === ReflectionKind.Property) || [];
+    const methods = reflection.children?.filter(child => child.kind === ReflectionKind.Method) || [];
 
     this.properties = properties.map(property => ({
       id: property.id,
@@ -71,6 +72,7 @@ export class InterfaceInfo implements IInterfaceInfo {
           name: param.name,
           type: formatType(param.type),
           comment: formatComment(param.comment),
+          //signature: getMethodSignature(signature),
         })),
         returnType: signature ? formatType(signature.type) : undefined,
       };

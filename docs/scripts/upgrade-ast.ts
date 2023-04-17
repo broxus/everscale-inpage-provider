@@ -1,6 +1,6 @@
 import { DeclarationReflection, ProjectReflection, SignatureReflection } from 'typedoc';
 import { ReflectionKind } from '../.vitepress/ast-utils/Class';
-//import fs from 'fs';
+import fs from 'fs';
 
 type SubCategory = { name: string; children: number[]; parent: number; parentCategory: string };
 
@@ -84,94 +84,8 @@ export function addSubCategoriesToChildrenNodes(parent: DeclarationReflection) {
       } as any);
     }
   }
-
   return knownedSubCategories;
 }
-
-// export function extractCategories(parent: DeclarationReflection): Category[] {
-//   const subCategoriesMap = new Map<string, SubCategory>();
-//   const categoryMap = new Map<string, Category>();
-//   let currentSubCategory: string | undefined;
-//   if (!parent.children) return [];
-//   for (const child of parent.children!) {
-//     let signature: SignatureReflection | undefined;
-
-//     if (child.kind === ReflectionKind.Accessor) {
-//       signature = child.getSignature;
-//     } else if (child.signatures) {
-//       signature = child.signatures[0];
-//     }
-//     if (!signature) continue;
-
-//     const childId = child.id;
-
-//     const categoryName = getCategoryName(child);
-
-//     let existCategory = categoryMap.get(categoryName);
-//     if (!existCategory) {
-//       existCategory = {
-//         name: categoryName,
-//         children: [],
-//       };
-//       categoryMap.set(categoryName, existCategory);
-//     }
-
-//     const comment = signature.comment;
-//     if (comment) {
-//       const blockTags = comment.blockTags || [];
-
-//       const subCategoryTag = blockTags.find(tag => tag.tag === '@subCategory');
-
-//       if (subCategoryTag) {
-//         currentSubCategory = subCategoryTag.content[0].text;
-
-//         let subCategory = subCategoriesMap.get(currentSubCategory);
-//         if (!subCategory) {
-//           subCategory = {
-//             name: currentSubCategory,
-//             children: [childId],
-//             parent: parent.id,
-//             parentCategory: categoryName,
-//           };
-//           subCategoriesMap.set(currentSubCategory, subCategory);
-
-//           if (!existCategory.subCategories) {
-//             existCategory.subCategories = [subCategory];
-//           } else {
-//             existCategory.subCategories.push(subCategory);
-//           }
-//         } else {
-//           subCategory.children.push(childId);
-//         }
-
-//         existCategory.children.push(childId);
-//       } else {
-//         if (child.name === 'raw') {
-//           console.log(currentSubCategory);
-//         }
-//         if (currentSubCategory) {
-//           const subCategory = subCategoriesMap.get(currentSubCategory);
-//           if (subCategory) {
-//             subCategory.children.push(childId);
-//             subCategoriesMap.set(currentSubCategory, subCategory);
-//           }
-//         }
-//         existCategory.children.push(childId);
-//       }
-//     } else {
-//       if (currentSubCategory) {
-//         const subCategory = subCategoriesMap.get(currentSubCategory);
-//         if (subCategory) {
-//           subCategory.children.push(childId);
-//           subCategoriesMap.set(currentSubCategory, subCategory);
-//         }
-//       }
-//       existCategory.children.push(childId);
-//     }
-//   }
-
-//   return [...categoryMap.values()];
-// }
 
 export async function upgradeAst() {
   const project = (await import('./../build/typedoc-ast.json').then(
@@ -191,7 +105,7 @@ export async function upgradeAst() {
 
   //project.subCategories = Array.from(knownedSubCategories.values());
   const path = './build/typedoc-ast.json';
-  //fs.writeFileSync('./docs/build/typedoc-ast.json', JSON.stringify(project, null, 2));
+  fs.writeFileSync('./docs/build/typedoc-ast.json', JSON.stringify(project, null, 2));
 }
 
 function processNamespaceOrModule(
