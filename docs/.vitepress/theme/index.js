@@ -1,3 +1,5 @@
+import './style.css';
+
 import DefaultTheme from 'vitepress/theme';
 import ClassComponent from './../components/class/Class.vue';
 import ConstructorComponent from './../components/class/components/Constructor.vue';
@@ -14,6 +16,12 @@ import ComponentSwitcher from './../components/component-switcher/ComponentSwitc
 import PageContentComponent from './../components/page-content/PageContent.vue';
 import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
 import ArrowComponent from './../components/shared/Arrow.vue';
+import TypeRendererComponent from './../components/shared/type/components/TypeRenderer.vue';
+import ArrayTypeComponent from './../components/shared/type/components/ArrayType.vue';
+import GetProviderStateComponent from './../components/demo/GetProviderState.vue';
+import PackUnpackCellComponent from './../components/snippets/PackUnpackCell.vue';
+// import SnippetComponent from './../components/shared/Snippet.vue';
+// import CodeBlockComponent from './../components/shared/CodeBlock.vue';
 
 export default {
   ...DefaultTheme,
@@ -34,5 +42,11 @@ export default {
     app.component('PageContentComponent', PageContentComponent);
     app.component('LinkComponent', AnchorLinkComponent);
     app.component('ArrowComponent', ArrowComponent);
+    app.component('TypeRendererComponent', TypeRendererComponent);
+    app.component('ArrayTypeComponent', ArrayTypeComponent);
+    app.component('GetProviderStateComponent', GetProviderStateComponent);
+    app.component('PackUnpackCellComponent', PackUnpackCellComponent);
+    // app.component('SnippetComponent', SnippetComponent);
+    // app.component('CodeBlockComponent', CodeBlockComponent);
   },
 };
