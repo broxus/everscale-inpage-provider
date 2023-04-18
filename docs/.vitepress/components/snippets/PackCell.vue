@@ -12,8 +12,8 @@
       <label for="city">City:</label>
       <input id="city" type="text" v-model="dataToPack.city" />
     </div>
-    <button @click="executeApiCall">Run</button>
-    <pre v-if="apiResult">{{ apiResult }}</pre>
+    <button @click="executeApiCall">Pack Data</button>
+    <pre v-if="packedData">{{ packedData }}</pre>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ import { ProviderRpcClient } from 'everscale-inpage-provider';
 
 const provider = new ProviderRpcClient();
 
-const abiStructure = [
+const ABI = [
   { name: 'name', type: 'string' },
   { name: 'age', type: 'uint32' },
   { name: 'city', type: 'string' },
@@ -31,50 +31,32 @@ const abiStructure = [
 
 export default defineComponent({
   setup() {
-    const apiResult = ref('');
+    const packedData = ref('');
     const dataToPack = ref({
       name: 'Alice',
       age: 30,
       city: 'New York',
     });
 
-    return { apiResult, dataToPack };
+    return { packedData, dataToPack };
   },
   methods: {
     async packData(): Promise<{ boc: string; hash: string }> {
       await provider.ensureInitialized();
 
       const { boc, hash } = await provider.packIntoCell({
-        structure: abiStructure,
+        structure: ABI,
         data: this.dataToPack,
       });
 
       return { boc, hash };
     },
 
-    async unpackData(boc: string) {
-      await provider.ensureInitialized();
-
-      const unpacked = await provider.unpackFromCell({
-        structure: abiStructure,
-        boc: boc,
-        allowPartial: true,
-      });
-
-      return unpacked.data;
-    },
-
     async executeApiCall() {
       await provider.requestPermissions({ permissions: ['basic'] });
 
-      const packedData = await this.packData();
-      const unpackedData = await this.unpackData(packedData.boc);
-
-      this.apiResult = `Packed Data: ${JSON.stringify(packedData, null, 2)}\n\nUnpacked Data: ${JSON.stringify(
-        unpackedData,
-        null,
-        2,
-      )}`;
+      const packed = await this.packData();
+      this.packedData = JSON.stringify(packed, null, 2);
     },
   },
 });
