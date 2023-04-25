@@ -4,9 +4,11 @@ import typescript from '@rollup/plugin-typescript';
 
 module.exports = {
   title: 'Everscale Inpage Provider',
+  base: '/everscale-inpage-provider/docs/',
   description: 'Web3-like interface to the Everscale blockchain.',
   plugins: [vue(), typescript()],
   themeConfig: {
+    headersDepth: 3,
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Documentation', link: '/pages/overview.md' },
@@ -25,7 +27,7 @@ module.exports = {
             collapsable: false,
             items: [
               { text: 'Working with Cells', link: '/pages/guides/3.1-working-with-cells.md' },
-              { text: 'Working with Contracts', link: '/pages/working-with-contracts.md' },
+              { text: 'Interaction with Contracts', link: '/pages/guides/3.2-working-with-contracts.md' },
               { text: 'Subscriptions', link: '/pages/subscriptions.md' },
               { text: 'Cryptography', link: '/pages/cryptography.md' },
             ],
@@ -35,7 +37,6 @@ module.exports = {
             text: 'Real-life Examples',
             collapsable: false,
             items: [
-              { text: 'Contract Deployment', link: '/pages/contract-deployment.md' },
               { text: 'Working with tip3', link: '/pages/working-with-tip3.md' },
               // { text: 'Working with NFTs', link: '/pages/working-with-nfts.md' },
               { text: 'Authorization through signing a string', link: '/pages/authorization.md' },

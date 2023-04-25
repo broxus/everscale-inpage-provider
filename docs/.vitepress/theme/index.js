@@ -18,13 +18,17 @@ import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
 import ArrowComponent from './../components/shared/Arrow.vue';
 // import TypeRendererComponent from './../components/shared/type/components/TypeRenderer.vue';
 // import ArrayTypeComponent from './../components/shared/type/components/ArrayType.vue';
-import GetProviderStateComponent from './../components/demo/GetProviderState.vue';
+import GetProviderStateComponent from './../components/snippets/GetProviderState.vue';
+
+import GetComplexStateAndPrefixedSecondComponent from './../components/snippets/GetComplexStateAndPrefixedSecond.vue';
+import ComputeSmthComponent from './../components/snippets/ComputeSmth.vue';
+import TvmExceptionComponent from './../components/snippets/TvmException.vue';
 import PackCellComponent from './../components/snippets/PackCell.vue';
 import UnpackCellComponent from './../components/snippets/UnpackCell.vue';
 import GetBocHashComponent from './../components/snippets/GetBocHash.vue';
-//import SendExternalMessageComponent from './../components/snippets/SendExternalMessage.vue';
-// import SnippetComponent from './../components/shared/Snippet.vue';
-// import CodeBlockComponent from './../components/shared/CodeBlock.vue';
+import DeployAccountComponent from './../components/snippets/DeployAccount.vue';
+import SendExternalMessageComponent from './../components/snippets/SendExternalMessage.vue';
+import SendInternalMessageComponent from './../components/snippets/SendInternalMessage.vue';
 
 export default {
   ...DefaultTheme,
@@ -48,12 +52,15 @@ export default {
     // app.component('TypeRendererComponent', TypeRendererComponent);
     // app.component('ArrayTypeComponent', ArrayTypeComponent);
     app.component('GetProviderStateComponent', GetProviderStateComponent);
+    app.component('GetComplexStateAndPrefixedSecondComponent', GetComplexStateAndPrefixedSecondComponent);
+    app.component('ComputeSmthComponent', ComputeSmthComponent);
+    app.component('TvmExceptionComponent', TvmExceptionComponent);
     app.component('PackCellComponent', PackCellComponent);
     app.component('UnpackCellComponent', UnpackCellComponent);
     app.component('GetBocHashComponent', GetBocHashComponent);
+    app.component('DeployAccountComponent', DeployAccountComponent);
 
-    // app.component('SnippetComponent', SnippetComponent);
-    // app.component('CodeBlockComponent', CodeBlockComponent);
-    //app.component('SendExternalMessageComponent', SendExternalMessageComponent);
+    app.component('SendExternalMessageComponent', SendExternalMessageComponent);
+    app.component('SendInternalMessageComponent', SendInternalMessageComponent);
   },
 };
