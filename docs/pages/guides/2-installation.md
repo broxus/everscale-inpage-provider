@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 <script setup>
 import { ProviderRpcClient } from 'everscale-inpage-provider';
 import { onMounted, onUnmounted, ref } from 'vue';

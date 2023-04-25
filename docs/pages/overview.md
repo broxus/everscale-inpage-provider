@@ -1,3 +1,7 @@
+---
+outline: deep
+---
+
 # Overview
 
 Before integrating with the blockchain, it is important to understand how it works. The following will be a brief description of the
