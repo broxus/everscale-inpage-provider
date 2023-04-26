@@ -1,6 +1,6 @@
 <template>
   <div class="demo">
-    <button @click="getProviderState">Get provider state</button>
+    <button @click="getProviderState">getProviderState</button>
     <pre v-if="providerState != null">{{ providerState }}</pre>
   </div>
 </template>

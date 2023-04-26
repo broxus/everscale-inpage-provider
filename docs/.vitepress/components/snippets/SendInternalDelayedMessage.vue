@@ -1,12 +1,22 @@
 <template>
   <div class="demo">
-    <div class="contract-state" v-if="parsedContractState">Simple State: {{ parsedContractState.simpleState }}</div>
+    <div class="contract-state" v-if="parsedContractState">
+      <div>Simple State: {{ parsedContractState.simpleState }}</div>
+    </div>
     <div>
       <label for="someParam">SomeParam:</label>
       <input id="someParam" type="number" v-model="someParam" />
     </div>
-    <button @click="sendInternalMessage">Send Message</button>
-    <AccordionComponent v-if="transaction" buttonText="Show transaction" :transactionData="transaction" />
+    <button @click="sendInternalDelayedMessage">Send Message</button>
+    <div class="message-info" v-if="messageInfo">
+      <div>Message Hash: {{ messageInfo.messageHash }}</div>
+      <div>Expiration Time: {{ messageInfo.expireAt }}</div>
+      <AccordionComponent
+        v-if="transactionExecuted"
+        :transactionData="transaction"
+        buttonText="Show transaction"
+      ></AccordionComponent>
+    </div>
   </div>
 </template>
 
@@ -14,16 +24,18 @@
 import { defineComponent, ref } from 'vue';
 import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
 
-import { testContract, errorExtractor, toNano } from './../../helpers';
+import { testContract, toNano } from './../../helpers';
 
 import AccordionComponent from './../shared/Accordion.vue';
 
 export default defineComponent({
-  name: 'SendInternalMessage',
+  name: 'SendInternalDelayedMessage',
   components: {
     AccordionComponent,
   },
   async setup() {
+    const transactionExecuted = ref(false);
+    const messageInfo = ref();
     const transaction = ref();
     const someParam = ref(1337);
 
@@ -34,7 +46,7 @@ export default defineComponent({
 
     const contractState = ref(JSON.stringify(state, null, 2));
 
-    return { transaction, contractState, someParam };
+    return { transactionExecuted, messageInfo, contractState, someParam, transaction };
   },
   computed: {
     parsedContractState() {
@@ -46,7 +58,8 @@ export default defineComponent({
     },
   },
   methods: {
-    async sendInternalMessage() {
+    async sendInternalDelayedMessage() {
+      this.messageInfo = null;
       const provider = new ProviderRpcClient();
       await provider.ensureInitialized();
       const { accountInteraction } = await provider.requestPermissions({
@@ -68,21 +81,28 @@ export default defineComponent({
           someParam: this.someParam,
         },
       };
-      const tx = await errorExtractor(
-        provider.sendMessage({
-          sender: senderAddress,
-          recipient: new Address(testContract.address),
-          amount: toNano(1),
-          bounce: true,
-          payload: payload,
-        }),
-      );
+      const { transaction, messageHash, expireAt } = await provider.sendMessageDelayed({
+        sender: senderAddress,
+        recipient: new Address(testContract.address),
+        amount: toNano(1),
+        bounce: true,
+        payload: payload,
+      });
 
-      const s = await exampleContract.waitForEvent({ filter: event => event.event === 'StateChanged' });
-      console.log(JSON.stringify(s, null, 2));
-      const state = await exampleContract.methods.simpleState().call();
-      this.contractState = JSON.stringify(state, null, 2);
-      this.transaction = JSON.stringify(tx.transaction, null, 2);
+      this.messageInfo = {
+        messageHash,
+        expireAt,
+      };
+
+      transaction
+        .then(async () => {
+          this.transactionExecuted = true;
+          this.transaction = await transaction;
+          return exampleContract.methods.simpleState().call();
+        })
+        .then(state => {
+          this.contractState = JSON.stringify(state, null, 2);
+        });
     },
   },
 });
@@ -91,5 +111,13 @@ export default defineComponent({
 <style scoped>
 .contract-state {
   margin-bottom: 1rem;
+}
+
+.message-info {
+  margin-top: 1rem;
+}
+
+.message-info > div {
+  margin-bottom: 0.5rem;
 }
 </style>

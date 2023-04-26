@@ -73,8 +73,8 @@ export default defineComponent({
         provider.sendMessage({
           sender: senderAddress,
           recipient: expectedAddress,
-          amount: toNano(0.3),
-          bounce: false, // This important
+          amount: toNano(1),
+          bounce: false,
           stateInit: stateInit.stateInit,
           //payload: constructorPayload,
         }),

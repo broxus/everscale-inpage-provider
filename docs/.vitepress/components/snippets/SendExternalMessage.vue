@@ -1,14 +1,16 @@
 <template>
   <div class="demo">
-    <div class="contract-state" v-if="parsedSimpleState">
-      <div>Simple State: {{ parsedSimpleState.simpleState }}</div>
-    </div>
+    <div class="contract-state" v-if="parsedSimpleState">Simple State: {{ parsedSimpleState.simpleState }}</div>
     <div>
       <label for="someParam">SomeParam:</label>
       <input id="someParam" type="number" v-model="someParam" />
     </div>
-    <button @click="sendExternalMessage">Send external message</button>
-    <pre v-if="transactionData != null">{{ transactionData }}</pre>
+    <button @click="sendExternalMessage">Send Message</button>
+    <AccordionComponent
+      v-if="transactionData"
+      :transactionData="transactionData"
+      buttonText="Show transaction"
+    ></AccordionComponent>
   </div>
 </template>
 
@@ -18,8 +20,13 @@ import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
 
 import { testContract, errorExtractor } from './../../helpers';
 
+import AccordionComponent from './../shared/Accordion.vue';
+
 export default defineComponent({
   name: 'SendExternalMessage',
+  components: {
+    AccordionComponent,
+  },
   async setup() {
     const transactionData = ref();
     const someParam = ref(42);
@@ -56,13 +63,13 @@ export default defineComponent({
         throw new Error('No public key');
       }
 
-      const payload = {
-        abi: JSON.stringify(testContract.ABI),
-        method: 'setVariableExternal',
-        params: {
-          someParam: this.someParam,
-        },
-      };
+      // const payload = {
+      //   abi: JSON.stringify(testContract.ABI),
+      //   method: 'setVariableExternal',
+      //   params: {
+      //     someParam: this.someParam,
+      //   },
+      // };
       // const { transaction: tr, output } = await provider.rawApi.sendExternalMessage({
       //   publicKey: senderPublicKey?.toString(),
       //   recipient: testContract.address,
@@ -71,13 +78,13 @@ export default defineComponent({
       // console.log('Transaction:', tr);
 
       const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
-      console.log(this.someParam);
+
       const tx = await errorExtractor(
         exampleContract.methods.setVariableExternal({ someParam: this.someParam }).sendExternal({
           publicKey: senderPublicKey!,
         }),
       );
-      console.log('Transaction:', tx);
+      this.transactionData = JSON.stringify(tx, null, 2);
       const state = await exampleContract.methods.simpleState().call();
       this.simpleState = JSON.stringify(state, null, 2);
     },

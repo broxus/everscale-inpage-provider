@@ -4,7 +4,7 @@
       <label for="boc">BOC:</label>
       <input id="boc" type="text" v-model="bocToHash" />
     </div>
-    <button @click="executeApiCall">Get BOC Hash</button>
+    <button @click="executeApiCall">getBocHash</button>
     <pre v-if="bocHash">{{ bocHash }}</pre>
   </div>
 </template>

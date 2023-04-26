@@ -1,7 +1,7 @@
 <template>
   <div class="demo">
-    <button @click="getComplexState">Get Complex State</button>
-    <button @click="getPrefixedSecond">Get Prefixed Second</button>
+    <button @click="getComplexState">getComplexState</button>
+    <button @click="getPrefixedSecond">getSecondElementWithPrefix</button>
 
     <div class="contract-state" v-if="complexState || prefixedSecond">
       <pre v-if="complexState">Complex State: {{ complexState }}</pre>

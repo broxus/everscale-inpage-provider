@@ -12,7 +12,7 @@
       <label for="city">City:</label>
       <input id="city" type="text" v-model="dataToPack.city" />
     </div>
-    <button @click="executeApiCall">Pack Data</button>
+    <button @click="executeApiCall">packData</button>
     <pre v-if="packedData">{{ packedData }}</pre>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="demo">
-    <button @click="computeSmth">Compute Smth</button>
+    <button @click="computeSmth">computeSmth</button>
     <pre class="computed-result" v-if="computedResult">Computed result: {{ computedResult }}</pre>
   </div>
 </template>

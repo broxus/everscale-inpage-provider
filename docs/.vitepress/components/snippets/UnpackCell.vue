@@ -4,7 +4,7 @@
       <label for="boc">BOC:</label>
       <input id="boc" type="text" v-model="bocToUnpack" />
     </div>
-    <button @click="executeApiCall">Unpack Data</button>
+    <button @click="executeApiCall">unpackData</button>
     <pre v-if="unpackedData">{{ unpackedData }}</pre>
   </div>
 </template>

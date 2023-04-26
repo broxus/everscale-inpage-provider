@@ -12,6 +12,7 @@ import FunctionComponent from './../components/function/Function.vue';
 import TableOfContentComponent from './../components/shared/TableOfContent.vue';
 import PropertyTableComponent from './../components/shared/PropertyTable.vue';
 import DefinedInLinkComponent from './../components/shared/DefinedInLink.vue';
+import AccordionComponent from './../components/shared/Accordion.vue';
 import ComponentSwitcher from './../components/component-switcher/ComponentSwitcher.vue';
 import PageContentComponent from './../components/page-content/PageContent.vue';
 import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
@@ -29,6 +30,8 @@ import GetBocHashComponent from './../components/snippets/GetBocHash.vue';
 import DeployAccountComponent from './../components/snippets/DeployAccount.vue';
 import SendExternalMessageComponent from './../components/snippets/SendExternalMessage.vue';
 import SendInternalMessageComponent from './../components/snippets/SendInternalMessage.vue';
+import SendInternalDelayedMessageComponent from './../components/snippets/SendInternalDelayedMessage.vue';
+import SendExternalDelayedMessageComponent from './../components/snippets/SendExternalDelayedMessage.vue';
 
 export default {
   ...DefaultTheme,
@@ -49,6 +52,7 @@ export default {
     app.component('PageContentComponent', PageContentComponent);
     app.component('LinkComponent', AnchorLinkComponent);
     app.component('ArrowComponent', ArrowComponent);
+    app.component('AccordionComponent', AccordionComponent);
     // app.component('TypeRendererComponent', TypeRendererComponent);
     // app.component('ArrayTypeComponent', ArrayTypeComponent);
     app.component('GetProviderStateComponent', GetProviderStateComponent);
@@ -62,5 +66,7 @@ export default {
 
     app.component('SendExternalMessageComponent', SendExternalMessageComponent);
     app.component('SendInternalMessageComponent', SendInternalMessageComponent);
+    app.component('SendInternalDelayedMessageComponent', SendInternalDelayedMessageComponent);
+    app.component('SendExternalDelayedMessageComponent', SendExternalDelayedMessageComponent);
   },
 };
