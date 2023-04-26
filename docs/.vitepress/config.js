@@ -28,22 +28,22 @@ module.exports = {
             items: [
               { text: 'Working with Cells', link: '/pages/guides/3.1-working-with-cells.md' },
               { text: 'Interaction with Contracts', link: '/pages/guides/3.2-working-with-contracts.md' },
-              { text: 'Subscriptions', link: '/pages/subscriptions.md' },
-              { text: 'Cryptography', link: '/pages/cryptography.md' },
+              // { text: 'Subscriptions', link: '/pages/subscriptions.md' },
+              // { text: 'Cryptography', link: '/pages/cryptography.md' },
             ],
           },
-          { text: 'Standalone Section', link: '/pages/standalone-section.md' },
-          {
-            text: 'Real-life Examples',
-            collapsable: false,
-            items: [
-              { text: 'Working with tip3', link: '/pages/working-with-tip3.md' },
-              // { text: 'Working with NFTs', link: '/pages/working-with-nfts.md' },
-              { text: 'Authorization through signing a string', link: '/pages/authorization.md' },
-              { text: 'Additional frequently used examples', link: '/pages/additional-examples.md' },
-            ],
-          },
-          { text: 'Additional Resources and Links', link: '/pages/additional-resources.md' },
+          // { text: 'Standalone Section', link: '/pages/standalone-section.md' },
+          // {
+          //   text: 'Real-life Examples',
+          //   collapsable: false,
+          //   items: [
+          //     { text: 'Working with tip3', link: '/pages/working-with-tip3.md' },
+          //     // { text: 'Working with NFTs', link: '/pages/working-with-nfts.md' },
+          //     { text: 'Authorization through signing a string', link: '/pages/authorization.md' },
+          //     { text: 'Additional frequently used examples', link: '/pages/additional-examples.md' },
+          //   ],
+          // },
+          // { text: 'Additional Resources and Links', link: '/pages/additional-resources.md' },
         ],
       },
 
