@@ -6,12 +6,12 @@ outline: deep
 import { ProviderRpcClient } from 'everscale-inpage-provider';
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const ever = new ProviderRpcClient();
+const provider = new ProviderRpcClient();
 
 const providerState = ref();
 const getProviderState = async () => {
-  await ever.ensureInitialized();
-  providerState.value = await ever.rawApi.getProviderState()
+  await provider.ensureInitialized();
+  providerState.value = await provider.rawApi.getProviderState()
     .then((state) => JSON.stringify(state, undefined, 4));
 };
 
@@ -21,7 +21,7 @@ const permissions = ref();
 let permissionsSubscription = undefined;
 onMounted(async () => {
 
-  permissionsSubscription = await ever.subscribe('permissionsChanged');
+  permissionsSubscription = await provider.subscribe('permissionsChanged');
   permissionsSubscription.on('data', data => {
     if (data.permissions.accountInteraction != null) {
       data.permissions.accountInteraction.address =
@@ -39,17 +39,17 @@ onUnmounted(async () => {
 });
 
 const requestPermissions = async () => {
-  await ever.requestPermissions({
+  await provider.requestPermissions({
     permissions: ['basic', 'accountInteraction']
   });
 };
 
 const disconnect = async () => {
-  await ever.disconnect()
+  await provider.disconnect()
 };
 
 const changeAccount = async () => {
-  await ever.changeAccount()
+  await provider.changeAccount()
 };
 
 </script>
@@ -116,7 +116,7 @@ Depending on your use case, you can use different kinds of providers:
 Right after provider is initialized its state can be retrieved:
 
 ```typescript
-const currentProviderState = await ever.getProviderState();
+const currentProviderState = await provider.getProviderState();
 ```
 
 <GetProviderStateComponent />
@@ -149,26 +149,26 @@ At the moment there are only two permissions:
 
 ```typescript
 // You can subscribe to permission changes in one place
-(await ever.subscribe('permissionsChanged')).on('data', permissions => {
+(await provider.subscribe('permissionsChanged')).on('data', permissions => {
   // You can update component state here
   console.log(permissions);
 });
 
 // NOTE: subscription object can be used during the disposal:
-//   const subscription = await ever.subscribe('permissionsChanged');
+//   const subscription = await provider.subscribe('permissionsChanged');
 //   subscription.on('data', data => { ... });
 //   ...
 //   await subscription.unsubscribe();
 
 // Request all permissions
-const permissions = await ever.requestPermissions({
+const permissions = await provider.requestPermissions({
   permissions: ['basic', 'accountInteraction'],
 });
 
 // ...
 
 // Log out and disable all permissions
-await ever.disconnect();
+await provider.disconnect();
 ```
 
 ::: info
@@ -193,7 +193,7 @@ will be reset. Therefore, to change the account there is a separate method that 
 ```typescript
 // It will trigger `permissionsChanged` event, where `accountInteraction`
 // will contain the selected account
-await ever.changeAccount();
+await provider.changeAccount();
 ```
 
 <div class="demo">
@@ -239,7 +239,7 @@ if (window.__ever || window.__hasEverscaleProvider || window.ton || window.hasTo
 - `hasEverscaleProvider()` will always return `false` in Web Workers or NodeJS environment. Otherwise, it will wait until the page is loaded and check whether the RPC object is injected.
 - You can explicitly wait until the provider is fully initialized using:
   ```typescript
-  await ever.ensureInitialized();
+  await provider.ensureInitialized();
   ```
   This function will either throw an exception if there are some problems, or wait until the extension/fallback initialization promise is resolved.
 - There are several lifecycle events to provide better error messages or state info:
