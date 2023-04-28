@@ -96,9 +96,9 @@ export function serializeTransaction(transaction: Transaction): RawTransaction {
     prevTransactionId:
       transaction.prevTransactionId != null
         ? {
-          hash: transaction.prevTransactionId.hash,
-          lt: transaction.prevTransactionId.lt,
-        }
+            hash: transaction.prevTransactionId.hash,
+            lt: transaction.prevTransactionId.lt,
+          }
         : undefined,
     createdAt: transaction.createdAt,
     aborted: transaction.aborted,
@@ -275,8 +275,8 @@ export type AssetType = 'tip3_token';
  */
 export type AssetTypeParams<T extends AssetType, Addr = Address> = T extends 'tip3_token'
   ? {
-    rootContract: Addr;
-  }
+      rootContract: Addr;
+    }
   : never;
 
 /**
@@ -613,10 +613,10 @@ export type OutputTokenObject<O> = O extends { name: infer K; type: infer T; com
 export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-    ? InputTokenObject<T>
-    : A extends readonly []
-      ? {}
-      : never;
+  ? InputTokenObject<T>
+  : A extends readonly []
+  ? {}
+  : never;
 
 /**
  * @category Models
@@ -624,43 +624,65 @@ export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts
 export type MergeOutputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-    ? OutputTokenObject<T>
-    : A extends readonly []
-      ? {}
-      : never;
+  ? OutputTokenObject<T>
+  : A extends readonly []
+  ? {}
+  : never;
 
-type AbiFunction<C> = C extends { functions: infer F }
+/**
+ * @category Models
+ */
+export type AbiFunctions<C> = C extends { functions: infer F }
   ? F extends readonly unknown[]
     ? ArrayItemType<F>
     : never
   : never;
-type AbiEvent<C> = C extends { events: infer E } ? (E extends readonly unknown[] ? ArrayItemType<E> : never) : never;
 
 /**
  * @category Models
  */
-export type AbiFunctionName<C> = AbiFunction<C>['name'];
+export type AbiEvents<C> = C extends { events: infer E }
+  ? E extends readonly unknown[]
+    ? ArrayItemType<E>
+    : never
+  : never;
+
 /**
  * @category Models
  */
-export type AbiEventName<C> = AbiEvent<C>['name'];
+export type AbiFields<C> = C extends { fields: infer F } ? F : never;
+
+/**
+ * @category Models
+ */
+export type AbiFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunctions<C>, { name: T }>;
+/**
+ * @category Models
+ */
+export type AbiEvent<C, T extends AbiEventName<C>> = Extract<AbiEvents<C>, { name: T }>;
+
+/**
+ * @category Models
+ */
+export type AbiFunctionName<C> = AbiFunctions<C>['name'];
+/**
+ * @category Models
+ */
+export type AbiEventName<C> = AbiEvents<C>['name'];
 /**
  * @category Models
  */
 export type AbiFieldName<C> = keyof DecodedAbiFields<C>;
 
-type PickFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunction<C>, { name: T }>;
-type PickEvent<C, T extends AbiEventName<C>> = Extract<AbiEvent<C>, { name: T }>;
+/**
+ * @category Models
+ */
+export type AbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeInputObjectsArray<AbiFunction<C, T>['inputs']>;
 
 /**
  * @category Models
  */
-export type AbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeInputObjectsArray<PickFunction<C, T>['inputs']>;
-
-/**
- * @category Models
- */
-export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> = PickFunction<
+export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> = AbiFunction<
   C,
   T
 >['inputs'] extends readonly []
@@ -671,18 +693,18 @@ export type AbiFunctionInputsWithDefault<C, T extends AbiFunctionName<C>> = Pick
  * @category Models
  */
 export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<
-  PickFunction<C, T>['inputs']
+  AbiFunction<C, T>['inputs']
 >;
 /**
  * @category Models
  */
 export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<
-  PickFunction<C, T>['outputs']
+  AbiFunction<C, T>['outputs']
 >;
 /**
  * @category Models
  */
-export type DecodedAbiEventData<C, T extends AbiEventName<C>> = MergeOutputObjectsArray<PickEvent<C, T>['inputs']>;
+export type DecodedAbiEventData<C, T extends AbiEventName<C>> = MergeOutputObjectsArray<AbiEvent<C, T>['inputs']>;
 
 /**
  * @category Models

@@ -169,13 +169,13 @@ export class ProviderRpcClient {
       {
         get:
           <K extends ProviderMethod>(_object: ProviderRpcClient, method: K) =>
-            (params: RawProviderApiRequestParams<K>) => {
-              if (this._provider != null) {
-                return this._provider.request({ method, params });
-              } else {
-                throw new ProviderNotInitializedException();
-              }
-            },
+          (params: RawProviderApiRequestParams<K>) => {
+            if (this._provider != null) {
+              return this._provider.request({ method, params });
+            } else {
+              throw new ProviderNotInitializedException();
+            }
+          },
       },
     ) as unknown as RawProviderApiMethods;
 
@@ -183,8 +183,8 @@ export class ProviderRpcClient {
       this._initializationPromise =
         properties.fallback != null
           ? properties.fallback().then(provider => {
-            this._provider = provider;
-          })
+              this._provider = provider;
+            })
           : Promise.resolve();
     } else {
       // Initialize provider with injected object by default
@@ -405,8 +405,7 @@ export class ProviderRpcClient {
       constructor(
         private readonly _subscribe: (s: SubscriptionImpl<T>) => Promise<void>,
         private readonly _unsubscribe: () => Promise<void>,
-      ) {
-      }
+      ) {}
 
       on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
       on(eventName: 'subscribed', listener: () => void): this;
@@ -688,9 +687,12 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async unpackInitData<Abi>(abi: Abi, data: string): Promise<{
-    publicKey?: string,
-    initParams: DecodedAbiInitData<Abi>,
+  public async unpackInitData<Abi>(
+    abi: Abi,
+    data: string,
+  ): Promise<{
+    publicKey?: string;
+    initParams: DecodedAbiInitData<Abi>;
   }> {
     await this.ensureInitialized();
     const { publicKey, initParams } = await this._api.unpackInitData({
@@ -945,10 +947,10 @@ export class ProviderRpcClient {
       bounce: args.bounce,
       payload: args.payload
         ? {
-          abi: args.payload.abi,
-          method: args.payload.method,
-          params: serializeTokensObject(args.payload.params),
-        }
+            abi: args.payload.abi,
+            method: args.payload.method,
+            params: serializeTokensObject(args.payload.params),
+          }
         : undefined,
       stateInit: args.stateInit,
     });
@@ -989,10 +991,10 @@ export class ProviderRpcClient {
         bounce: args.bounce,
         payload: args.payload
           ? {
-            abi: args.payload.abi,
-            method: args.payload.method,
-            params: serializeTokensObject(args.payload.params),
-          }
+              abi: args.payload.abi,
+              method: args.payload.method,
+              params: serializeTokensObject(args.payload.params),
+            }
           : undefined,
         stateInit: args.stateInit,
       })
@@ -1127,23 +1129,23 @@ export type RawProviderApiMethods = {
  */
 export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D }
   ? {
-    /**
-     * Base64 encoded TVC file
-     */
-    tvc: string;
-    /**
-     * Contract workchain. 0 by default
-     */
-    workchain?: number;
-    /**
-     * Public key, which will be injected into the contract. 0 by default
-     */
-    publicKey?: string;
-    /**
-     * State init params
-     */
-    initParams: MergeInputObjectsArray<D>;
-  }
+      /**
+       * Base64 encoded TVC file
+       */
+      tvc: string;
+      /**
+       * Contract workchain. 0 by default
+       */
+      workchain?: number;
+      /**
+       * Public key, which will be injected into the contract. 0 by default
+       */
+      publicKey?: string;
+      /**
+       * State init params
+       */
+      initParams: MergeInputObjectsArray<D>;
+    }
   : never;
 
 /**
@@ -1160,19 +1162,19 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
   salt:
     | string
     | {
-    /**
-     * ABI version. 2.2 if not specified otherwise
-     */
-    abiVersion?: AbiVersion;
-    /**
-     * Cell structure
-     */
-    structure: P;
-    /**
-     * Cell data
-     */
-    data: MergeInputObjectsArray<P>;
-  };
+        /**
+         * ABI version. 2.2 if not specified otherwise
+         */
+        abiVersion?: AbiVersion;
+        /**
+         * Cell structure
+         */
+        structure: P;
+        /**
+         * Cell data
+         */
+        data: MergeInputObjectsArray<P>;
+      };
 };
 
 /**

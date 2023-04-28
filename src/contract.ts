@@ -1,6 +1,9 @@
 import { Address, UniqueArray, DelayedTransactions, LT_COLLATOR } from './utils';
 import {
   AbiParam,
+  AbiFunction,
+  AbiEvent,
+  AbiFields,
   FullContractState,
   RawTokensObject,
   TokensObject,
@@ -30,14 +33,17 @@ import { ProviderApiResponse, ProviderRpcClient } from './index';
 export class Contract<Abi> {
   private readonly _provider: ProviderRpcClient;
   private readonly _abi: string;
-  private readonly _functionsAbi: { [name: string]: { inputs: AbiParam[]; outputs: AbiParam[] } };
-  private readonly _eventsAbi: { [name: string]: { inputs: AbiParam[] } };
-  private readonly _fieldsAbi: AbiParam[];
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
   private readonly _fields: ContractFields<Abi>;
 
+  public readonly methodsAbi: { [K in AbiFunctionName<Abi>]: AbiFunction<Abi, K> };
+  public readonly eventsAbi: { [K in AbiEventName<Abi>]: AbiEvent<Abi, K> };
+  public readonly fieldsAbi: AbiFields<Abi>;
+
   constructor(provider: ProviderRpcClient, abi: Abi, address: Address) {
+    type ContractFunction = { name: string; inputs?: AbiParam[]; outputs?: AbiParam[] };
+
     if (!Array.isArray((abi as any).functions)) {
       throw new Error('Invalid abi. Functions array required');
     }
@@ -47,16 +53,26 @@ export class Contract<Abi> {
 
     this._provider = provider;
     this._abi = JSON.stringify(abi);
-    this._functionsAbi = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
-      functions[item.name] = { inputs: item.inputs || [], outputs: item.outputs || [] };
-      return functions;
-    }, {} as typeof Contract.prototype._functionsAbi);
+    this.methodsAbi = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
+      if (item.inputs == null) {
+        item.inputs = [];
+      }
+      if (item.outputs == null) {
+        item.outputs = [];
+      }
 
-    this._eventsAbi = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
-      events[item.name] = { inputs: item.inputs || [] };
+      (functions as any)[item.name] = item;
+      return functions;
+    }, {} as typeof Contract.prototype.methodsAbi);
+
+    this.eventsAbi = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
+      if (item.inputs == null) {
+        item.inputs = [];
+      }
+      (events as any)[item.name] = item;
       return events;
-    }, {} as typeof Contract.prototype._eventsAbi);
-    this._fieldsAbi = (abi as any).fields;
+    }, {} as typeof Contract.prototype.eventsAbi);
+    this.fieldsAbi = (abi as any).fields;
 
     this._address = address;
 
@@ -64,7 +80,7 @@ export class Contract<Abi> {
       {},
       {
         get: <K extends AbiFunctionName<Abi>>(_object: Record<string, unknown>, method: K) => {
-          const rawAbi = this._functionsAbi[method];
+          const rawAbi = this.methodsAbi[method];
           return (params: TokensObject = {}) =>
             new ContractMethodImpl(this._provider, rawAbi, this._abi, this._address, method, params);
         },
@@ -92,7 +108,7 @@ export class Contract<Abi> {
                 throw new Error('Invalid account data');
               }
             }
-            const parsedFields = parseTokensObject(this._fieldsAbi, fields) as DecodedAbiFields<Abi>;
+            const parsedFields = parseTokensObject(this.fieldsAbi as AbiParam[], fields) as DecodedAbiFields<Abi>;
             if (parsedFields == null || !Object.prototype.hasOwnProperty.call(parsedFields, field)) {
               throw new Error('Unknown field');
             }
@@ -139,8 +155,8 @@ export class Contract<Abi> {
    * Required permissions: `basic`
    */
   public async getFields(args: GetContractFieldsParams = {}): Promise<{
-    fields?: DecodedAbiFields<Abi>,
-    state?: FullContractState,
+    fields?: DecodedAbiFields<Abi>;
+    state?: FullContractState;
   }> {
     await this._provider.ensureInitialized();
     const { fields, state } = await this._provider.rawApi.getContractFields({
@@ -150,7 +166,8 @@ export class Contract<Abi> {
       allowPartial: args.allowPartial == null ? false : args.allowPartial,
     });
     return {
-      fields: fields != null ? parseTokensObject(this._fieldsAbi, fields) as DecodedAbiFields<Abi> : undefined,
+      fields:
+        fields != null ? (parseTokensObject(this.fieldsAbi as AbiParam[], fields) as DecodedAbiFields<Abi>) : undefined,
       state,
     };
   }
@@ -197,8 +214,8 @@ export class Contract<Abi> {
     }
 
     const event = await (range?.fromLt != null || range?.fromUtime != null
-        ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
-        : subscriber.transactions(this.address)
+      ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
+      : subscriber.transactions(this.address)
     )
       .flatMap(item => item.transactions)
       .takeWhile(
@@ -320,7 +337,7 @@ export class Contract<Abi> {
 
       const { method, input, output } = result;
 
-      const rawAbi = this._functionsAbi[method];
+      const rawAbi = (this.methodsAbi as any)[method];
 
       return {
         method,
@@ -345,7 +362,7 @@ export class Contract<Abi> {
       const result: DecodedEvent<Abi, AbiEventName<Abi>>[] = [];
 
       for (const { event, data } of events) {
-        const rawAbi = this._eventsAbi[event];
+        const rawAbi = (this.eventsAbi as any)[event];
 
         result.push({
           event,
@@ -376,7 +393,7 @@ export class Contract<Abi> {
 
       const { method, input } = result;
 
-      const rawAbi = this._functionsAbi[method];
+      const rawAbi = (this.methodsAbi as any)[method];
 
       return {
         method,
@@ -403,7 +420,7 @@ export class Contract<Abi> {
 
       const { method, output } = result;
 
-      const rawAbi = this._functionsAbi[method];
+      const rawAbi = (this.methodsAbi as any)[method];
 
       return {
         method,
@@ -428,7 +445,7 @@ export class Contract<Abi> {
 
       const { event, data } = result;
 
-      const rawAbi = this._eventsAbi[event];
+      const rawAbi = (this.eventsAbi as any)[event];
 
       return {
         event,
@@ -480,9 +497,7 @@ export type ContractMethods<C> = {
  * @category Contract
  */
 export type ContractFields<C> = {
-  [K in AbiFieldName<C>]: (
-    params?: GetContractFieldsParams,
-  ) => Promise<DecodedAbiFields<C>[K]>;
+  [K in AbiFieldName<C>]: (params?: GetContractFieldsParams) => Promise<DecodedAbiFields<C>[K]>;
 };
 
 /**
@@ -760,9 +775,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       local: args.local,
       executorParams: args.executorParams
         ? {
-          disableSignatureCheck: args.executorParams.disableSignatureCheck,
-          overrideBalance: args.executorParams.overrideBalance,
-        }
+            disableSignatureCheck: args.executorParams.disableSignatureCheck,
+            overrideBalance: args.executorParams.overrideBalance,
+          }
         : undefined,
     });
 
@@ -852,10 +867,13 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         publicKey: args.publicKey,
         withoutSignature: args.withoutSignature,
       },
-      executorParams: args.executorParams != null ? {
-        disableSignatureCheck: args.executorParams.disableSignatureCheck,
-        overrideBalance: args.executorParams.overrideBalance,
-      } : undefined,
+      executorParams:
+        args.executorParams != null
+          ? {
+              disableSignatureCheck: args.executorParams.disableSignatureCheck,
+              overrideBalance: args.executorParams.overrideBalance,
+            }
+          : undefined,
     });
 
     return {
@@ -887,10 +905,13 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         bounce: args.bounce != null ? args.bounce : false,
         bounced: args.bounced,
       },
-      executorParams: args.executorParams != null ? {
-        disableSignatureCheck: args.executorParams.disableSignatureCheck,
-        overrideBalance: args.executorParams.overrideBalance,
-      } : undefined,
+      executorParams:
+        args.executorParams != null
+          ? {
+              disableSignatureCheck: args.executorParams.disableSignatureCheck,
+              overrideBalance: args.executorParams.overrideBalance,
+            }
+          : undefined,
     });
 
     return {
@@ -924,11 +945,6 @@ export type GetContractFieldsParams = {
    */
   allowPartial?: boolean;
 };
-
-/**
- * @category Contract
- */
-export type ContractFunction = { name: string; inputs?: AbiParam[]; outputs?: AbiParam[] };
 
 /**
  * @category Contract
@@ -1109,7 +1125,7 @@ export type ExecuteInternalParams = {
      */
     overrideBalance?: string | number;
   };
-}
+};
 
 /**
  * @category Contract
