@@ -15,6 +15,7 @@ import { defineComponent, ref } from 'vue';
 import { ProviderRpcClient, GetExpectedAddressParams, Contract } from 'everscale-inpage-provider';
 
 import { toNano, testContract, errorExtractor } from '../../helpers';
+import { EverscaleStandaloneClient } from 'everscale-standalone-client';
 
 type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
   publicKey: string | undefined;
@@ -32,6 +33,20 @@ export default defineComponent({
   },
   methods: {
     async deployAccount() {
+      // const provider = new ProviderRpcClient({
+      //   fallback: () =>
+      //     EverscaleStandaloneClient.create({
+      //       connection: {
+      //         id: 1000,
+      //         group: 'venom_testnet',
+      //         type: 'jrpc',
+      //         data: {
+      //           endpoint: 'https://jrpc-testnet.venom.foundation/rpc',
+      //         },
+      //       },
+      //     }),
+      //   forceUseFallback: true,
+      // });
       const provider = new ProviderRpcClient();
 
       await provider.ensureInitialized();

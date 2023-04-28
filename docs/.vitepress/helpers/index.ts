@@ -1,7 +1,7 @@
 import { Transaction } from 'everscale-inpage-provider';
 
 export const testContract = {
-  address: `0:1f2656c5b9d351fbf1eb1f2053d086ade850c45290e5e0946900fb8ecc401348`,
+  address: `0:eb6d9f792a6d96eff7c8cb2f7d5cedcf81b5c55db2145a1c9d7910c72763443f`,
   ABI: {
     'ABI version': 2,
     version: '2.3',

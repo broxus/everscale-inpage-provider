@@ -32,6 +32,11 @@ import SendExternalMessageComponent from './../components/snippets/SendExternalM
 import SendInternalMessageComponent from './../components/snippets/SendInternalMessage.vue';
 import SendInternalDelayedMessageComponent from './../components/snippets/SendInternalDelayedMessage.vue';
 import SendExternalDelayedMessageComponent from './../components/snippets/SendExternalDelayedMessage.vue';
+import ContractInfoComponent from './../components/snippets/shared/ContractInfo.vue';
+import ProviderEventsComponent from './../components/snippets/ProviderEvents.vue';
+import BlockchainEventsComponent from './../components/snippets/BlockchainEvents.vue';
+
+import ToastComponent from './../components/shared/Toast.vue';
 
 export default {
   ...DefaultTheme,
@@ -68,5 +73,11 @@ export default {
     app.component('SendInternalMessageComponent', SendInternalMessageComponent);
     app.component('SendInternalDelayedMessageComponent', SendInternalDelayedMessageComponent);
     app.component('SendExternalDelayedMessageComponent', SendExternalDelayedMessageComponent);
+    app.component('ContractInfoComponent', ContractInfoComponent);
+
+    app.component('ProviderEventsComponent', ProviderEventsComponent);
+    app.component('BlockchainEventsComponent', BlockchainEventsComponent);
+
+    app.component('ToastComponent', ToastComponent);
   },
 };
