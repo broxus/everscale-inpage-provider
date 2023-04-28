@@ -8,7 +8,6 @@ module.exports = {
   description: 'Web3-like interface to the Everscale blockchain.',
   plugins: [vue(), typescript()],
   themeConfig: {
-    headersDepth: 3,
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Documentation', link: '/pages/overview.md' },
@@ -28,7 +27,7 @@ module.exports = {
             items: [
               { text: 'Working with Cells', link: '/pages/guides/3.1-working-with-cells.md' },
               { text: 'Interaction with Contracts', link: '/pages/guides/3.2-working-with-contracts.md' },
-              // { text: 'Subscriptions', link: '/pages/subscriptions.md' },
+              { text: 'Subscriptions', link: '/pages/guides/3.3-subscriptions.md' },
               // { text: 'Cryptography', link: '/pages/cryptography.md' },
             ],
           },
