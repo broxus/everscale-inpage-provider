@@ -24,9 +24,13 @@ import GetProviderStateComponent from './../components/snippets/GetProviderState
 import GetComplexStateAndPrefixedSecondComponent from './../components/snippets/GetComplexStateAndPrefixedSecond.vue';
 import ComputeSmthComponent from './../components/snippets/ComputeSmth.vue';
 import TvmExceptionComponent from './../components/snippets/TvmException.vue';
+
 import PackCellComponent from './../components/snippets/PackCell.vue';
 import UnpackCellComponent from './../components/snippets/UnpackCell.vue';
 import GetBocHashComponent from './../components/snippets/GetBocHash.vue';
+import ExtractPKComponent from './../components/snippets/ExtractPK.vue';
+import MergeSplitTvcComponent from './../components/snippets/MergeSplitTvc.vue';
+
 import DeployAccountComponent from './../components/snippets/DeployAccount.vue';
 import SendExternalMessageComponent from './../components/snippets/SendExternalMessage.vue';
 import SendInternalMessageComponent from './../components/snippets/SendInternalMessage.vue';
@@ -67,6 +71,9 @@ export default {
     app.component('PackCellComponent', PackCellComponent);
     app.component('UnpackCellComponent', UnpackCellComponent);
     app.component('GetBocHashComponent', GetBocHashComponent);
+    app.component('ExtractPKComponent', ExtractPKComponent);
+    app.component('MergeSplitTvcComponent', MergeSplitTvcComponent);
+
     app.component('DeployAccountComponent', DeployAccountComponent);
 
     app.component('SendExternalMessageComponent', SendExternalMessageComponent);

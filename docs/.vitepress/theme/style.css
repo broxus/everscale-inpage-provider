@@ -80,6 +80,7 @@
 
 .demo pre {
   overflow-x: scroll;
+  margin-top: 1.5rem;
 }
 
 .demo pre.error {
