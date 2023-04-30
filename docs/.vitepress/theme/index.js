@@ -25,12 +25,17 @@ import GetComplexStateAndPrefixedSecondComponent from './../components/snippets/
 import ComputeSmthComponent from './../components/snippets/ComputeSmth.vue';
 import TvmExceptionComponent from './../components/snippets/TvmException.vue';
 
+// Working with cells snippets
 import PackCellComponent from './../components/snippets/PackCell.vue';
 import UnpackCellComponent from './../components/snippets/UnpackCell.vue';
 import GetBocHashComponent from './../components/snippets/GetBocHash.vue';
 import ExtractPKComponent from './../components/snippets/ExtractPK.vue';
 import MergeSplitTvcComponent from './../components/snippets/MergeSplitTvc.vue';
+import CodeToTvcComponent from './../components/snippets/CodeToTvc.vue';
+import GetSetSaltComponent from './../components/snippets/GetSetSalt.vue';
+import GetExpectedAddressComponent from './../components/snippets/GetExpectedAddress.vue';
 
+// Working with contracts snippets
 import DeployAccountComponent from './../components/snippets/DeployAccount.vue';
 import SendExternalMessageComponent from './../components/snippets/SendExternalMessage.vue';
 import SendInternalMessageComponent from './../components/snippets/SendInternalMessage.vue';
@@ -39,6 +44,14 @@ import SendExternalDelayedMessageComponent from './../components/snippets/SendEx
 import ContractInfoComponent from './../components/snippets/shared/ContractInfo.vue';
 import ProviderEventsComponent from './../components/snippets/ProviderEvents.vue';
 import BlockchainEventsComponent from './../components/snippets/BlockchainEvents.vue';
+
+// Cryptography snippets
+import SignDataComponent from './../components/snippets/SignData.vue';
+import VerifySignComponent from './../components/snippets/VerifySign.vue';
+import DecodeTransactionComponent from './../components/snippets/DecodeTransaction.vue';
+import DecodeEventComponent from './../components/snippets/DecodeEvent.vue';
+import DecodeInputMsgComponent from './../components/snippets/DecodeInputMsg.vue';
+import DecodeOutputMsgComponent from './../components/snippets/DecodeOutputMsg.vue';
 
 import ToastComponent from './../components/shared/Toast.vue';
 
@@ -68,22 +81,36 @@ export default {
     app.component('GetComplexStateAndPrefixedSecondComponent', GetComplexStateAndPrefixedSecondComponent);
     app.component('ComputeSmthComponent', ComputeSmthComponent);
     app.component('TvmExceptionComponent', TvmExceptionComponent);
+
+    // Working with cells snippets
     app.component('PackCellComponent', PackCellComponent);
     app.component('UnpackCellComponent', UnpackCellComponent);
     app.component('GetBocHashComponent', GetBocHashComponent);
     app.component('ExtractPKComponent', ExtractPKComponent);
     app.component('MergeSplitTvcComponent', MergeSplitTvcComponent);
+    app.component('CodeToTvcComponent', CodeToTvcComponent);
+    app.component('GetSetSaltComponent', GetSetSaltComponent);
+    app.component('GetExpectedAddressComponent', GetExpectedAddressComponent);
 
+    // Working with contracts snippets
     app.component('DeployAccountComponent', DeployAccountComponent);
-
     app.component('SendExternalMessageComponent', SendExternalMessageComponent);
     app.component('SendInternalMessageComponent', SendInternalMessageComponent);
     app.component('SendInternalDelayedMessageComponent', SendInternalDelayedMessageComponent);
     app.component('SendExternalDelayedMessageComponent', SendExternalDelayedMessageComponent);
     app.component('ContractInfoComponent', ContractInfoComponent);
 
+    // Subscriptions snippets
     app.component('ProviderEventsComponent', ProviderEventsComponent);
     app.component('BlockchainEventsComponent', BlockchainEventsComponent);
+
+    // Cryptography snippets
+    app.component('SignDataComponent', SignDataComponent);
+    app.component('VerifySignComponent', VerifySignComponent);
+    app.component('DecodeTransactionComponent', DecodeTransactionComponent);
+    app.component('DecodeEventComponent', DecodeEventComponent);
+    app.component('DecodeInputMsgComponent', DecodeInputMsgComponent);
+    app.component('DecodeOutputMsgComponent', DecodeOutputMsgComponent);
 
     app.component('ToastComponent', ToastComponent);
   },

@@ -28,7 +28,7 @@ module.exports = {
               { text: 'Working with Cells', link: '/pages/guides/3.1-working-with-cells.md' },
               { text: 'Interaction with Contracts', link: '/pages/guides/3.2-working-with-contracts.md' },
               { text: 'Subscriptions', link: '/pages/guides/3.3-subscriptions.md' },
-              // { text: 'Cryptography', link: '/pages/cryptography.md' },
+              { text: 'Cryptography & Security', link: '/pages/guides/3.4-cryptography.md' },
             ],
           },
           // { text: 'Standalone Section', link: '/pages/standalone-section.md' },
