@@ -42,8 +42,12 @@ import SendInternalMessageComponent from './../components/snippets/SendInternalM
 import SendInternalDelayedMessageComponent from './../components/snippets/SendInternalDelayedMessage.vue';
 import SendExternalDelayedMessageComponent from './../components/snippets/SendExternalDelayedMessage.vue';
 import ContractInfoComponent from './../components/snippets/shared/ContractInfo.vue';
+
+// Subscriptions snippets
 import ProviderEventsComponent from './../components/snippets/ProviderEvents.vue';
 import BlockchainEventsComponent from './../components/snippets/BlockchainEvents.vue';
+import ListenContractEventsComponent from './../components/snippets/ListenContractEvents.vue';
+import GetPastEventsComponent from './../components/snippets/GetPastEvents.vue';
 
 // Cryptography snippets
 import SignDataComponent from './../components/snippets/SignData.vue';
@@ -103,6 +107,8 @@ export default {
     // Subscriptions snippets
     app.component('ProviderEventsComponent', ProviderEventsComponent);
     app.component('BlockchainEventsComponent', BlockchainEventsComponent);
+    app.component('ListenContractEventsComponent', ListenContractEventsComponent);
+    app.component('GetPastEventsComponent', GetPastEventsComponent);
 
     // Cryptography snippets
     app.component('SignDataComponent', SignDataComponent);
