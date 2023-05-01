@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import typescript from '@rollup/plugin-typescript';
 
 import nodeExternals from 'vite-plugin-node-externals';
-import { viteExternalsPlugin as externals } from 'vite-plugin-externals';
+//import { viteExternalsPlugin as externals } from 'vite-plugin-externals';
 
 module.exports = {
   title: 'Everscale Inpage Provider',
