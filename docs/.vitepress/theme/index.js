@@ -50,6 +50,7 @@ import ListenContractEventsComponent from './../components/snippets/ListenContra
 import GetPastEventsComponent from './../components/snippets/GetPastEvents.vue';
 
 // Cryptography snippets
+import EncryptDecryptComponent from './../components/snippets/EncryptDecrypt.vue';
 import SignDataComponent from './../components/snippets/SignData.vue';
 import VerifySignComponent from './../components/snippets/VerifySign.vue';
 import DecodeTransactionComponent from './../components/snippets/DecodeTransaction.vue';
@@ -111,6 +112,7 @@ export default {
     app.component('GetPastEventsComponent', GetPastEventsComponent);
 
     // Cryptography snippets
+    app.component('EncryptDecryptComponent', EncryptDecryptComponent);
     app.component('SignDataComponent', SignDataComponent);
     app.component('VerifySignComponent', VerifySignComponent);
     app.component('DecodeTransactionComponent', DecodeTransactionComponent);
