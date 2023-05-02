@@ -185,7 +185,7 @@ _Please refer to [the docs](https://docs.ton.dev/86757ecb2/p/45e664-basics-of-fr
 > > If an event _e_ logically depends on events _e<sub>1</sub> ,... , e<sub>n</sub>_, then logical time of _e_ is the smallest
 > > non-negative integer that is greater than all logical times of _e<sub>i</sub>_
 
-In Everscale, messages exist "separately" from transactions as an entity. There are three types of messages:
+In TON-compatibles blockchain, messages exist "separately" from transactions as an entity. There are three types of messages:
 
 - _External inbound_ - doesn't contain source address but has the destination address, doesn't have any value. It is used to
   call contracts from outside or to deploy them.

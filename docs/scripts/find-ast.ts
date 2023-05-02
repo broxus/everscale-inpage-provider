@@ -1,4 +1,4 @@
-import { ProjectReflection, Reflection, ContainerReflection } from 'typedoc';
+import { ProjectReflection, Reflection, ContainerReflection } from 'typedoc-web';
 import { ReflectionKind } from '../.vitepress/ast-utils/Class';
 
 export function findAllNodesOfType(node: Reflection, type: ReflectionKind): Reflection[] {

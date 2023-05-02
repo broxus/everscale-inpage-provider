@@ -1,4 +1,4 @@
-import { DeclarationReflection, ProjectReflection, SignatureReflection } from 'typedoc';
+import { DeclarationReflection, ProjectReflection, SignatureReflection } from 'typedoc-web';
 import {
   ClassInfo,
   InterfaceInfo,

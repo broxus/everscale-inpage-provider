@@ -1,4 +1,4 @@
-import { DeclarationReflection, ProjectReflection } from 'typedoc';
+import { DeclarationReflection, ProjectReflection } from 'typedoc-web';
 import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';
 import { ComponentKind, ReflectionKind } from './Class';
 import { formatComment, formatType } from './utils';

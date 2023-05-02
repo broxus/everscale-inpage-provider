@@ -5,7 +5,7 @@ import {
   ParameterReflection,
   SignatureReflection,
   DeclarationReflection,
-} from 'typedoc';
+} from 'typedoc-web';
 // import { ReflectionKind } from 'typedoc-web';
 //import { SignatureReflection } from 'typedoc/dist/lib/serialization/schema';
 import { findAllNodesOfType, getNodesByCategoryTitle } from '../../scripts/find-ast';

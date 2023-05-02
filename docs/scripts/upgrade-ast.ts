@@ -1,5 +1,5 @@
-import { DeclarationReflection, ProjectReflection, SignatureReflection } from 'typedoc';
-import { ReflectionKind } from '../.vitepress/ast-utils/Class';
+import { DeclarationReflection, ProjectReflection, SignatureReflection, ReflectionKind } from 'typedoc-web';
+
 import fs from 'fs';
 
 type SubCategory = { name: string; children: number[]; parent: number; parentCategory: string };
@@ -88,7 +88,7 @@ export function addSubCategoriesToChildrenNodes(parent: DeclarationReflection) {
 }
 
 export async function upgradeAst() {
-  const project = (await import('./../build/typedoc-ast.json').then(
+  const project = (await import('../build/typedoc-ast.json').then(
     module => module.default,
   )) as ProjectReflectionWithSubCategories;
   let knownedSubCategories = new Map<string, Category>();

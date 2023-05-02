@@ -7,7 +7,7 @@ import {
   SomeType,
   Reflection,
   DeclarationReflection,
-} from 'typedoc';
+} from 'typedoc-web';
 
 export type typeParam = {
   name: string;

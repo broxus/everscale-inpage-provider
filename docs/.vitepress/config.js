@@ -3,18 +3,29 @@ import { resolve } from 'path';
 import typescript from '@rollup/plugin-typescript';
 
 import nodeExternals from 'vite-plugin-node-externals';
+// import { createHtmlPlugin as html } from 'vite-plugin-html';
 //import { viteExternalsPlugin as externals } from 'vite-plugin-externals';
+//import vueJsx from '@vitejs/plugin-vue-jsx';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: resolve(__dirname, './../', '.env') });
+
+const env = process.env;
+
+const HELP_URL = env.HELP_URL || '';
+const FEEDBACK_URL = env.FEEDBACK_URL || '';
 
 module.exports = {
   title: 'Everscale Inpage Provider',
-  base: '/everscale-inpage-provider/docs/',
-  description: 'Web3-like interface to the Everscale blockchain.',
+  base: '/docs',
+  description: 'Web3-like interface to the TON-compatible blockchains.',
   plugins: [
     vue(),
     typescript(),
     nodeExternals({
       allowList: ['vue', 'vue-toastification', 'js-base64'],
     }),
+
     // externals({
     //   externals: ['fs', 'path', 'assert', 'util', 'typedoc'],
     // }),
@@ -38,12 +49,13 @@ module.exports = {
   // },
   themeConfig: {
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Documentation', link: '/pages/overview.md' },
+      // { text: 'Home', link: '/pages/overview.md' },
+      { text: 'Feedback', link: `${FEEDBACK_URL}` },
+      { text: 'Help', link: `${HELP_URL}` },
       // { text: 'Guide', link: '/pages/guide.md' },
     ],
     sidebar: [
-      { text: 'Overview', link: '/pages/overview.md' },
+      { text: 'Overview', link: './../../' },
       {
         text: 'Guide',
         collapsable: false,
@@ -90,6 +102,7 @@ module.exports = {
         ],
       },
     ],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/broxus/everscale-inpage-provider' }],
   },
   // build: {
   //   rollupOptions: {
