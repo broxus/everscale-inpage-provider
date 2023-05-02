@@ -42,7 +42,7 @@
     "typedoc": "^0.24.1",
     "typedoc-plugin-markdown": "^3.14.0",
     "typedoc-plugin-missing-exports": "^0.23.0",
-    "typedoc-web": "./../typedoc",
+    "typedoc-web": "github:Cyace84/typedoc-web",
     "typescript": "^4.2.4",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-node-externals": "^0.0.1",
