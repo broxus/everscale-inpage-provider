@@ -1,0 +1,62 @@
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+* {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+:root {
+    --light-color-input-background: var(--light-color-accent);
+
+    --dark-color-background: #282828;
+    --dark-color-background-secondary: #1d2021;
+    --dark-color-icon-background: var(--dark-color-background-secondary);
+    --dark-color-input-background: #a89984;
+    --dark-color-accent: #fbf1c7;
+    --dark-color-text: #ebdbb2;
+    --dark-color-text-aside: #d5c4a1;
+    --dark-color-link: #83a598;
+}
+
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-input-background: var(--light-color-input-background);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-input-background: var(--dark-color-input-background);
+    }
+}
+
+:root[data-theme="light"] {
+    --color-input-background: var(--light-color-input-background);
+}
+
+:root[data-theme="dark"] {
+    --color-input-background: var(--dark-color-input-background);
+}
+
+:root[data-theme="dark"] .tsd-checkbox-background {
+    fill: var(--color-input-background);
+}
+
+:root[data-theme="dark"] #tsd-search.has-focus {
+    background-color: var(--color-input-background);
+}
+
+:root[data-theme="dark"] #tsd-search .field input {
+    color: var(--color-background);
+}
+
+:root[data-theme="dark"] #tsd-search .results li:hover a {
+    color: var(--color-background);
+}
