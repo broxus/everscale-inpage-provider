@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / ContractState
-
 # Interface: ContractState
 
 ## Hierarchy
@@ -32,7 +30,7 @@
 
 ### genTimings
 
-• **genTimings**: [`GenTimings`](../README.md#gentimings)
+• **genTimings**: [`GenTimings`](../models.md#gentimings)
 
 #### Defined in
 
@@ -42,7 +40,7 @@
 
 ### lastTransactionId
 
-• `Optional` **lastTransactionId**: [`LastTransactionId`](../README.md#lasttransactionid)
+• `Optional` **lastTransactionId**: [`LastTransactionId`](../models.md#lasttransactionid)
 
 #### Defined in
 

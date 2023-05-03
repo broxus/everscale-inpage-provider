@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Contract
-
 # Class: Contract<Abi\>
 
 ## Type parameters
@@ -63,11 +61,11 @@
 
 ### methods
 
-• `get` **methods**(): [`ContractMethods`](../README.md#contractmethods)<`Abi`\>
+• `get` **methods**(): [`ContractMethods`](../contract.md#contractmethods)<`Abi`\>
 
 #### Returns
 
-[`ContractMethods`](../README.md#contractmethods)<`Abi`\>
+[`ContractMethods`](../contract.md#contractmethods)<`Abi`\>
 
 #### Defined in
 
@@ -77,11 +75,11 @@
 
 ### fields
 
-• `get` **fields**(): [`ContractFields`](../README.md#contractfields)<`Abi`\>
+• `get` **fields**(): [`ContractFields`](../contract.md#contractfields)<`Abi`\>
 
 #### Returns
 
-[`ContractFields`](../README.md#contractfields)<`Abi`\>
+[`ContractFields`](../contract.md#contractfields)<`Abi`\>
 
 #### Defined in
 
@@ -139,7 +137,7 @@ Required permissions: `basic`
 
 ### getFields
 
-▸ **getFields**(`args?`): `Promise`<{ `fields?`: [`DecodedAbiFields`](../README.md#decodedabifields)<`Abi`\> ; `state?`: [`FullContractState`](../interfaces/FullContractState.md) }\>
+▸ **getFields**(`args?`): `Promise`<{ `fields?`: [`DecodedAbiFields`](../models.md#decodedabifields)<`Abi`\> ; `state?`: [`FullContractState`](../interfaces/FullContractState.md) }\>
 
 Unpacks all fields from the contract state using the specified ABI
 
@@ -149,13 +147,13 @@ Required permissions: `basic`
 
 #### Parameters
 
-| Name   | Type                                                              |
-| :----- | :---------------------------------------------------------------- |
-| `args` | [`GetContractFieldsParams`](../README.md#getcontractfieldsparams) |
+| Name   | Type                                                                |
+| :----- | :------------------------------------------------------------------ |
+| `args` | [`GetContractFieldsParams`](../contract.md#getcontractfieldsparams) |
 
 #### Returns
 
-`Promise`<{ `fields?`: [`DecodedAbiFields`](../README.md#decodedabifields)<`Abi`\> ; `state?`: [`FullContractState`](../interfaces/FullContractState.md) }\>
+`Promise`<{ `fields?`: [`DecodedAbiFields`](../models.md#decodedabifields)<`Abi`\> ; `state?`: [`FullContractState`](../interfaces/FullContractState.md) }\>
 
 #### Defined in
 
@@ -165,7 +163,7 @@ Required permissions: `basic`
 
 ### transactions
 
-▸ **transactions**(`subscriber`): [`Stream`](../interfaces/Stream.md)<`unknown`, [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>, `false`\>
+▸ **transactions**(`subscriber`): [`Stream`](../interfaces/Stream.md)<`unknown`, [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>, `false`\>
 
 Creates new contract transactions stream
 
@@ -177,7 +175,7 @@ Creates new contract transactions stream
 
 #### Returns
 
-[`Stream`](../interfaces/Stream.md)<`unknown`, [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>, `false`\>
+[`Stream`](../interfaces/Stream.md)<`unknown`, [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>, `false`\>
 
 #### Defined in
 
@@ -187,7 +185,7 @@ Creates new contract transactions stream
 
 ### events
 
-▸ **events**(`subscriber`): [`Stream`](../interfaces/Stream.md)<`unknown`, [`DecodedEventWithTransaction`](../README.md#decodedeventwithtransaction)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>, `false`\>
+▸ **events**(`subscriber`): [`Stream`](../interfaces/Stream.md)<`unknown`, [`DecodedEventWithTransaction`](../contract.md#decodedeventwithtransaction)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>, `false`\>
 
 Creates new contract events stream
 
@@ -199,7 +197,7 @@ Creates new contract events stream
 
 #### Returns
 
-[`Stream`](../interfaces/Stream.md)<`unknown`, [`DecodedEventWithTransaction`](../README.md#decodedeventwithtransaction)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>, `false`\>
+[`Stream`](../interfaces/Stream.md)<`unknown`, [`DecodedEventWithTransaction`](../contract.md#decodedeventwithtransaction)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>, `false`\>
 
 #### Defined in
 
@@ -209,23 +207,23 @@ Creates new contract events stream
 
 ### waitForEvent
 
-▸ **waitForEvent**<`E`\>(`args?`): `Promise`<`undefined` \| [`DecodedEvent`](../README.md#decodedevent)<`Abi`, `E`\>\>
+▸ **waitForEvent**<`E`\>(`args?`): `Promise`<`undefined` \| [`DecodedEvent`](../contract.md#decodedevent)<`Abi`, `E`\>\>
 
 #### Type parameters
 
 | Name | Type                                                                  |
 | :--- | :-------------------------------------------------------------------- |
-| `E`  | extends `never` = [`AbiEventName`](../README.md#abieventname)<`Abi`\> |
+| `E`  | extends `never` = [`AbiEventName`](../models.md#abieventname)<`Abi`\> |
 
 #### Parameters
 
-| Name   | Type                                                                 |
-| :----- | :------------------------------------------------------------------- |
-| `args` | [`WaitForEventParams`](../README.md#waitforeventparams)<`Abi`, `E`\> |
+| Name   | Type                                                                   |
+| :----- | :--------------------------------------------------------------------- |
+| `args` | [`WaitForEventParams`](../contract.md#waitforeventparams)<`Abi`, `E`\> |
 
 #### Returns
 
-`Promise`<`undefined` \| [`DecodedEvent`](../README.md#decodedevent)<`Abi`, `E`\>\>
+`Promise`<`undefined` \| [`DecodedEvent`](../contract.md#decodedevent)<`Abi`, `E`\>\>
 
 #### Defined in
 
@@ -235,23 +233,23 @@ Creates new contract events stream
 
 ### getPastEvents
 
-▸ **getPastEvents**<`E`\>(`args`): `Promise`<[`EventsBatch`](../README.md#eventsbatch)<`Abi`, `E`\>\>
+▸ **getPastEvents**<`E`\>(`args`): `Promise`<[`EventsBatch`](../contract.md#eventsbatch)<`Abi`, `E`\>\>
 
 #### Type parameters
 
 | Name | Type                                                                  |
 | :--- | :-------------------------------------------------------------------- |
-| `E`  | extends `never` = [`AbiEventName`](../README.md#abieventname)<`Abi`\> |
+| `E`  | extends `never` = [`AbiEventName`](../models.md#abieventname)<`Abi`\> |
 
 #### Parameters
 
-| Name   | Type                                                                 |
-| :----- | :------------------------------------------------------------------- |
-| `args` | [`GetPastEventParams`](../README.md#getpasteventparams)<`Abi`, `E`\> |
+| Name   | Type                                                                   |
+| :----- | :--------------------------------------------------------------------- |
+| `args` | [`GetPastEventParams`](../contract.md#getpasteventparams)<`Abi`, `E`\> |
 
 #### Returns
 
-`Promise`<[`EventsBatch`](../README.md#eventsbatch)<`Abi`, `E`\>\>
+`Promise`<[`EventsBatch`](../contract.md#eventsbatch)<`Abi`, `E`\>\>
 
 #### Defined in
 
@@ -261,17 +259,17 @@ Creates new contract events stream
 
 ### decodeTransaction
 
-▸ **decodeTransaction**(`args`): `Promise`<`undefined` \| [`DecodedTransaction`](../README.md#decodedtransaction)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+▸ **decodeTransaction**(`args`): `Promise`<`undefined` \| [`DecodedTransaction`](../contract.md#decodedtransaction)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Parameters
 
-| Name   | Type                                                                      |
-| :----- | :------------------------------------------------------------------------ |
-| `args` | [`DecodeTransactionParams`](../README.md#decodetransactionparams)<`Abi`\> |
+| Name   | Type                                                                        |
+| :----- | :-------------------------------------------------------------------------- |
+| `args` | [`DecodeTransactionParams`](../contract.md#decodetransactionparams)<`Abi`\> |
 
 #### Returns
 
-`Promise`<`undefined` \| [`DecodedTransaction`](../README.md#decodedtransaction)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+`Promise`<`undefined` \| [`DecodedTransaction`](../contract.md#decodedtransaction)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Defined in
 
@@ -281,17 +279,17 @@ Creates new contract events stream
 
 ### decodeTransactionEvents
 
-▸ **decodeTransactionEvents**(`args`): `Promise`<[`DecodedEvent`](../README.md#decodedevent)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>[]\>
+▸ **decodeTransactionEvents**(`args`): `Promise`<[`DecodedEvent`](../contract.md#decodedevent)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>[]\>
 
 #### Parameters
 
-| Name   | Type                                                                          |
-| :----- | :---------------------------------------------------------------------------- |
-| `args` | [`DecodeTransactionEventsParams`](../README.md#decodetransactioneventsparams) |
+| Name   | Type                                                                            |
+| :----- | :------------------------------------------------------------------------------ |
+| `args` | [`DecodeTransactionEventsParams`](../contract.md#decodetransactioneventsparams) |
 
 #### Returns
 
-`Promise`<[`DecodedEvent`](../README.md#decodedevent)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>[]\>
+`Promise`<[`DecodedEvent`](../contract.md#decodedevent)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>[]\>
 
 #### Defined in
 
@@ -301,17 +299,17 @@ Creates new contract events stream
 
 ### decodeInputMessage
 
-▸ **decodeInputMessage**(`args`): `Promise`<`undefined` \| [`DecodedInput`](../README.md#decodedinput)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+▸ **decodeInputMessage**(`args`): `Promise`<`undefined` \| [`DecodedInput`](../contract.md#decodedinput)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Parameters
 
-| Name   | Type                                                          |
-| :----- | :------------------------------------------------------------ |
-| `args` | [`DecodeInputParams`](../README.md#decodeinputparams)<`Abi`\> |
+| Name   | Type                                                            |
+| :----- | :-------------------------------------------------------------- |
+| `args` | [`DecodeInputParams`](../contract.md#decodeinputparams)<`Abi`\> |
 
 #### Returns
 
-`Promise`<`undefined` \| [`DecodedInput`](../README.md#decodedinput)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+`Promise`<`undefined` \| [`DecodedInput`](../contract.md#decodedinput)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Defined in
 
@@ -321,17 +319,17 @@ Creates new contract events stream
 
 ### decodeOutputMessage
 
-▸ **decodeOutputMessage**(`args`): `Promise`<`undefined` \| [`DecodedOutput`](../README.md#decodedoutput)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+▸ **decodeOutputMessage**(`args`): `Promise`<`undefined` \| [`DecodedOutput`](../contract.md#decodedoutput)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Parameters
 
-| Name   | Type                                                            |
-| :----- | :-------------------------------------------------------------- |
-| `args` | [`DecodeOutputParams`](../README.md#decodeoutputparams)<`Abi`\> |
+| Name   | Type                                                              |
+| :----- | :---------------------------------------------------------------- |
+| `args` | [`DecodeOutputParams`](../contract.md#decodeoutputparams)<`Abi`\> |
 
 #### Returns
 
-`Promise`<`undefined` \| [`DecodedOutput`](../README.md#decodedoutput)<`Abi`, [`AbiFunctionName`](../README.md#abifunctionname)<`Abi`\>\>\>
+`Promise`<`undefined` \| [`DecodedOutput`](../contract.md#decodedoutput)<`Abi`, [`AbiFunctionName`](../models.md#abifunctionname)<`Abi`\>\>\>
 
 #### Defined in
 
@@ -341,17 +339,17 @@ Creates new contract events stream
 
 ### decodeEvent
 
-▸ **decodeEvent**(`args`): `Promise`<`undefined` \| [`DecodedEvent`](../README.md#decodedevent)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>\>
+▸ **decodeEvent**(`args`): `Promise`<`undefined` \| [`DecodedEvent`](../contract.md#decodedevent)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>\>
 
 #### Parameters
 
-| Name   | Type                                                          |
-| :----- | :------------------------------------------------------------ |
-| `args` | [`DecodeEventParams`](../README.md#decodeeventparams)<`Abi`\> |
+| Name   | Type                                                            |
+| :----- | :-------------------------------------------------------------- |
+| `args` | [`DecodeEventParams`](../contract.md#decodeeventparams)<`Abi`\> |
 
 #### Returns
 
-`Promise`<`undefined` \| [`DecodedEvent`](../README.md#decodedevent)<`Abi`, [`AbiEventName`](../README.md#abieventname)<`Abi`\>\>\>
+`Promise`<`undefined` \| [`DecodedEvent`](../contract.md#decodedevent)<`Abi`, [`AbiEventName`](../models.md#abieventname)<`Abi`\>\>\>
 
 #### Defined in
 

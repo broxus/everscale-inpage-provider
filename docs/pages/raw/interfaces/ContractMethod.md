@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / ContractMethod
-
 # Interface: ContractMethod<I, O\>
 
 ## Type parameters
@@ -77,19 +75,19 @@ Target contract address
 
 ### send
 
-▸ **send**(`args`): `Promise`<[`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\>\>
+▸ **send**(`args`): `Promise`<[`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\>\>
 
 Sends internal message and returns wallet transaction
 
 #### Parameters
 
-| Name   | Type                                                    |
-| :----- | :------------------------------------------------------ |
-| `args` | [`SendInternalParams`](../README.md#sendinternalparams) |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `args` | [`SendInternalParams`](../contract.md#sendinternalparams) |
 
 #### Returns
 
-`Promise`<[`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\>\>
+`Promise`<[`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\>\>
 
 #### Defined in
 
@@ -99,19 +97,19 @@ Sends internal message and returns wallet transaction
 
 ### sendDelayed
 
-▸ **sendDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+▸ **sendDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 Sends internal message without waiting for the transaction
 
 #### Parameters
 
-| Name   | Type                                                    |
-| :----- | :------------------------------------------------------ |
-| `args` | [`SendInternalParams`](../README.md#sendinternalparams) |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `args` | [`SendInternalParams`](../contract.md#sendinternalparams) |
 
 #### Returns
 
-`Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+`Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 #### Defined in
 
@@ -121,19 +119,19 @@ Sends internal message without waiting for the transaction
 
 ### sendWithResult
 
-▸ **sendWithResult**(`args`): `Promise`<{ `parentTransaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `childTransaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
+▸ **sendWithResult**(`args`): `Promise`<{ `parentTransaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `childTransaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
 
 Sends internal message and waits for the new transaction on target address
 
 #### Parameters
 
-| Name   | Type                                                    |
-| :----- | :------------------------------------------------------ |
-| `args` | [`SendInternalParams`](../README.md#sendinternalparams) |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `args` | [`SendInternalParams`](../contract.md#sendinternalparams) |
 
 #### Returns
 
-`Promise`<{ `parentTransaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `childTransaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
+`Promise`<{ `parentTransaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `childTransaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
 
 #### Defined in
 
@@ -149,9 +147,9 @@ Estimates wallet fee for calling this method as an internal message
 
 #### Parameters
 
-| Name   | Type                                                    |
-| :----- | :------------------------------------------------------ |
-| `args` | [`SendInternalParams`](../README.md#sendinternalparams) |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `args` | [`SendInternalParams`](../contract.md#sendinternalparams) |
 
 #### Returns
 
@@ -165,19 +163,19 @@ Estimates wallet fee for calling this method as an internal message
 
 ### sendExternal
 
-▸ **sendExternal**(`args`): `Promise`<{ `transaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
+▸ **sendExternal**(`args`): `Promise`<{ `transaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
 
 Sends external message and returns contract transaction with parsed output
 
 #### Parameters
 
-| Name   | Type                                                    |
-| :----- | :------------------------------------------------------ |
-| `args` | [`SendExternalParams`](../README.md#sendexternalparams) |
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `args` | [`SendExternalParams`](../contract.md#sendexternalparams) |
 
 #### Returns
 
-`Promise`<{ `transaction`: [`Transaction`](../README.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
+`Promise`<{ `transaction`: [`Transaction`](../models.md#transaction)<[`Address`](../classes/Address.md)\> ; `output?`: `O` }\>
 
 #### Defined in
 
@@ -187,19 +185,19 @@ Sends external message and returns contract transaction with parsed output
 
 ### sendExternalDelayed
 
-▸ **sendExternalDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+▸ **sendExternalDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 Sends external message without waiting for the transaction
 
 #### Parameters
 
-| Name   | Type                                                                  |
-| :----- | :-------------------------------------------------------------------- |
-| `args` | [`SendExternalDelayedParams`](../README.md#sendexternaldelayedparams) |
+| Name   | Type                                                                    |
+| :----- | :---------------------------------------------------------------------- |
+| `args` | [`SendExternalDelayedParams`](../contract.md#sendexternaldelayedparams) |
 
 #### Returns
 
-`Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+`Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 #### Defined in
 
@@ -215,9 +213,9 @@ Executes only a compute phase locally
 
 #### Parameters
 
-| Name    | Type                                    |
-| :------ | :-------------------------------------- |
-| `args?` | [`CallParams`](../README.md#callparams) |
+| Name    | Type                                      |
+| :------ | :---------------------------------------- |
+| `args?` | [`CallParams`](../contract.md#callparams) |
 
 #### Returns
 
@@ -231,20 +229,20 @@ Executes only a compute phase locally
 
 ### executeExternal
 
-▸ **executeExternal**(`args`): `Promise`<[`ExecutorOutput`](../README.md#executoroutput)<`O`\>\>
+▸ **executeExternal**(`args`): `Promise`<[`ExecutorOutput`](../contract.md#executoroutput)<`O`\>\>
 
 Encodes this method as an external message and
 executes all transaction phases locally, producing a new state
 
 #### Parameters
 
-| Name   | Type                                                          |
-| :----- | :------------------------------------------------------------ |
-| `args` | [`ExecuteExternalParams`](../README.md#executeexternalparams) |
+| Name   | Type                                                            |
+| :----- | :-------------------------------------------------------------- |
+| `args` | [`ExecuteExternalParams`](../contract.md#executeexternalparams) |
 
 #### Returns
 
-`Promise`<[`ExecutorOutput`](../README.md#executoroutput)<`O`\>\>
+`Promise`<[`ExecutorOutput`](../contract.md#executoroutput)<`O`\>\>
 
 #### Defined in
 
@@ -254,20 +252,20 @@ executes all transaction phases locally, producing a new state
 
 ### executeInternal
 
-▸ **executeInternal**(`args`): `Promise`<[`ExecutorOutput`](../README.md#executoroutput)<`O`\>\>
+▸ **executeInternal**(`args`): `Promise`<[`ExecutorOutput`](../contract.md#executoroutput)<`O`\>\>
 
 Encodes this method as an internal message and
 executes all transaction phases locally, producing a new state
 
 #### Parameters
 
-| Name   | Type                                                          |
-| :----- | :------------------------------------------------------------ |
-| `args` | [`ExecuteInternalParams`](../README.md#executeinternalparams) |
+| Name   | Type                                                            |
+| :----- | :-------------------------------------------------------------- |
+| `args` | [`ExecuteInternalParams`](../contract.md#executeinternalparams) |
 
 #### Returns
 
-`Promise`<[`ExecutorOutput`](../README.md#executoroutput)<`O`\>\>
+`Promise`<[`ExecutorOutput`](../contract.md#executoroutput)<`O`\>\>
 
 #### Defined in
 

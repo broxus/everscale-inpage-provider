@@ -1,12 +1,10 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / RawProviderRequest
-
 # Interface: RawProviderRequest<T\>
 
 ## Type parameters
 
-| Name | Type                                                    |
-| :--- | :------------------------------------------------------ |
-| `T`  | extends [`ProviderMethod`](../README.md#providermethod) |
+| Name | Type                                                          |
+| :--- | :------------------------------------------------------------ |
+| `T`  | extends [`ProviderMethod`](../provider-api.md#providermethod) |
 
 ## Table of contents
 
@@ -29,7 +27,7 @@
 
 ### params
 
-• **params**: [`ProviderApiRequestParams`](../README.md#providerapirequestparams)<`T`, `string`\>
+• **params**: [`ProviderApiRequestParams`](../provider-api.md#providerapirequestparams)<`T`, `string`\>
 
 #### Defined in
 

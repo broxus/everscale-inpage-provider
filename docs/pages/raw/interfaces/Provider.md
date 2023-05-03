@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Provider
-
 # Interface: Provider
 
 **`Toc Section`**
@@ -27,7 +25,7 @@ Subscription, and other types in the module.
 
 ### request
 
-▸ **request**<`T`\>(`data`): `Promise`<[`ProviderApiResponse`](../README.md#providerapiresponse)<`T`, `string`\>\>
+▸ **request**<`T`\>(`data`): `Promise`<[`ProviderApiResponse`](../provider-api.md#providerapiresponse)<`T`, `string`\>\>
 
 Sends request to the provider.
 
@@ -37,9 +35,9 @@ Request Method
 
 #### Type parameters
 
-| Name | Type                                                                                         |
-| :--- | :------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderApi`](../README.md#providerapi)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                               |
+| :--- | :------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderApi`](../provider-api.md#providerapi)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
@@ -49,7 +47,7 @@ Request Method
 
 #### Returns
 
-`Promise`<[`ProviderApiResponse`](../README.md#providerapiresponse)<`T`, `string`\>\>
+`Promise`<[`ProviderApiResponse`](../provider-api.md#providerapiresponse)<`T`, `string`\>\>
 
 #### Defined in
 
@@ -69,16 +67,16 @@ Event Listener Methods
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 
@@ -98,16 +96,16 @@ Removes a listener for the specified event.
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 
@@ -129,16 +127,16 @@ Event Management Methods
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 
@@ -156,16 +154,16 @@ Event Management Methods
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 
@@ -183,16 +181,16 @@ Event Management Methods
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 
@@ -210,16 +208,16 @@ Event Management Methods
 
 #### Type parameters
 
-| Name | Type                                                                                               |
-| :--- | :------------------------------------------------------------------------------------------------- |
-| `T`  | extends keyof [`ProviderEvents`](../README.md#providerevents)<[`Address`](../classes/Address.md)\> |
+| Name | Type                                                                                                     |
+| :--- | :------------------------------------------------------------------------------------------------------- |
+| `T`  | extends keyof [`ProviderEvents`](../provider-api.md#providerevents)<[`Address`](../classes/Address.md)\> |
 
 #### Parameters
 
-| Name        | Type                                                                                  |
-| :---------- | :------------------------------------------------------------------------------------ |
-| `eventName` | `T`                                                                                   |
-| `listener`  | (`data`: [`RawProviderEventData`](../README.md#rawprovidereventdata)<`T`\>) => `void` |
+| Name        | Type                                                                                        |
+| :---------- | :------------------------------------------------------------------------------------------ |
+| `eventName` | `T`                                                                                         |
+| `listener`  | (`data`: [`RawProviderEventData`](../provider-api.md#rawprovidereventdata)<`T`\>) => `void` |
 
 #### Returns
 

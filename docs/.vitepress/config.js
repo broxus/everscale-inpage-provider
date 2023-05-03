@@ -18,7 +18,7 @@ const FEEDBACK_URL = env.FEEDBACK_URL || '';
 module.exports = {
   title: 'Everscale Inpage Provider',
   base: '/docs',
-  description: 'Web3-like interface to the TON-compatible blockchains.',
+  description: 'Web3-like interface to the TVM-compatible blockchains.',
   head: [
     [
       'script',
@@ -109,7 +109,7 @@ module.exports = {
               { text: 'Provider', link: '/pages/raw/provider.md' },
               { text: 'Provider API', link: '/pages/raw/provider-api.md' },
               { text: 'Models', link: '/pages/raw/model.md' },
-              // { text: 'Stream', link: '/pages/raw/stream.md' },
+              { text: 'Stream', link: '/pages/raw/stream.md' },
               { text: 'Utils', link: '/pages/raw/utils.md' },
             ],
             // items: [

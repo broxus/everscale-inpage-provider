@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Subscription
-
 # Interface: Subscription<T\>
 
 **`Toc Ref`**
@@ -8,9 +6,9 @@
 
 ## Type parameters
 
-| Name | Type                                                  |
-| :--- | :---------------------------------------------------- |
-| `T`  | extends [`ProviderEvent`](../README.md#providerevent) |
+| Name | Type                                                        |
+| :--- | :---------------------------------------------------------- |
+| `T`  | extends [`ProviderEvent`](../provider-api.md#providerevent) |
 
 ## Table of contents
 
@@ -73,10 +71,10 @@ Fires on each incoming event with the event object as argument.
 
 #### Parameters
 
-| Name        | Type                                                                                                                | Description |
-| :---------- | :------------------------------------------------------------------------------------------------------------------ | :---------- |
-| `eventName` | `"data"`                                                                                                            | 'data'      |
-| `listener`  | (`data`: [`ProviderEventData`](../README.md#providereventdata)<`T`, [`Address`](../classes/Address.md)\>) => `void` |             |
+| Name        | Type                                                                                                                      | Description |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------ | :---------- |
+| `eventName` | `"data"`                                                                                                                  | 'data'      |
+| `listener`  | (`data`: [`ProviderEventData`](../provider-api.md#providereventdata)<`T`, [`Address`](../classes/Address.md)\>) => `void` |             |
 
 #### Returns
 

@@ -1,10 +1,4 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / ProviderNotFoundException
-
 # Class: ProviderNotFoundException
-
-**`Toc Ref`**
-
-3
 
 ## Hierarchy
 

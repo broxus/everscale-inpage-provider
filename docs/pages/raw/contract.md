@@ -14,7 +14,7 @@ outline: deep
 | :------------ | :------------------------------------------------- | :------------------------------------------------------------------- |
 | `messageHash` | `string`                                           | External message hash                                                |
 | `expireAt`    | `number`                                           | Message expiration timestamp                                         |
-| `transaction` | `Promise`<[`Transaction`](README.md#transaction)\> | Transaction promise (it will be rejected if the message has expired) |
+| `transaction` | `Promise`<[`Transaction`](models.md#transaction)\> | Transaction promise (it will be rejected if the message has expired) |
 
 **Defined in:**
 
@@ -80,8 +80,8 @@ outline: deep
 | Name       | Type                               |
 | :--------- | :--------------------------------- |
 | `name`     | `string`                           |
-| `inputs?`  | [`AbiParam`](README.md#abiparam)[] |
-| `outputs?` | [`AbiParam`](README.md#abiparam)[] |
+| `inputs?`  | [`AbiParam`](models.md#abiparam)[] |
+| `outputs?` | [`AbiParam`](models.md#abiparam)[] |
 
 **Defined in:**
 
@@ -110,7 +110,7 @@ outline: deep
 
 ### SendInternalWithResultParams
 
-Ƭ **SendInternalWithResultParams**: [`SendInternalParams`](README.md#sendinternalparams) & { `subscriber?`: [`Subscriber`](classes/Subscriber.md) }
+Ƭ **SendInternalWithResultParams**: [`SendInternalParams`](contract.md#sendinternalparams) & { `subscriber?`: [`Subscriber`](classes/Subscriber.md) }
 
 **Defined in:**
 
@@ -229,16 +229,16 @@ outline: deep
 | Name  | Type                                                     |
 | :---- | :------------------------------------------------------- |
 | `Abi` | `Abi`                                                    |
-| `E`   | extends [`AbiEventName`](README.md#abieventname)<`Abi`\> |
+| `E`   | extends [`AbiEventName`](models.md#abieventname)<`Abi`\> |
 
 #### Type declaration
 
-| Name            | Type                                                                                                      |
-| :-------------- | :-------------------------------------------------------------------------------------------------------- |
-| `filter?`       | `E` \| [`EventsFilter`](README.md#eventsfilter)<`Abi`, [`AbiEventName`](README.md#abieventname)<`Abi`\>\> |
-| `range?`        | [`EventsRange`](README.md#eventsrange)                                                                    |
-| `limit?`        | `number`                                                                                                  |
-| `continuation?` | [`TransactionId`](README.md#transactionid)                                                                |
+| Name            | Type                                                                                                        |
+| :-------------- | :---------------------------------------------------------------------------------------------------------- |
+| `filter?`       | `E` \| [`EventsFilter`](contract.md#eventsfilter)<`Abi`, [`AbiEventName`](models.md#abieventname)<`Abi`\>\> |
+| `range?`        | [`EventsRange`](contract.md#eventsrange)                                                                    |
+| `limit?`        | `number`                                                                                                    |
+| `continuation?` | [`TransactionId`](models.md#transactionid)                                                                  |
 
 **Defined in:**
 
@@ -255,15 +255,15 @@ outline: deep
 | Name  | Type                                                     |
 | :---- | :------------------------------------------------------- |
 | `Abi` | `Abi`                                                    |
-| `E`   | extends [`AbiEventName`](README.md#abieventname)<`Abi`\> |
+| `E`   | extends [`AbiEventName`](models.md#abieventname)<`Abi`\> |
 
 #### Type declaration
 
-| Name          | Type                                                         |
-| :------------ | :----------------------------------------------------------- |
-| `filter?`     | `E` \| [`EventsFilter`](README.md#eventsfilter)<`Abi`, `E`\> |
-| `range?`      | [`EventsRange`](README.md#eventsrange)                       |
-| `subscriber?` | [`Subscriber`](classes/Subscriber.md)                        |
+| Name          | Type                                                           |
+| :------------ | :------------------------------------------------------------- |
+| `filter?`     | `E` \| [`EventsFilter`](contract.md#eventsfilter)<`Abi`, `E`\> |
+| `range?`      | [`EventsRange`](contract.md#eventsrange)                       |
+| `subscriber?` | [`Subscriber`](classes/Subscriber.md)                          |
 
 **Defined in:**
 
@@ -280,14 +280,14 @@ outline: deep
 | Name  | Type                                                     |
 | :---- | :------------------------------------------------------- |
 | `Abi` | `Abi`                                                    |
-| `E`   | extends [`AbiEventName`](README.md#abieventname)<`Abi`\> |
+| `E`   | extends [`AbiEventName`](models.md#abieventname)<`Abi`\> |
 
 #### Type declaration
 
-| Name            | Type                                                                                  |
-| :-------------- | :------------------------------------------------------------------------------------ |
-| `events`        | [`DecodedEventWithTransaction`](README.md#decodedeventwithtransaction)<`Abi`, `E`\>[] |
-| `continuation?` | [`TransactionId`](README.md#transactionid)                                            |
+| Name            | Type                                                                                    |
+| :-------------- | :-------------------------------------------------------------------------------------- |
+| `events`        | [`DecodedEventWithTransaction`](contract.md#decodedeventwithtransaction)<`Abi`, `E`\>[] |
+| `continuation?` | [`TransactionId`](models.md#transactionid)                                              |
 
 **Defined in:**
 
@@ -297,14 +297,14 @@ outline: deep
 
 ### EventsFilter
 
-Ƭ **EventsFilter**<`Abi`, `E`\>: (`event`: [`DecodedEventWithTransaction`](README.md#decodedeventwithtransaction)<`Abi`, `E`\>) => `Promise`<`boolean`\> \| `boolean`
+Ƭ **EventsFilter**<`Abi`, `E`\>: (`event`: [`DecodedEventWithTransaction`](contract.md#decodedeventwithtransaction)<`Abi`, `E`\>) => `Promise`<`boolean`\> \| `boolean`
 
 #### Type parameters
 
 | Name  | Type                                                                                                        |
 | :---- | :---------------------------------------------------------------------------------------------------------- |
 | `Abi` | `Abi`                                                                                                       |
-| `E`   | extends [`AbiEventName`](README.md#abieventname)<`Abi`\> = [`AbiEventName`](README.md#abieventname)<`Abi`\> |
+| `E`   | extends [`AbiEventName`](models.md#abieventname)<`Abi`\> = [`AbiEventName`](models.md#abieventname)<`Abi`\> |
 
 #### Type declaration
 
@@ -312,9 +312,9 @@ outline: deep
 
 ##### Parameters
 
-| Name    | Type                                                                                |
-| :------ | :---------------------------------------------------------------------------------- |
-| `event` | [`DecodedEventWithTransaction`](README.md#decodedeventwithtransaction)<`Abi`, `E`\> |
+| Name    | Type                                                                                  |
+| :------ | :------------------------------------------------------------------------------------ |
+| `event` | [`DecodedEventWithTransaction`](contract.md#decodedeventwithtransaction)<`Abi`, `E`\> |
 
 ##### Returns
 
@@ -328,14 +328,14 @@ outline: deep
 
 ### DecodedEventWithTransaction
 
-Ƭ **DecodedEventWithTransaction**<`Abi`, `E`\>: [`DecodedEvent`](README.md#decodedevent)<`Abi`, `E`\> & { `transaction`: [`Transaction`](README.md#transaction) }
+Ƭ **DecodedEventWithTransaction**<`Abi`, `E`\>: [`DecodedEvent`](contract.md#decodedevent)<`Abi`, `E`\> & { `transaction`: [`Transaction`](models.md#transaction) }
 
 #### Type parameters
 
 | Name  | Type                                                     |
 | :---- | :------------------------------------------------------- |
 | `Abi` | `Abi`                                                    |
-| `E`   | extends [`AbiEventName`](README.md#abieventname)<`Abi`\> |
+| `E`   | extends [`AbiEventName`](models.md#abieventname)<`Abi`\> |
 
 **Defined in:**
 
@@ -374,10 +374,10 @@ outline: deep
 
 #### Type declaration
 
-| Name          | Type                                                                                              |
-| :------------ | :------------------------------------------------------------------------------------------------ |
-| `transaction` | [`Transaction`](README.md#transaction)                                                            |
-| `methods`     | [`UniqueArray`](README.md#uniquearray)<[`AbiFunctionName`](README.md#abifunctionname)<`Abi`\>[]\> |
+| Name          | Type                                                                                             |
+| :------------ | :----------------------------------------------------------------------------------------------- |
+| `transaction` | [`Transaction`](models.md#transaction)                                                           |
+| `methods`     | [`UniqueArray`](utils.md#uniquearray)<[`AbiFunctionName`](models.md#abifunctionname)<`Abi`\>[]\> |
 
 **Defined in:**
 
@@ -387,7 +387,7 @@ outline: deep
 
 ### DecodedTransaction
 
-Ƭ **DecodedTransaction**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](README.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `input`: [`DecodedAbiFunctionInputs`](README.md#decodedabifunctioninputs)<`Abi`, `T`\> ; `output`: [`DecodedAbiFunctionOutputs`](README.md#decodedabifunctionoutputs)<`Abi`, `T`\> } : `never`
+Ƭ **DecodedTransaction**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](models.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `input`: [`DecodedAbiFunctionInputs`](models.md#decodedabifunctioninputs)<`Abi`, `T`\> ; `output`: [`DecodedAbiFunctionOutputs`](models.md#decodedabifunctionoutputs)<`Abi`, `T`\> } : `never`
 
 #### Type parameters
 
@@ -414,11 +414,11 @@ outline: deep
 
 #### Type declaration
 
-| Name       | Type                                                                                              |
-| :--------- | :------------------------------------------------------------------------------------------------ |
-| `body`     | `string`                                                                                          |
-| `methods`  | [`UniqueArray`](README.md#uniquearray)<[`AbiFunctionName`](README.md#abifunctionname)<`Abi`\>[]\> |
-| `internal` | `boolean`                                                                                         |
+| Name       | Type                                                                                             |
+| :--------- | :----------------------------------------------------------------------------------------------- |
+| `body`     | `string`                                                                                         |
+| `methods`  | [`UniqueArray`](utils.md#uniquearray)<[`AbiFunctionName`](models.md#abifunctionname)<`Abi`\>[]\> |
+| `internal` | `boolean`                                                                                        |
 
 **Defined in:**
 
@@ -428,7 +428,7 @@ outline: deep
 
 ### DecodedInput
 
-Ƭ **DecodedInput**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](README.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `input`: [`DecodedAbiFunctionInputs`](README.md#decodedabifunctioninputs)<`Abi`, `T`\> } : `never`
+Ƭ **DecodedInput**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](models.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `input`: [`DecodedAbiFunctionInputs`](models.md#decodedabifunctioninputs)<`Abi`, `T`\> } : `never`
 
 #### Type parameters
 
@@ -455,10 +455,10 @@ outline: deep
 
 #### Type declaration
 
-| Name      | Type                                                                                              | Description                     |
-| :-------- | :------------------------------------------------------------------------------------------------ | :------------------------------ |
-| `body`    | `string`                                                                                          | Base64 encoded message body BOC |
-| `methods` | [`UniqueArray`](README.md#uniquearray)<[`AbiFunctionName`](README.md#abifunctionname)<`Abi`\>[]\> | -                               |
+| Name      | Type                                                                                             | Description                     |
+| :-------- | :----------------------------------------------------------------------------------------------- | :------------------------------ |
+| `body`    | `string`                                                                                         | Base64 encoded message body BOC |
+| `methods` | [`UniqueArray`](utils.md#uniquearray)<[`AbiFunctionName`](models.md#abifunctionname)<`Abi`\>[]\> | -                               |
 
 **Defined in:**
 
@@ -478,10 +478,10 @@ outline: deep
 
 #### Type declaration
 
-| Name     | Type                                                                                        | Description                     |
-| :------- | :------------------------------------------------------------------------------------------ | :------------------------------ |
-| `body`   | `string`                                                                                    | Base64 encoded message body BOC |
-| `events` | [`UniqueArray`](README.md#uniquearray)<[`AbiEventName`](README.md#abieventname)<`Abi`\>[]\> | -                               |
+| Name     | Type                                                                                       | Description                     |
+| :------- | :----------------------------------------------------------------------------------------- | :------------------------------ |
+| `body`   | `string`                                                                                   | Base64 encoded message body BOC |
+| `events` | [`UniqueArray`](utils.md#uniquearray)<[`AbiEventName`](models.md#abieventname)<`Abi`\>[]\> | -                               |
 
 **Defined in:**
 
@@ -491,7 +491,7 @@ outline: deep
 
 ### DecodedOutput
 
-Ƭ **DecodedOutput**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](README.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `output`: [`DecodedAbiFunctionOutputs`](README.md#decodedabifunctionoutputs)<`Abi`, `T`\> } : `never`
+Ƭ **DecodedOutput**<`Abi`, `T`\>: `T` extends [`AbiFunctionName`](models.md#abifunctionname)<`Abi`\> ? { `method`: `T` ; `output`: [`DecodedAbiFunctionOutputs`](models.md#decodedabifunctionoutputs)<`Abi`, `T`\> } : `never`
 
 #### Type parameters
 
@@ -514,7 +514,7 @@ outline: deep
 
 | Name          | Type                                   |
 | :------------ | :------------------------------------- |
-| `transaction` | [`Transaction`](README.md#transaction) |
+| `transaction` | [`Transaction`](models.md#transaction) |
 
 **Defined in:**
 
@@ -524,7 +524,7 @@ outline: deep
 
 ### DecodedEvent
 
-Ƭ **DecodedEvent**<`Abi`, `T`\>: `T` extends [`AbiEventName`](README.md#abieventname)<`Abi`\> ? { `event`: `T` ; `data`: [`DecodedAbiEventData`](README.md#decodedabieventdata)<`Abi`, `T`\> } : `never`
+Ƭ **DecodedEvent**<`Abi`, `T`\>: `T` extends [`AbiEventName`](models.md#abieventname)<`Abi`\> ? { `event`: `T` ; `data`: [`DecodedAbiEventData`](models.md#decodedabieventdata)<`Abi`, `T`\> } : `never`
 
 #### Type parameters
 
@@ -553,7 +553,7 @@ outline: deep
 
 | Name          | Type                                                                  | Description                                   |
 | :------------ | :-------------------------------------------------------------------- | :-------------------------------------------- |
-| `transaction` | [`Transaction`](README.md#transaction)                                | Executed transaction                          |
+| `transaction` | [`Transaction`](models.md#transaction)                                | Executed transaction                          |
 | `newState`    | [`FullContractState`](interfaces/FullContractState.md) \| `undefined` | Contract state after the executed transaction |
 | `output`      | `O` \| `undefined`                                                    | Parsed function call output                   |
 

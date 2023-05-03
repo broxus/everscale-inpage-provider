@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Subscriber
-
 # Class: Subscriber
 
 ## Table of contents
@@ -36,7 +34,7 @@
 
 ### transactions
 
-▸ **transactions**(`address`): `IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }, `false`\>
+▸ **transactions**(`address`): `IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }, `false`\>
 
 Returns a stream of new transactions
 
@@ -48,7 +46,7 @@ Returns a stream of new transactions
 
 #### Returns
 
-`IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }, `false`\>
+`IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }, `false`\>
 
 #### Defined in
 
@@ -58,7 +56,7 @@ Returns a stream of new transactions
 
 ### trace
 
-▸ **trace**(`transaction`): `IdentityStream`<[`TransactionWithAccount`](../README.md#transactionwithaccount)<[`Address`](Address.md)\>, `true`\>
+▸ **trace**(`transaction`): `IdentityStream`<[`TransactionWithAccount`](../models.md#transactionwithaccount)<[`Address`](Address.md)\>, `true`\>
 
 Returns a finite stream of child transactions
 
@@ -66,11 +64,11 @@ Returns a finite stream of child transactions
 
 | Name          | Type                                                                | Description      |
 | :------------ | :------------------------------------------------------------------ | :--------------- |
-| `transaction` | [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\> | root transaction |
+| `transaction` | [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\> | root transaction |
 
 #### Returns
 
-`IdentityStream`<[`TransactionWithAccount`](../README.md#transactionwithaccount)<[`Address`](Address.md)\>, `true`\>
+`IdentityStream`<[`TransactionWithAccount`](../models.md#transactionwithaccount)<[`Address`](Address.md)\>, `true`\>
 
 #### Defined in
 
@@ -80,7 +78,7 @@ Returns a finite stream of child transactions
 
 ### oldTransactions
 
-▸ **oldTransactions**(`address`, `filter?`): `IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }, `true`\>
+▸ **oldTransactions**(`address`, `filter?`): `IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }, `true`\>
 
 Returns a stream of old transactions
 
@@ -95,7 +93,7 @@ Returns a stream of old transactions
 
 #### Returns
 
-`IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }, `true`\>
+`IdentityStream`<{ `address`: [`Address`](Address.md) ; `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `info`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }, `true`\>
 
 #### Defined in
 

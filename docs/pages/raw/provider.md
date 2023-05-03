@@ -37,13 +37,13 @@ outline: deep
 
 ### RawRpcMethod
 
-Ƭ **RawRpcMethod**<`P`\>: [`RawProviderApiRequestParams`](README.md#rawproviderapirequestparams)<`P`\> extends `undefined` ? () => `Promise`<[`RawProviderApiResponse`](README.md#rawproviderapiresponse)<`P`\>\> : (`args`: [`RawProviderApiRequestParams`](README.md#rawproviderapirequestparams)<`P`\>) => `Promise`<[`RawProviderApiResponse`](README.md#rawproviderapiresponse)<`P`\>\>
+Ƭ **RawRpcMethod**<`P`\>: [`RawProviderApiRequestParams`](provider-api.md#rawproviderapirequestparams)<`P`\> extends `undefined` ? () => `Promise`<[`RawProviderApiResponse`](provider-api.md#rawproviderapirequestparams)<`P`\>\> : (`args`: [`RawProviderApiRequestParams`](provider-api.md#rawproviderapirequestparams)<`P`\>) => `Promise`<[`RawProviderApiResponse`](provider-api.md#rawproviderapirequestparams)<`P`\>\>
 
 #### Type parameters
 
-| Name | Type                                                 |
-| :--- | :--------------------------------------------------- |
-| `P`  | extends [`ProviderMethod`](README.md#providermethod) |
+| Name | Type                                                       |
+| :--- | :--------------------------------------------------------- |
+| `P`  | extends [`ProviderMethod`](provider-api.md#providermethod) |
 
 **Defined in:**
 
@@ -63,7 +63,7 @@ outline: deep
 
 ### GetExpectedAddressParams
 
-Ƭ **GetExpectedAddressParams**<`Abi`\>: `Abi` extends { `data`: infer D } ? { `tvc`: `string` ; `workchain?`: `number` ; `publicKey?`: `string` ; `initParams`: [`MergeInputObjectsArray`](README.md#mergeinputobjectsarray)<`D`\> } : `never`
+Ƭ **GetExpectedAddressParams**<`Abi`\>: `Abi` extends { `data`: infer D } ? { `tvc`: `string` ; `workchain?`: `number` ; `publicKey?`: `string` ; `initParams`: [`MergeInputObjectsArray`](models.md#mergeinputobjectsarray)<`D`\> } : `never`
 
 #### Type parameters
 
@@ -85,14 +85,14 @@ outline: deep
 
 | Name | Type                                                                |
 | :--- | :------------------------------------------------------------------ |
-| `P`  | extends readonly [`ReadonlyAbiParam`](README.md#readonlyabiparam)[] |
+| `P`  | extends readonly [`ReadonlyAbiParam`](models.md#readonlyabiparam)[] |
 
 #### Type declaration
 
 | Name   | Type                                                                                                                                                                | Description                                           |
 | :----- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------- |
 | `code` | `string`                                                                                                                                                            | Base64 encoded contract code                          |
-| `salt` | `string` \| { `abiVersion?`: [`AbiVersion`](README.md#abiversion) ; `structure`: `P` ; `data`: [`MergeInputObjectsArray`](README.md#mergeinputobjectsarray)<`P`\> } | Base64 encoded salt (as BOC) or params of boc encoder |
+| `salt` | `string` \| { `abiVersion?`: [`AbiVersion`](models.md#abiversion) ; `structure`: `P` ; `data`: [`MergeInputObjectsArray`](models.md#mergeinputobjectsarray)<`P`\> } | Base64 encoded salt (as BOC) or params of boc encoder |
 
 **Defined in:**
 
@@ -124,7 +124,7 @@ outline: deep
 
 | Name | Type                                       |
 | :--- | :----------------------------------------- |
-| `T`  | extends [`AssetType`](README.md#assettype) |
+| `T`  | extends [`AssetType`](models.md#assettype) |
 
 #### Type declaration
 
@@ -132,7 +132,7 @@ outline: deep
 | :-------- | :--------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
 | `account` | [`Address`](classes/Address.md)                      | Owner's wallet address. It is the same address as the `accountInteraction.address`, but it must be explicitly provided |
 | `type`    | `T`                                                  | Which asset to add                                                                                                     |
-| `params`  | [`AssetTypeParams`](README.md#assettypeparams)<`T`\> | Asset parameters                                                                                                       |
+| `params`  | [`AssetTypeParams`](models.md#assettypeparams)<`T`\> | Asset parameters                                                                                                       |
 
 **Defined in:**
 

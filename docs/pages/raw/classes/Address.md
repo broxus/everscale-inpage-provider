@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Address
-
 # Class: Address
 
 ## Hierarchy

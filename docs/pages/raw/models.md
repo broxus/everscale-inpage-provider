@@ -48,7 +48,7 @@ outline: deep
 | :---------- | :--------------------------------------------------------- |
 | `minLt`     | `string`                                                   |
 | `maxLt`     | `string`                                                   |
-| `batchType` | [`TransactionsBatchType`](README.md#transactionsbatchtype) |
+| `batchType` | [`TransactionsBatchType`](models.md#transactionsbatchtype) |
 
 **Defined in:**
 
@@ -80,17 +80,17 @@ outline: deep
 
 | Name                 | Type                                       |
 | :------------------- | :----------------------------------------- |
-| `id`                 | [`TransactionId`](README.md#transactionid) |
-| `prevTransactionId?` | [`TransactionId`](README.md#transactionid) |
+| `id`                 | [`TransactionId`](models.md#transactionid) |
+| `prevTransactionId?` | [`TransactionId`](models.md#transactionid) |
 | `createdAt`          | `number`                                   |
 | `aborted`            | `boolean`                                  |
 | `exitCode?`          | `number`                                   |
 | `resultCode?`        | `number`                                   |
-| `origStatus`         | [`AccountStatus`](README.md#accountstatus) |
-| `endStatus`          | [`AccountStatus`](README.md#accountstatus) |
+| `origStatus`         | [`AccountStatus`](models.md#accountstatus) |
+| `endStatus`          | [`AccountStatus`](models.md#accountstatus) |
 | `totalFees`          | `string`                                   |
-| `inMessage`          | [`Message`](README.md#message)<`Addr`\>    |
-| `outMessages`        | [`Message`](README.md#message)<`Addr`\>[]  |
+| `inMessage`          | [`Message`](models.md#message)<`Addr`\>    |
+| `outMessages`        | [`Message`](models.md#message)<`Addr`\>[]  |
 
 **Defined in:**
 
@@ -100,7 +100,7 @@ outline: deep
 
 ### TransactionWithAccount
 
-Ƭ **TransactionWithAccount**<`Addr`\>: [`Transaction`](README.md#transaction)<`Addr`\> & { `account`: `Addr` }
+Ƭ **TransactionWithAccount**<`Addr`\>: [`Transaction`](models.md#transaction)<`Addr`\> & { `account`: `Addr` }
 
 #### Type parameters
 
@@ -116,7 +116,7 @@ outline: deep
 
 ### RawTransaction
 
-Ƭ **RawTransaction**: [`Transaction`](README.md#transaction)<`string`\>
+Ƭ **RawTransaction**: [`Transaction`](models.md#transaction)<`string`\>
 
 **Defined in:**
 
@@ -126,17 +126,17 @@ outline: deep
 
 ### serializeTransaction
 
-▸ **serializeTransaction**(`transaction`): [`RawTransaction`](README.md#rawtransaction)
+▸ **serializeTransaction**(`transaction`): [`RawTransaction`](models.md#rawtransaction)
 
 #### Parameters
 
 | Name          | Type                                                                     |
 | :------------ | :----------------------------------------------------------------------- |
-| `transaction` | [`Transaction`](README.md#transaction)<[`Address`](classes/Address.md)\> |
+| `transaction` | [`Transaction`](models.md#transaction)<[`Address`](classes/Address.md)\> |
 
 #### Returns
 
-[`RawTransaction`](README.md#rawtransaction)
+[`RawTransaction`](models.md#rawtransaction)
 
 **Defined in:**
 
@@ -146,17 +146,17 @@ outline: deep
 
 ### parseTransaction
 
-▸ **parseTransaction**(`transaction`): [`Transaction`](README.md#transaction)
+▸ **parseTransaction**(`transaction`): [`Transaction`](models.md#transaction)
 
 #### Parameters
 
 | Name          | Type                                         |
 | :------------ | :------------------------------------------- |
-| `transaction` | [`RawTransaction`](README.md#rawtransaction) |
+| `transaction` | [`RawTransaction`](models.md#rawtransaction) |
 
 #### Returns
 
-[`Transaction`](README.md#transaction)
+[`Transaction`](models.md#transaction)
 
 **Defined in:**
 
@@ -195,7 +195,7 @@ outline: deep
 
 ### RawMessage
 
-Ƭ **RawMessage**: [`Message`](README.md#message)<`string`\>
+Ƭ **RawMessage**: [`Message`](models.md#message)<`string`\>
 
 **Defined in:**
 
@@ -205,17 +205,17 @@ outline: deep
 
 ### serializeMessage
 
-▸ **serializeMessage**(`message`): [`RawMessage`](README.md#rawmessage)
+▸ **serializeMessage**(`message`): [`RawMessage`](models.md#rawmessage)
 
 #### Parameters
 
 | Name      | Type                                                             |
 | :-------- | :--------------------------------------------------------------- |
-| `message` | [`Message`](README.md#message)<[`Address`](classes/Address.md)\> |
+| `message` | [`Message`](models.md#message)<[`Address`](classes/Address.md)\> |
 
 #### Returns
 
-[`RawMessage`](README.md#rawmessage)
+[`RawMessage`](models.md#rawmessage)
 
 **Defined in:**
 
@@ -225,17 +225,17 @@ outline: deep
 
 ### parseMessage
 
-▸ **parseMessage**(`message`): [`Message`](README.md#message)
+▸ **parseMessage**(`message`): [`Message`](models.md#message)
 
 #### Parameters
 
 | Name      | Type                                 |
 | :-------- | :----------------------------------- |
-| `message` | [`RawMessage`](README.md#rawmessage) |
+| `message` | [`RawMessage`](models.md#rawmessage) |
 
 #### Returns
 
-[`Message`](README.md#message)
+[`Message`](models.md#message)
 
 **Defined in:**
 
@@ -340,7 +340,7 @@ outline: deep
 
 ### RawPermissions
 
-Ƭ **RawPermissions**: [`Permissions`](README.md#permissions)<`string`\>
+Ƭ **RawPermissions**: [`Permissions`](models.md#permissions)<`string`\>
 
 **Defined in:**
 
@@ -350,17 +350,17 @@ outline: deep
 
 ### parsePermissions
 
-▸ **parsePermissions**(`permissions`): `Partial`<[`Permissions`](README.md#permissions)\>
+▸ **parsePermissions**(`permissions`): `Partial`<[`Permissions`](models.md#permissions)\>
 
 #### Parameters
 
 | Name          | Type                                                     |
 | :------------ | :------------------------------------------------------- |
-| `permissions` | `Partial`<[`RawPermissions`](README.md#rawpermissions)\> |
+| `permissions` | `Partial`<[`RawPermissions`](models.md#rawpermissions)\> |
 
 #### Returns
 
-`Partial`<[`Permissions`](README.md#permissions)\>
+`Partial`<[`Permissions`](models.md#permissions)\>
 
 **Defined in:**
 
@@ -370,7 +370,7 @@ outline: deep
 
 ### parseAccountInteraction
 
-▸ **parseAccountInteraction**(`accountInteraction`): `Required`<[`Permissions`](README.md#permissions)\>[``"accountInteraction"``]
+▸ **parseAccountInteraction**(`accountInteraction`): `Required`<[`Permissions`](models.md#permissions)\>[``"accountInteraction"``]
 
 #### Parameters
 
@@ -383,7 +383,7 @@ outline: deep
 
 #### Returns
 
-`Required`<[`Permissions`](README.md#permissions)\>[``"accountInteraction"``]
+`Required`<[`Permissions`](models.md#permissions)\>[``"accountInteraction"``]
 
 **Defined in:**
 
@@ -393,7 +393,7 @@ outline: deep
 
 ### Permission
 
-Ƭ **Permission**: keyof [`Permissions`](README.md#permissions)
+Ƭ **Permission**: keyof [`Permissions`](models.md#permissions)
 
 **Defined in:**
 
@@ -403,13 +403,13 @@ outline: deep
 
 ### PermissionData
 
-Ƭ **PermissionData**<`T`, `Addr`\>: [`Permissions`](README.md#permissions)<`Addr`\>[`T`]
+Ƭ **PermissionData**<`T`, `Addr`\>: [`Permissions`](models.md#permissions)<`Addr`\>[`T`]
 
 #### Type parameters
 
 | Name   | Type                                         |
 | :----- | :------------------------------------------- |
-| `T`    | extends [`Permission`](README.md#permission) |
+| `T`    | extends [`Permission`](models.md#permission) |
 | `Addr` | [`Address`](classes/Address.md)              |
 
 **Defined in:**
@@ -436,7 +436,7 @@ outline: deep
 
 | Name   | Type                                       |
 | :----- | :----------------------------------------- |
-| `T`    | extends [`AssetType`](README.md#assettype) |
+| `T`    | extends [`AssetType`](models.md#assettype) |
 | `Addr` | [`Address`](classes/Address.md)            |
 
 **Defined in:**
@@ -463,7 +463,7 @@ outline: deep
 
 | Name                 | Type                                                   | Description                        |
 | :------------------- | :----------------------------------------------------- | :--------------------------------- |
-| `algorithm`          | [`EncryptionAlgorithm`](README.md#encryptionalgorithm) | -                                  |
+| `algorithm`          | [`EncryptionAlgorithm`](models.md#encryptionalgorithm) | -                                  |
 | `sourcePublicKey`    | `string`                                               | Hex encoded encryptor's public key |
 | `recipientPublicKey` | `string`                                               | Hex encoded recipient public key   |
 | `data`               | `string`                                               | Base64 encoded data                |
@@ -487,7 +487,7 @@ outline: deep
 
 ### TokenValue
 
-Ƭ **TokenValue**<`Addr`\>: `null` \| `boolean` \| `string` \| `number` \| `Addr` \| { [K in string]: TokenValue<Addr\> } \| [`TokenValue`](README.md#tokenvalue)<`Addr`\>[] \| readonly [[`TokenValue`](README.md#tokenvalue)<`Addr`\>, [`TokenValue`](README.md#tokenvalue)<`Addr`\>][]
+Ƭ **TokenValue**<`Addr`\>: `null` \| `boolean` \| `string` \| `number` \| `Addr` \| { [K in string]: TokenValue<Addr\> } \| [`TokenValue`](models.md#tokenvalue)<`Addr`\>[] \| readonly [[`TokenValue`](models.md#tokenvalue)<`Addr`\>, [`TokenValue`](models.md#tokenvalue)<`Addr`\>][]
 
 #### Type parameters
 
@@ -503,7 +503,7 @@ outline: deep
 
 ### RawTokenValue
 
-Ƭ **RawTokenValue**: [`TokenValue`](README.md#tokenvalue)<`string`\>
+Ƭ **RawTokenValue**: [`TokenValue`](models.md#tokenvalue)<`string`\>
 
 **Defined in:**
 
@@ -529,7 +529,7 @@ outline: deep
 
 ### RawTokensObject
 
-Ƭ **RawTokensObject**: [`TokensObject`](README.md#tokensobject)<`string`\>
+Ƭ **RawTokensObject**: [`TokensObject`](models.md#tokensobject)<`string`\>
 
 **Defined in:**
 
@@ -553,7 +553,7 @@ outline: deep
 | :------- | :------------------------------------------------ | :------------------------------------------ |
 | `abi`    | `string`                                          | Contract ABI                                |
 | `method` | `string`                                          | Specific method from specified contract ABI |
-| `params` | [`TokensObject`](README.md#tokensobject)<`Addr`\> | Method arguments                            |
+| `params` | [`TokensObject`](models.md#tokensobject)<`Addr`\> | Method arguments                            |
 
 **Defined in:**
 
@@ -580,8 +580,8 @@ outline: deep
 | Name          | Type                                                                                                                                                                          |
 | :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`        | `string`                                                                                                                                                                      |
-| `type`        | [`AbiParamKind`](README.md#abiparamkind) \| `AbiParamKindMap` \| `AbiParamKindArray` \| `AbiParamOptional` \| `AbiParamRef` \| `AbiParamOptionalRef` \| `AbiParamRefOptional` |
-| `components?` | [`AbiParam`](README.md#abiparam)[]                                                                                                                                            |
+| `type`        | [`AbiParamKind`](models.md#abiparamkind) \| `AbiParamKindMap` \| `AbiParamKindArray` \| `AbiParamOptional` \| `AbiParamRef` \| `AbiParamOptionalRef` \| `AbiParamRefOptional` |
+| `components?` | [`AbiParam`](models.md#abiparam)[]                                                                                                                                            |
 
 **Defined in:**
 
@@ -598,8 +598,8 @@ outline: deep
 | Name          | Type                                                                                                                                                                          |
 | :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`        | `string`                                                                                                                                                                      |
-| `type`        | [`AbiParamKind`](README.md#abiparamkind) \| `AbiParamKindMap` \| `AbiParamKindArray` \| `AbiParamOptional` \| `AbiParamRef` \| `AbiParamOptionalRef` \| `AbiParamRefOptional` |
-| `components?` | readonly [`ReadonlyAbiParam`](README.md#readonlyabiparam)[]                                                                                                                   |
+| `type`        | [`AbiParamKind`](models.md#abiparamkind) \| `AbiParamKindMap` \| `AbiParamKindArray` \| `AbiParamOptional` \| `AbiParamRef` \| `AbiParamOptionalRef` \| `AbiParamRefOptional` |
+| `components?` | readonly [`ReadonlyAbiParam`](models.md#readonlyabiparam)[]                                                                                                                   |
 
 **Defined in:**
 
@@ -609,17 +609,17 @@ outline: deep
 
 ### serializeTokensObject
 
-▸ **serializeTokensObject**(`object`): [`RawTokensObject`](README.md#rawtokensobject)
+▸ **serializeTokensObject**(`object`): [`RawTokensObject`](models.md#rawtokensobject)
 
 #### Parameters
 
 | Name     | Type                                                                       |
 | :------- | :------------------------------------------------------------------------- |
-| `object` | [`TokensObject`](README.md#tokensobject)<[`Address`](classes/Address.md)\> |
+| `object` | [`TokensObject`](models.md#tokensobject)<[`Address`](classes/Address.md)\> |
 
 #### Returns
 
-[`RawTokensObject`](README.md#rawtokensobject)
+[`RawTokensObject`](models.md#rawtokensobject)
 
 **Defined in:**
 
@@ -629,18 +629,18 @@ outline: deep
 
 ### parseTokensObject
 
-▸ **parseTokensObject**(`params`, `object`): [`TokensObject`](README.md#tokensobject)
+▸ **parseTokensObject**(`params`, `object`): [`TokensObject`](models.md#tokensobject)
 
 #### Parameters
 
 | Name     | Type                                           |
 | :------- | :--------------------------------------------- |
-| `params` | [`AbiParam`](README.md#abiparam)[]             |
-| `object` | [`RawTokensObject`](README.md#rawtokensobject) |
+| `params` | [`AbiParam`](models.md#abiparam)[]             |
+| `object` | [`RawTokensObject`](models.md#rawtokensobject) |
 
 #### Returns
 
-[`TokensObject`](README.md#tokensobject)
+[`TokensObject`](models.md#tokensobject)
 
 **Defined in:**
 
@@ -650,18 +650,18 @@ outline: deep
 
 ### parsePartialTokensObject
 
-▸ **parsePartialTokensObject**(`params`, `object`): [`TokensObject`](README.md#tokensobject)
+▸ **parsePartialTokensObject**(`params`, `object`): [`TokensObject`](models.md#tokensobject)
 
 #### Parameters
 
 | Name     | Type                                                       |
 | :------- | :--------------------------------------------------------- |
-| `params` | [`AbiParam`](README.md#abiparam)[]                         |
-| `object` | `Partial`<[`RawTokensObject`](README.md#rawtokensobject)\> |
+| `params` | [`AbiParam`](models.md#abiparam)[]                         |
+| `object` | `Partial`<[`RawTokensObject`](models.md#rawtokensobject)\> |
 
 #### Returns
 
-[`TokensObject`](README.md#tokensobject)
+[`TokensObject`](models.md#tokensobject)
 
 **Defined in:**
 
@@ -703,7 +703,7 @@ outline: deep
 
 ### MergeInputObjectsArray
 
-Ƭ **MergeInputObjectsArray**<`A`\>: `A` extends readonly [infer T, ...(infer Ts)] ? [`InputTokenObject`](README.md#inputtokenobject)<`T`\> & [`MergeInputObjectsArray`](README.md#mergeinputobjectsarray)<[...Ts]\> : `A` extends readonly [infer T] ? [`InputTokenObject`](README.md#inputtokenobject)<`T`\> : `A` extends readonly [] ? {} : `never`
+Ƭ **MergeInputObjectsArray**<`A`\>: `A` extends readonly [infer T, ...(infer Ts)] ? [`InputTokenObject`](models.md#inputtokenobject)<`T`\> & [`MergeInputObjectsArray`](models.md#mergeinputobjectsarray)<[...Ts]\> : `A` extends readonly [infer T] ? [`InputTokenObject`](models.md#inputtokenobject)<`T`\> : `A` extends readonly [] ? {} : `never`
 
 #### Type parameters
 
@@ -719,7 +719,7 @@ outline: deep
 
 ### MergeOutputObjectsArray
 
-Ƭ **MergeOutputObjectsArray**<`A`\>: `A` extends readonly [infer T, ...(infer Ts)] ? [`OutputTokenObject`](README.md#outputtokenobject)<`T`\> & [`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<[...Ts]\> : `A` extends readonly [infer T] ? [`OutputTokenObject`](README.md#outputtokenobject)<`T`\> : `A` extends readonly [] ? {} : `never`
+Ƭ **MergeOutputObjectsArray**<`A`\>: `A` extends readonly [infer T, ...(infer Ts)] ? [`OutputTokenObject`](models.md#outputtokenobject)<`T`\> & [`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<[...Ts]\> : `A` extends readonly [infer T] ? [`OutputTokenObject`](models.md#outputtokenobject)<`T`\> : `A` extends readonly [] ? {} : `never`
 
 #### Type parameters
 
@@ -767,7 +767,7 @@ outline: deep
 
 ### AbiFieldName
 
-Ƭ **AbiFieldName**<`C`\>: keyof [`DecodedAbiFields`](README.md#decodedabifields)<`C`\>
+Ƭ **AbiFieldName**<`C`\>: keyof [`DecodedAbiFields`](models.md#decodedabifields)<`C`\>
 
 #### Type parameters
 
@@ -783,14 +783,14 @@ outline: deep
 
 ### AbiFunctionInputs
 
-Ƭ **AbiFunctionInputs**<`C`, `T`\>: [`MergeInputObjectsArray`](README.md#mergeinputobjectsarray)<`PickFunction`<`C`, `T`\>[``"inputs"``]\>
+Ƭ **AbiFunctionInputs**<`C`, `T`\>: [`MergeInputObjectsArray`](models.md#mergeinputobjectsarray)<`PickFunction`<`C`, `T`\>[``"inputs"``]\>
 
 #### Type parameters
 
 | Name | Type                                                         |
 | :--- | :----------------------------------------------------------- |
 | `C`  | `C`                                                          |
-| `T`  | extends [`AbiFunctionName`](README.md#abifunctionname)<`C`\> |
+| `T`  | extends [`AbiFunctionName`](models.md#abifunctionname)<`C`\> |
 
 **Defined in:**
 
@@ -800,14 +800,14 @@ outline: deep
 
 ### AbiFunctionInputsWithDefault
 
-Ƭ **AbiFunctionInputsWithDefault**<`C`, `T`\>: `PickFunction`<`C`, `T`\>[``"inputs"``] extends readonly [] ? `void` \| `Record`<`string`, `never`\> : [`AbiFunctionInputs`](README.md#abifunctioninputs)<`C`, `T`\>
+Ƭ **AbiFunctionInputsWithDefault**<`C`, `T`\>: `PickFunction`<`C`, `T`\>[``"inputs"``] extends readonly [] ? `void` \| `Record`<`string`, `never`\> : [`AbiFunctionInputs`](models.md#abifunctioninputs)<`C`, `T`\>
 
 #### Type parameters
 
 | Name | Type                                                         |
 | :--- | :----------------------------------------------------------- |
 | `C`  | `C`                                                          |
-| `T`  | extends [`AbiFunctionName`](README.md#abifunctionname)<`C`\> |
+| `T`  | extends [`AbiFunctionName`](models.md#abifunctionname)<`C`\> |
 
 **Defined in:**
 
@@ -817,14 +817,14 @@ outline: deep
 
 ### DecodedAbiFunctionInputs
 
-Ƭ **DecodedAbiFunctionInputs**<`C`, `T`\>: [`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<`PickFunction`<`C`, `T`\>[``"inputs"``]\>
+Ƭ **DecodedAbiFunctionInputs**<`C`, `T`\>: [`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<`PickFunction`<`C`, `T`\>[``"inputs"``]\>
 
 #### Type parameters
 
 | Name | Type                                                         |
 | :--- | :----------------------------------------------------------- |
 | `C`  | `C`                                                          |
-| `T`  | extends [`AbiFunctionName`](README.md#abifunctionname)<`C`\> |
+| `T`  | extends [`AbiFunctionName`](models.md#abifunctionname)<`C`\> |
 
 **Defined in:**
 
@@ -834,14 +834,14 @@ outline: deep
 
 ### DecodedAbiFunctionOutputs
 
-Ƭ **DecodedAbiFunctionOutputs**<`C`, `T`\>: [`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<`PickFunction`<`C`, `T`\>[``"outputs"``]\>
+Ƭ **DecodedAbiFunctionOutputs**<`C`, `T`\>: [`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<`PickFunction`<`C`, `T`\>[``"outputs"``]\>
 
 #### Type parameters
 
 | Name | Type                                                         |
 | :--- | :----------------------------------------------------------- |
 | `C`  | `C`                                                          |
-| `T`  | extends [`AbiFunctionName`](README.md#abifunctionname)<`C`\> |
+| `T`  | extends [`AbiFunctionName`](models.md#abifunctionname)<`C`\> |
 
 **Defined in:**
 
@@ -851,14 +851,14 @@ outline: deep
 
 ### DecodedAbiEventData
 
-Ƭ **DecodedAbiEventData**<`C`, `T`\>: [`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<`PickEvent`<`C`, `T`\>[``"inputs"``]\>
+Ƭ **DecodedAbiEventData**<`C`, `T`\>: [`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<`PickEvent`<`C`, `T`\>[``"inputs"``]\>
 
 #### Type parameters
 
 | Name | Type                                                   |
 | :--- | :----------------------------------------------------- |
 | `C`  | `C`                                                    |
-| `T`  | extends [`AbiEventName`](README.md#abieventname)<`C`\> |
+| `T`  | extends [`AbiEventName`](models.md#abieventname)<`C`\> |
 
 **Defined in:**
 
@@ -868,7 +868,7 @@ outline: deep
 
 ### DecodedAbiInitData
 
-Ƭ **DecodedAbiInitData**<`C`\>: `C` extends { `data`: infer D } ? `Partial`<[`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<`D`\>\> : `never`
+Ƭ **DecodedAbiInitData**<`C`\>: `C` extends { `data`: infer D } ? `Partial`<[`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<`D`\>\> : `never`
 
 #### Type parameters
 
@@ -884,7 +884,7 @@ outline: deep
 
 ### DecodedAbiFields
 
-Ƭ **DecodedAbiFields**<`C`\>: `C` extends { `fields`: infer F } ? [`MergeOutputObjectsArray`](README.md#mergeoutputobjectsarray)<`F`\> : `never`
+Ƭ **DecodedAbiFields**<`C`\>: `C` extends { `fields`: infer F } ? [`MergeOutputObjectsArray`](models.md#mergeoutputobjectsarray)<`F`\> : `never`
 
 #### Type parameters
 

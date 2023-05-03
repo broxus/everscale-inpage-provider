@@ -1,5 +1,3 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / Stream
-
 # Interface: Stream<P, T, F\>
 
 ## Type parameters

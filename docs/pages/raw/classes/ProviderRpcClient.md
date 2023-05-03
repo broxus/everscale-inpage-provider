@@ -1,15 +1,4 @@
-[everscale-inpage-provider - v0.3.57](../README.md) / ProviderRpcClient
-
 # Class: ProviderRpcClient
-
-**`Toc Section`**
-
-3. Classes
-
-**`Toc Description`**
-
-Implement the main class, ProviderRpcClient, which contains
-methods and properties for interacting with the Everscale blockchain.
 
 ## Table of contents
 
@@ -73,9 +62,9 @@ methods and properties for interacting with the Everscale blockchain.
 
 #### Parameters
 
-| Name         | Type                                                    |
-| :----------- | :------------------------------------------------------ |
-| `properties` | [`ProviderProperties`](../README.md#providerproperties) |
+| Name         | Type                                                      |
+| :----------- | :-------------------------------------------------------- |
+| `properties` | [`ProviderProperties`](../provider.md#providerproperties) |
 
 #### Defined in
 
@@ -158,13 +147,13 @@ Raw provider
 
 ### rawApi
 
-• `get` **rawApi**(): [`RawProviderApiMethods`](../README.md#rawproviderapimethods)
+• `get` **rawApi**(): [`RawProviderApiMethods`](../provider.md#rawproviderapimethods)
 
 Raw provider api
 
 #### Returns
 
-[`RawProviderApiMethods`](../README.md#rawproviderapimethods)
+[`RawProviderApiMethods`](../provider.md#rawproviderapimethods)
 
 #### Defined in
 
@@ -272,7 +261,7 @@ ProviderNotFoundException when no provider found
 
 ### requestPermissions
 
-▸ **requestPermissions**(`args`): `Promise`<`Partial`<[`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>\>\>
+▸ **requestPermissions**(`args`): `Promise`<`Partial`<[`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>\>\>
 
 Requests new permissions for current origin.
 Shows an approval window to the user.
@@ -291,11 +280,11 @@ Account and Permissions management
 | Name               | Type                                                                        |
 | :----------------- | :-------------------------------------------------------------------------- |
 | `args`             | `Object`                                                                    |
-| `args.permissions` | keyof [`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>[] |
+| `args.permissions` | keyof [`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>[] |
 
 #### Returns
 
-`Promise`<`Partial`<[`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>\>\>
+`Promise`<`Partial`<[`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>\>\>
 
 #### Defined in
 
@@ -499,7 +488,7 @@ Called when the user logs out of the extension
 
 ### getProviderState
 
-▸ **getProviderState**(): `Promise`<{ `version`: `string` ; `numericVersion`: `number` ; `selectedConnection`: `string` ; `networkId`: `number` ; `supportedPermissions`: keyof [`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>[] ; `permissions`: `Partial`<[`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>\> ; `subscriptions`: { `[address: string]`: [`ContractUpdatesSubscription`](../README.md#contractupdatessubscription); } }\>
+▸ **getProviderState**(): `Promise`<{ `version`: `string` ; `numericVersion`: `number` ; `selectedConnection`: `string` ; `networkId`: `number` ; `supportedPermissions`: keyof [`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>[] ; `permissions`: `Partial`<[`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>\> ; `subscriptions`: { `[address: string]`: [`ContractUpdatesSubscription`](../models.md#contractupdatessubscription); } }\>
 
 Returns provider api state
 
@@ -513,7 +502,7 @@ Contract & Data Handling
 
 #### Returns
 
-`Promise`<{ `version`: `string` ; `numericVersion`: `number` ; `selectedConnection`: `string` ; `networkId`: `number` ; `supportedPermissions`: keyof [`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>[] ; `permissions`: `Partial`<[`Permissions`](../README.md#permissions)<[`Address`](Address.md)\>\> ; `subscriptions`: { `[address: string]`: [`ContractUpdatesSubscription`](../README.md#contractupdatessubscription); } }\>
+`Promise`<{ `version`: `string` ; `numericVersion`: `number` ; `selectedConnection`: `string` ; `networkId`: `number` ; `supportedPermissions`: keyof [`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>[] ; `permissions`: `Partial`<[`Permissions`](../models.md#permissions)<[`Address`](Address.md)\>\> ; `subscriptions`: { `[address: string]`: [`ContractUpdatesSubscription`](../models.md#contractupdatessubscription); } }\>
 
 #### Defined in
 
@@ -621,10 +610,10 @@ Required permissions: `basic`
 
 #### Parameters
 
-| Name   | Type                                                                        |
-| :----- | :-------------------------------------------------------------------------- |
-| `abi`  | `Abi`                                                                       |
-| `args` | [`GetExpectedAddressParams`](../README.md#getexpectedaddressparams)<`Abi`\> |
+| Name   | Type                                                                          |
+| :----- | :---------------------------------------------------------------------------- |
+| `abi`  | `Abi`                                                                         |
+| `args` | [`GetExpectedAddressParams`](../provider.md#getexpectedaddressparams)<`Abi`\> |
 
 #### Returns
 
@@ -654,10 +643,10 @@ Required permissions: `basic`
 
 #### Parameters
 
-| Name   | Type                                                                        |
-| :----- | :-------------------------------------------------------------------------- |
-| `abi`  | `Abi`                                                                       |
-| `args` | [`GetExpectedAddressParams`](../README.md#getexpectedaddressparams)<`Abi`\> |
+| Name   | Type                                                                          |
+| :----- | :---------------------------------------------------------------------------- |
+| `abi`  | `Abi`                                                                         |
+| `args` | [`GetExpectedAddressParams`](../provider.md#getexpectedaddressparams)<`Abi`\> |
 
 #### Returns
 
@@ -671,7 +660,7 @@ Required permissions: `basic`
 
 ### unpackInitData
 
-▸ **unpackInitData**<`Abi`\>(`abi`, `data`): `Promise`<{ `publicKey?`: `string` ; `initParams`: [`DecodedAbiInitData`](../README.md#decodedabiinitdata)<`Abi`\> }\>
+▸ **unpackInitData**<`Abi`\>(`abi`, `data`): `Promise`<{ `publicKey?`: `string` ; `initParams`: [`DecodedAbiInitData`](../models.md#decodedabiinitdata)<`Abi`\> }\>
 
 Decodes initial contract data using the specified ABI
 
@@ -694,7 +683,7 @@ Required permissions: `basic`
 
 #### Returns
 
-`Promise`<{ `publicKey?`: `string` ; `initParams`: [`DecodedAbiInitData`](../README.md#decodedabiinitdata)<`Abi`\> }\>
+`Promise`<{ `publicKey?`: `string` ; `initParams`: [`DecodedAbiInitData`](../models.md#decodedabiinitdata)<`Abi`\> }\>
 
 #### Defined in
 
@@ -716,16 +705,16 @@ Required permissions: `basic`
 
 | Name | Type                                                                   |
 | :--- | :--------------------------------------------------------------------- |
-| `P`  | extends readonly [`ReadonlyAbiParam`](../README.md#readonlyabiparam)[] |
+| `P`  | extends readonly [`ReadonlyAbiParam`](../models.md#readonlyabiparam)[] |
 
 #### Parameters
 
 | Name               | Type                                                                  |
 | :----------------- | :-------------------------------------------------------------------- |
 | `args`             | `Object`                                                              |
-| `args.abiVersion?` | [`AbiVersion`](../README.md#abiversion)                               |
+| `args.abiVersion?` | [`AbiVersion`](../models.md#abiversion)                               |
 | `args.structure`   | `P`                                                                   |
-| `args.data`        | [`MergeInputObjectsArray`](../README.md#mergeinputobjectsarray)<`P`\> |
+| `args.data`        | [`MergeInputObjectsArray`](../models.md#mergeinputobjectsarray)<`P`\> |
 
 #### Returns
 
@@ -739,7 +728,7 @@ Required permissions: `basic`
 
 ### unpackFromCell
 
-▸ **unpackFromCell**<`P`\>(`args`): `Promise`<{ `data`: [`MergeOutputObjectsArray`](../README.md#mergeoutputobjectsarray)<`P`\> }\>
+▸ **unpackFromCell**<`P`\>(`args`): `Promise`<{ `data`: [`MergeOutputObjectsArray`](../models.md#mergeoutputobjectsarray)<`P`\> }\>
 
 Decodes base64 encoded BOC
 
@@ -751,21 +740,21 @@ Required permissions: `basic`
 
 | Name | Type                                                                   |
 | :--- | :--------------------------------------------------------------------- |
-| `P`  | extends readonly [`ReadonlyAbiParam`](../README.md#readonlyabiparam)[] |
+| `P`  | extends readonly [`ReadonlyAbiParam`](../models.md#readonlyabiparam)[] |
 
 #### Parameters
 
 | Name                | Type                                    |
 | :------------------ | :-------------------------------------- |
 | `args`              | `Object`                                |
-| `args.abiVersion?`  | [`AbiVersion`](../README.md#abiversion) |
+| `args.abiVersion?`  | [`AbiVersion`](../models.md#abiversion) |
 | `args.structure`    | `P`                                     |
 | `args.boc`          | `string`                                |
 | `args.allowPartial` | `boolean`                               |
 
 #### Returns
 
-`Promise`<{ `data`: [`MergeOutputObjectsArray`](../README.md#mergeoutputobjectsarray)<`P`\> }\>
+`Promise`<{ `data`: [`MergeOutputObjectsArray`](../models.md#mergeoutputobjectsarray)<`P`\> }\>
 
 #### Defined in
 
@@ -895,13 +884,13 @@ Required permissions: `basic`
 
 | Name | Type                                                                   |
 | :--- | :--------------------------------------------------------------------- |
-| `P`  | extends readonly [`ReadonlyAbiParam`](../README.md#readonlyabiparam)[] |
+| `P`  | extends readonly [`ReadonlyAbiParam`](../models.md#readonlyabiparam)[] |
 
 #### Parameters
 
-| Name   | Type                                                        |
-| :----- | :---------------------------------------------------------- |
-| `args` | [`SetCodeSaltParams`](../README.md#setcodesaltparams)<`P`\> |
+| Name   | Type                                                          |
+| :----- | :------------------------------------------------------------ |
+| `args` | [`SetCodeSaltParams`](../provider.md#setcodesaltparams)<`P`\> |
 
 #### Returns
 
@@ -925,9 +914,9 @@ Required permissions: `basic`
 
 #### Parameters
 
-| Name   | Type                                                  |
-| :----- | :---------------------------------------------------- |
-| `args` | [`GetCodeSaltParams`](../README.md#getcodesaltparams) |
+| Name   | Type                                                    |
+| :----- | :------------------------------------------------------ |
+| `args` | [`GetCodeSaltParams`](../provider.md#getcodesaltparams) |
 
 #### Returns
 
@@ -957,9 +946,9 @@ Requires permissions: `accountInteraction`
 
 #### Parameters
 
-| Name   | Type                                                  |
-| :----- | :---------------------------------------------------- |
-| `args` | [`AddAssetParams`](../README.md#addassetparams)<`T`\> |
+| Name   | Type                                                    |
+| :----- | :------------------------------------------------------ |
+| `args` | [`AddAssetParams`](../provider.md#addassetparams)<`T`\> |
 
 #### Returns
 
@@ -973,7 +962,7 @@ Requires permissions: `accountInteraction`
 
 ### getTransactions
 
-▸ **getTransactions**(`args`): `Promise`<{ `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `continuation`: `undefined` \| [`TransactionId`](../README.md#transactionid) ; `info?`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }\>
+▸ **getTransactions**(`args`): `Promise`<{ `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `continuation`: `undefined` \| [`TransactionId`](../models.md#transactionid) ; `info?`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }\>
 
 Requests contract transactions
 
@@ -991,12 +980,12 @@ Transactions
 | :------------------- | :-------------------------------------------- | :--------------------------------------------------------- |
 | `args`               | `Object`                                      | -                                                          |
 | `args.address`       | [`Address`](Address.md)                       | Contract address                                           |
-| `args.continuation?` | [`TransactionId`](../README.md#transactionid) | Id of the transaction from which to request the next batch |
+| `args.continuation?` | [`TransactionId`](../models.md#transactionid) | Id of the transaction from which to request the next batch |
 | `args.limit?`        | `number`                                      | Optional limit. Values greater than 50 have no effect      |
 
 #### Returns
 
-`Promise`<{ `transactions`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\>[] ; `continuation`: `undefined` \| [`TransactionId`](../README.md#transactionid) ; `info?`: [`TransactionsBatchInfo`](../README.md#transactionsbatchinfo) }\>
+`Promise`<{ `transactions`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\>[] ; `continuation`: `undefined` \| [`TransactionId`](../models.md#transactionid) ; `info?`: [`TransactionsBatchInfo`](../models.md#tokenvalue) }\>
 
 #### Defined in
 
@@ -1006,7 +995,7 @@ Transactions
 
 ### getTransaction
 
-▸ **getTransaction**(`args`): `Promise`<{ `transaction`: `undefined` \| [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\> }\>
+▸ **getTransaction**(`args`): `Promise`<{ `transaction`: `undefined` \| [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\> }\>
 
 Searches transaction by hash
 
@@ -1023,7 +1012,7 @@ Required permissions: `basic`
 
 #### Returns
 
-`Promise`<{ `transaction`: `undefined` \| [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\> }\>
+`Promise`<{ `transaction`: `undefined` \| [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\> }\>
 
 #### Defined in
 
@@ -1033,7 +1022,7 @@ Required permissions: `basic`
 
 ### sendMessage
 
-▸ **sendMessage**(`args`): `Promise`<{ `transaction`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\> }\>
+▸ **sendMessage**(`args`): `Promise`<{ `transaction`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\> }\>
 
 Sends an internal message from the user account.
 Shows an approval window to the user.
@@ -1051,12 +1040,12 @@ Required permissions: `accountInteraction`
 | `args.recipient`  | [`Address`](Address.md)                                               | Message destination address                                                                                              |
 | `args.amount`     | `string`                                                              | Amount of nano EVER to send                                                                                              |
 | `args.bounce`     | `boolean`                                                             | Whether to bounce message back on error                                                                                  |
-| `args.payload?`   | [`FunctionCall`](../README.md#functioncall)<[`Address`](Address.md)\> | Optional function call                                                                                                   |
+| `args.payload?`   | [`FunctionCall`](../models.md#functioncall)<[`Address`](Address.md)\> | Optional function call                                                                                                   |
 | `args.stateInit?` | `string`                                                              | Optional base64 encoded TVC NOTE: If the selected contract do not support this, an error is returned                     |
 
 #### Returns
 
-`Promise`<{ `transaction`: [`Transaction`](../README.md#transaction)<[`Address`](Address.md)\> }\>
+`Promise`<{ `transaction`: [`Transaction`](../models.md#transaction)<[`Address`](Address.md)\> }\>
 
 #### Defined in
 
@@ -1066,7 +1055,7 @@ Required permissions: `accountInteraction`
 
 ### sendMessageDelayed
 
-▸ **sendMessageDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+▸ **sendMessageDelayed**(`args`): `Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 Sends an internal message from the user account without waiting for the transaction.
 Shows an approval window to the user.
@@ -1088,12 +1077,12 @@ Required permissions: `accountInteraction`
 | `args.recipient`  | [`Address`](Address.md)                                               | Message destination address                                                                                              |
 | `args.amount`     | `string`                                                              | Amount of nano EVER to send                                                                                              |
 | `args.bounce`     | `boolean`                                                             | Whether to bounce message back on error                                                                                  |
-| `args.payload?`   | [`FunctionCall`](../README.md#functioncall)<[`Address`](Address.md)\> | Optional function call                                                                                                   |
+| `args.payload?`   | [`FunctionCall`](../models.md#functioncall)<[`Address`](Address.md)\> | Optional function call                                                                                                   |
 | `args.stateInit?` | `string`                                                              | Optional base64 encoded TVC NOTE: If the selected contract do not support this, an error is returned                     |
 
 #### Returns
 
-`Promise`<[`DelayedMessageExecution`](../README.md#delayedmessageexecution)\>
+`Promise`<[`DelayedMessageExecution`](../contract.md#delayedmessageexecution)\>
 
 #### Defined in
 
@@ -1217,7 +1206,7 @@ Requires permissions: `accountInteraction`
 
 ### encryptData
 
-▸ **encryptData**(`args`): `Promise`<[`EncryptedData`](../README.md#encrypteddata)[]\>
+▸ **encryptData**(`args`): `Promise`<[`EncryptedData`](../models.md#encrypteddata)[]\>
 
 Encrypts arbitrary data with specified algorithm for each specified recipient
 
@@ -1237,7 +1226,7 @@ Requires permissions: `accountInteraction`
 
 #### Returns
 
-`Promise`<[`EncryptedData`](../README.md#encrypteddata)[]\>
+`Promise`<[`EncryptedData`](../models.md#encrypteddata)[]\>
 
 #### Defined in
 
@@ -1259,7 +1248,7 @@ Requires permissions: `accountInteraction`
 
 | Name            | Type                                          |
 | :-------------- | :-------------------------------------------- |
-| `encryptedData` | [`EncryptedData`](../README.md#encrypteddata) |
+| `encryptedData` | [`EncryptedData`](../models.md#encrypteddata) |
 
 #### Returns
 

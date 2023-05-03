@@ -48,7 +48,7 @@ outline: deep
 
 ### mergeTransactions
 
-▸ **mergeTransactions**<`Addr`\>(`knownTransactions`, `newTransactions`, `info`): [`Transaction`](README.md#transaction)<`Addr`\>[]
+▸ **mergeTransactions**<`Addr`\>(`knownTransactions`, `newTransactions`, `info`): [`Transaction`](models.md#transaction)<`Addr`\>[]
 
 Modifies knownTransactions array, merging it with new transactions.
 All arrays are assumed to be sorted by descending logical time.
@@ -65,13 +65,13 @@ All arrays are assumed to be sorted by descending logical time.
 
 | Name                | Type                                                       |
 | :------------------ | :--------------------------------------------------------- |
-| `knownTransactions` | [`Transaction`](README.md#transaction)<`Addr`\>[]          |
-| `newTransactions`   | [`Transaction`](README.md#transaction)<`Addr`\>[]          |
-| `info`              | [`TransactionsBatchInfo`](README.md#transactionsbatchinfo) |
+| `knownTransactions` | [`Transaction`](models.md#transaction)<`Addr`\>[]          |
+| `newTransactions`   | [`Transaction`](models.md#transaction)<`Addr`\>[]          |
+| `info`              | [`TransactionsBatchInfo`](models.md#transactionsbatchinfo) |
 
 #### Returns
 
-[`Transaction`](README.md#transaction)<`Addr`\>[]
+[`Transaction`](models.md#transaction)<`Addr`\>[]
 
 **Defined in:**
 
