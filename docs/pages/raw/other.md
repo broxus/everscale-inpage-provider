@@ -17,4 +17,4 @@ handling the case of duplicated dependencies.
 
 `boolean`
 
-[src/utils.ts:61](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/utils.ts#L61)
+[src/utils.ts:61](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/utils.ts#L61)

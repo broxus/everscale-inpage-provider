@@ -40,7 +40,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:26](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L26)
+[src/api.ts:26](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L26)
 
 ---
 
@@ -373,7 +373,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:121](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L121)
+[src/api.ts:121](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L121)
 
 ---
 
@@ -383,7 +383,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1581](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1581)
+[src/api.ts:1581](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1581)
 
 ---
 
@@ -400,7 +400,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1586](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1586)
+[src/api.ts:1586](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1586)
 
 ---
 
@@ -416,7 +416,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1591](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1591)
+[src/api.ts:1591](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1591)
 
 ---
 
@@ -426,7 +426,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1596](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1596)
+[src/api.ts:1596](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1596)
 
 ---
 
@@ -443,7 +443,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1601](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1601)
+[src/api.ts:1601](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1601)
 
 ---
 
@@ -459,7 +459,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1610](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1610)
+[src/api.ts:1610](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1610)
 
 ---
 
@@ -476,7 +476,7 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1615](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1615)
+[src/api.ts:1615](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1615)
 
 ---
 
@@ -492,6 +492,6 @@ outline: deep
 
 **Defined in:**
 
-[src/api.ts:1624](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/api.ts#L1624)
+[src/api.ts:1624](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/api.ts#L1624)
 
 ---

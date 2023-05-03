@@ -16,7 +16,7 @@ outline: deep
 
 **Defined in:**
 
-[src/utils.ts:6](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/utils.ts#L6)
+[src/utils.ts:6](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/utils.ts#L6)
 
 ---
 
@@ -32,7 +32,7 @@ outline: deep
 
 **Defined in:**
 
-[src/utils.ts:81](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/utils.ts#L81)
+[src/utils.ts:81](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/utils.ts#L81)
 
 ---
 
@@ -42,7 +42,7 @@ outline: deep
 
 **Defined in:**
 
-[src/utils.ts:262](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/utils.ts#L262)
+[src/utils.ts:262](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/utils.ts#L262)
 
 ---
 
@@ -75,4 +75,4 @@ All arrays are assumed to be sorted by descending logical time.
 
 **Defined in:**
 
-[src/utils.ts:276](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/utils.ts#L276)
+[src/utils.ts:276](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/utils.ts#L276)

@@ -18,7 +18,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:455](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L455)
+[src/contract.ts:455](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L455)
 
 ---
 
@@ -34,7 +34,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:473](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L473)
+[src/contract.ts:473](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L473)
 
 ---
 
@@ -50,7 +50,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:482](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L482)
+[src/contract.ts:482](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L482)
 
 ---
 
@@ -67,7 +67,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:917](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L917)
+[src/contract.ts:917](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L917)
 
 ---
 
@@ -85,7 +85,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:931](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L931)
+[src/contract.ts:931](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L931)
 
 ---
 
@@ -104,7 +104,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:936](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L936)
+[src/contract.ts:936](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L936)
 
 ---
 
@@ -114,7 +114,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:962](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L962)
+[src/contract.ts:962](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L962)
 
 ---
 
@@ -136,7 +136,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:972](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L972)
+[src/contract.ts:972](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L972)
 
 ---
 
@@ -153,7 +153,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1008](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1008)
+[src/contract.ts:1008](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1008)
 
 ---
 
@@ -170,7 +170,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1023](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1023)
+[src/contract.ts:1023](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1023)
 
 ---
 
@@ -192,7 +192,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1039](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1039)
+[src/contract.ts:1039](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1039)
 
 ---
 
@@ -216,7 +216,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1074](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1074)
+[src/contract.ts:1074](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1074)
 
 ---
 
@@ -242,7 +242,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1117](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1117)
+[src/contract.ts:1117](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1117)
 
 ---
 
@@ -267,7 +267,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1127](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1127)
+[src/contract.ts:1127](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1127)
 
 ---
 
@@ -291,7 +291,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1136](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1136)
+[src/contract.ts:1136](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1136)
 
 ---
 
@@ -322,7 +322,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1144](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1144)
+[src/contract.ts:1144](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1144)
 
 ---
 
@@ -339,7 +339,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1151](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1151)
+[src/contract.ts:1151](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1151)
 
 ---
 
@@ -358,7 +358,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1158](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1158)
+[src/contract.ts:1158](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1158)
 
 ---
 
@@ -381,7 +381,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1168](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1168)
+[src/contract.ts:1168](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1168)
 
 ---
 
@@ -398,7 +398,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1176](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1176)
+[src/contract.ts:1176](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1176)
 
 ---
 
@@ -422,7 +422,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1183](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1183)
+[src/contract.ts:1183](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1183)
 
 ---
 
@@ -439,7 +439,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1192](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1192)
+[src/contract.ts:1192](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1192)
 
 ---
 
@@ -462,7 +462,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1199](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1199)
+[src/contract.ts:1199](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1199)
 
 ---
 
@@ -485,7 +485,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1210](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1210)
+[src/contract.ts:1210](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1210)
 
 ---
 
@@ -502,7 +502,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1221](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1221)
+[src/contract.ts:1221](https://github.com/broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1221)
 
 ---
 
@@ -518,7 +518,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1228](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1228)
+[src/contract.ts:1228](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1228)
 
 ---
 
@@ -535,7 +535,7 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1235](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1235)
+[src/contract.ts:1235](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1235)
 
 ---
 
@@ -559,4 +559,4 @@ outline: deep
 
 **Defined in:**
 
-[src/contract.ts:1242](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1242)
+[src/contract.ts:1242](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/contract.ts#L1242)

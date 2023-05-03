@@ -17,7 +17,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:89](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L89)
+[src/index.ts:89](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L89)
 
 ---
 
@@ -31,7 +31,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:133](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L133)
+[src/index.ts:133](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L133)
 
 ---
 
@@ -47,7 +47,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1160](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1160)
+[src/index.ts:1160](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1160)
 
 ---
 
@@ -57,7 +57,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1168](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1168)
+[src/index.ts:1168](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1168)
 
 ---
 
@@ -73,7 +73,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1176](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1176)
+[src/index.ts:1176](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1176)
 
 ---
 
@@ -96,7 +96,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1201](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1201)
+[src/index.ts:1201](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1201)
 
 ---
 
@@ -112,7 +112,7 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1231](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1231)
+[src/index.ts:1231](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1231)
 
 ---
 
@@ -136,4 +136,4 @@ outline: deep
 
 **Defined in:**
 
-[src/index.ts:1242](https://github.com/Cyace84/everscale-inpage-provider/blob/14e397c/src/index.ts#L1242)
+[src/index.ts:1242](https://github.com/Broxus/everscale-inpage-provider/blob/14e397c/src/index.ts#L1242)
