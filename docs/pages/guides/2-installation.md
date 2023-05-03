@@ -209,7 +209,7 @@ Here's an example of how to use it:
 
 #### Using the hasEverscaleProvider() function
 
-Import the `hasEverscaleProvider()` function from the 'everscale-inpage-provider' package and use it to check if your browser supports TON-compatible blockchains.
+Import the `hasEverscaleProvider()` function from the 'everscale-inpage-provider' package and use it to check if your browser supports TVM-compatible blockchains.
 
 ```typescript
 import { hasEverscaleProvider } from 'everscale-inpage-provider';

@@ -1,6 +1,6 @@
 # Introduction
 
-This library seeks to be a powerful tool for building web3 applications that work with TON-compatible blockchains.
+This library seeks to be a powerful tool for building web3 applications that work with TVM-compatible blockchains.
 It helps you build statically type checked contract interaction, pack/unpack complex cell data structures or write
 elegant transaction parsers using streams and a bunch of combinators.
 
