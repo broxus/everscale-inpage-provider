@@ -764,7 +764,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         : this.provider.rawApi.sendExternalMessage;
 
     const { transaction, output } = await method({
-      publicKey: args.publicKey,
+      publicKey: (args as any).publicKey,
       recipient: this.address.toString(),
       stateInit: args.stateInit,
       payload: {
@@ -775,9 +775,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       local: args.local,
       executorParams: args.executorParams
         ? {
-            disableSignatureCheck: args.executorParams.disableSignatureCheck,
-            overrideBalance: args.executorParams.overrideBalance,
-          }
+          disableSignatureCheck: args.executorParams.disableSignatureCheck,
+          overrideBalance: args.executorParams.overrideBalance,
+        }
         : undefined,
     });
 
@@ -870,9 +870,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       executorParams:
         args.executorParams != null
           ? {
-              disableSignatureCheck: args.executorParams.disableSignatureCheck,
-              overrideBalance: args.executorParams.overrideBalance,
-            }
+            disableSignatureCheck: args.executorParams.disableSignatureCheck,
+            overrideBalance: args.executorParams.overrideBalance,
+          }
           : undefined,
     });
 
@@ -908,9 +908,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       executorParams:
         args.executorParams != null
           ? {
-              disableSignatureCheck: args.executorParams.disableSignatureCheck,
-              overrideBalance: args.executorParams.overrideBalance,
-            }
+            disableSignatureCheck: args.executorParams.disableSignatureCheck,
+            overrideBalance: args.executorParams.overrideBalance,
+          }
           : undefined,
     });
 
@@ -985,12 +985,22 @@ export type SendInternalWithResultParams = SendInternalParams & {
 /**
  * @category Contract
  */
-export type SendExternalParams = {
+export type SendExternalParams = ({
+  /**
+   * Whether to prepare this message without signature. Default: false
+   */
+  withoutSignature: true;
+} | {
   /**
    * The public key of the preferred account.
    * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
    */
   publicKey: string;
+  /**
+   * Whether to prepare this message without signature. Default: false
+   */
+  withoutSignature?: false;
+}) & {
   /**
    * Optional base64 encoded TVC
    */
@@ -1012,10 +1022,6 @@ export type SendExternalParams = {
      */
     overrideBalance?: string | number;
   };
-  /**
-   * Whether to prepare this message without signature. Default: false
-   */
-  withoutSignature?: boolean;
 };
 
 /**
