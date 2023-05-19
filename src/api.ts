@@ -402,6 +402,13 @@ export type ProviderApi<Addr = Address> = {
        * Function call params
        */
       functionCall: FunctionCall<Addr>;
+      /**
+       * Whether to use the signature id during signature verification (true by default).
+       * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+       * - If `false`, forces signature check to ignore any signature id.
+       * - If `number`, uses the specified number as a signature id.
+       */
+      withSignatureId?: boolean | number;
     };
     output: {
       /**
