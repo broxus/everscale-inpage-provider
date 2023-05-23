@@ -535,9 +535,9 @@ function parseTokenValue(param: AbiParam, token: RawTokenValue): TokenValue {
   } else {
     type TokenValueMap<Addr> = (readonly [TokenValue<Addr>, TokenValue<Addr>])[];
 
-    let [keyType, valueType] = param.type.split(',');
-    keyType = keyType.slice(4);
-    valueType = valueType.slice(0, -1);
+    const valueTypeIndex = param.type.indexOf(',');
+    const keyType = param.type.slice(4, valueTypeIndex);
+    const valueType = param.type.slice(valueTypeIndex + 1, -1);
 
     const result: TokenValueMap<Address> = [];
     for (const [key, value] of token as unknown as TokenValueMap<string>) {
