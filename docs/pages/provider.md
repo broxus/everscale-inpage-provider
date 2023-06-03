@@ -1,32 +1,5 @@
-<script lang="ts">
-  import { buildTableOfContent, buildPage } from './../scripts/build';
+---
+outline: deep
+---
 
-  export default {
-    name: 'Provider',
-    data() {
-      return {
-        tableOfContent: [],
-        pageContent: {},
-        projectq: Object,
-        types: Object,
-      };
-    },
-    async created() {
-      const project = (await import(/* @vite-ignore */ './../build/typedoc-ast.json').then(
-        module => module.default,
-      )) as ProjectReflection;
-
-      this.tableOfContent = await buildTableOfContent(project, 'Provider');
-      this.pageContent = await buildPage(project, 'Provider', this.tableOfContent);
-
-    },
-  };
-</script>
-
-# Provider
-
-## Table of Contents
-
-<TableOfContentComponent :tocData="tableOfContent" />
-
-<PageContentComponent :page="pageContent"/>
+<Page projectName="everscale-inpage-provider" pageName="provider" />

@@ -9,3 +9,7 @@ providers are installed (or you are in the NodeJS environment), you can
 use [`everscale-standalone-client`](https://github.com/broxus/everscale-standalone-client).
 It only supports methods that do not require user interaction (and its implementation is loaded only when it is used, so the size of the
 resulting bundle is not very large).
+
+::: info
+Please note that in order to interact with the sample contracts provided in the guide, it is necessary to use [Ever Wallet](https://everwallet.net) and the test network.
+:::
