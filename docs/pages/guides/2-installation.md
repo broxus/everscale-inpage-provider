@@ -191,18 +191,6 @@ if (hasProvider) {
 }
 ```
 
-#### Using the window object
-
-Alternatively, you can check the global `window` object for the presence of TON-related properties:
-
-```typescript
-if (window.__ever || window.__hasEverscaleProvider || window.ton || window.hasTonProvider) {
-  console.log('Provider is detected');
-} else {
-  console.log('Provider is not detected');
-}
-```
-
 ::: info Additional notes:
 
 - `hasEverscaleProvider()` will always return `false` in Web Workers or NodeJS environment. Otherwise, it will wait until the page is loaded and check whether the RPC object is injected.
