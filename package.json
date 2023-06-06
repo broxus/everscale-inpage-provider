@@ -8,12 +8,7 @@
   "scripts": {
     "build": "tsc",
     "build:vanilla": "rollup --config rollup.config.ts --configPlugin typescript",
-    "lint": "npx eslint .",
-    "docs:clean": "rm -rf ./docs/build",
-    "build:docs": "npm run docs:clean && node ./scripts/generate-doc-ast.js ",
-    "vitepress-dev": "cd ./docs && npx vitepress dev --port 8080 --host 0.0.0.0",
-    "map-snippets": "ts-node ./docs/scripts/create-snippet-map.ts",
-    "test": "ts-node ./docs/snippets/pack-unpack-cells.ts"
+    "lint": "npx eslint ."
   },
   "author": "",
   "license": "GPL-3.0",

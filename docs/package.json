@@ -3,8 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vue-tsc && vitepress build"
+    "docs:clean": "rm -rf ./docs/build",
+    "build:docs": "npm run docs:clean && npx vitepress build",
+    "vitepress-dev": "cd ./docs && npx vitepress dev --port 8080 --host 0.0.0.0"
   },
   "dependencies": {
     "@types/node": "^20.2.0",
