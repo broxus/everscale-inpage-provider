@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "docs:clean": "rm -rf ./docs/build",
-    "build:docs": "npm run docs:clean && npx vitepress build",
+    "docs:build": "npm run docs:clean && npx vitepress build",
     "vitepress-dev": "cd ./docs && npx vitepress dev --port 8080 --host 0.0.0.0"
   },
   "dependencies": {
