@@ -19,7 +19,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: cd docs && npm install
+        run: cd docs && npm install --force
 
       - name: Build website
         run: cd docs && npm run docs:build
