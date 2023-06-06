@@ -14,7 +14,7 @@ import { testContract } from './../../helpers';
 export default defineComponent({
   name: 'ComputeSmth',
   setup() {
-    const computedResult = ref(null);
+    const computedResult = ref('');
 
     return { computedResult };
   },

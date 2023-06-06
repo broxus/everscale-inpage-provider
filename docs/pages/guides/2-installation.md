@@ -80,38 +80,7 @@ Depending on your use case, you can use different kinds of providers:
   Depending on `forceUseFallback` parameter it will either always use fallback or only
   when injected rpc object was not found.
 
-  In browser environment it will load additional `wasm` file (**~1.3MB**),
-  so make sure to enable compression or be aware of your app startup time.
-
-  <div class="language-sh"><pre><code><span class="line"><span style="color:var(--vp-c-brand);">&gt;</span> <span style="color:#A6ACCD;">npm install --save everscale-inpage-provider everscale-standalone-client</span></span></code></pre></div>
-
-  ```typescript
-  import { ProviderRpcClient } from 'everscale-inpage-provider';
-  import { EverscaleStandaloneClient } from 'everscale-standalone-client';
-
-  const ever = new ProviderRpcClient({
-    // You can pass `false` to still use extension if it is installed
-    forceUseFallback: true,
-
-    // This method will be executed if either extension
-    // was not found or `forceUseFallback` is `true`
-    fallback: async () =>
-      EverscaleStandaloneClient.create({
-        // You can specify either connection options or preset name.
-        // Available presets:
-        // - `mainnet` - GQL mainnet
-        // - `mainnetJrpc` - JRPC mainnet
-        // - `testnet` - GQL testnet
-        // - `localnet` - Local node GQL
-        connection: 'mainnet',
-      }),
-  });
-  ```
-
-  ::: warning
-  In **NodeJS** environment you should import from `everscale-standalone-client/nodejs` instead.
-  It will not be initialized correctly otherwise.
-  :::
+  For more information on setting up and using the Everscale Standalone Client, please refer to the [Standalone Client Guide](./standalone/1-introduction.md).
 
 Right after provider is initialized its state can be retrieved:
 

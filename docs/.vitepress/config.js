@@ -122,6 +122,18 @@ module.exports = {
           // { text: 'Additional Resources and Links', link: '/pages/additional-resources.md' },
         ],
       },
+      {
+        text: 'Standalone Client',
+        collapsable: false,
+
+        items: [
+          { text: 'Introduction', link: '/pages/guides/standalone/1-introduction.md' },
+          { text: 'Installation & Setup', link: '/pages/guides/standalone/2-installation-and-setup.md' },
+          { text: 'Keystore', link: '/pages/guides/standalone/3-keystore.md' },
+          { text: 'Account Storage', link: '/pages/guides/standalone/4-account-storage.md' },
+          { text: 'Time manipulation', link: '/pages/guides/standalone/5-time-manipulation.md' },
+        ],
+      },
 
       {
         text: 'API Reference',

@@ -32,12 +32,17 @@ import SendInternalMessageComponent from './../components/snippets/SendInternalM
 import SendInternalDelayedMessageComponent from './../components/snippets/SendInternalDelayedMessage.vue';
 import SendExternalDelayedMessageComponent from './../components/snippets/SendExternalDelayedMessage.vue';
 import ContractInfoComponent from './../components/snippets/shared/ContractInfo.vue';
+import RunLocalComponent from './../components/snippets/RunLocal.vue';
+import ExecuteLocalComponent from './../components/snippets/ExecuteLocal.vue';
 
 // Subscriptions snippets
 import ProviderEventsComponent from './../components/snippets/ProviderEvents.vue';
 import BlockchainEventsComponent from './../components/snippets/BlockchainEvents.vue';
 import ListenContractEventsComponent from './../components/snippets/ListenContractEvents.vue';
 import GetPastEventsComponent from './../components/snippets/GetPastEvents.vue';
+import SubscriberTxComponent from './../components/snippets/SubscriberTx.vue';
+import SubscriberStateComponent from './../components/snippets/SubscriberState.vue';
+import SubscriberTraceComponent from './../components/snippets/SubscriberTrace.vue';
 
 // Cryptography snippets
 import EncryptDecryptComponent from './../components/snippets/EncryptDecrypt.vue';
@@ -83,12 +88,17 @@ export default {
     app.component('SendInternalDelayedMessageComponent', SendInternalDelayedMessageComponent);
     app.component('SendExternalDelayedMessageComponent', SendExternalDelayedMessageComponent);
     app.component('ContractInfoComponent', ContractInfoComponent);
+    app.component('RunLocalComponent', RunLocalComponent);
+    app.component('ExecuteLocalComponent', ExecuteLocalComponent);
 
     // Subscriptions snippets
     app.component('ProviderEventsComponent', ProviderEventsComponent);
     app.component('BlockchainEventsComponent', BlockchainEventsComponent);
     app.component('ListenContractEventsComponent', ListenContractEventsComponent);
     app.component('GetPastEventsComponent', GetPastEventsComponent);
+    app.component('SubscriberTxComponent', SubscriberTxComponent);
+    app.component('SubscriberStateComponent', SubscriberStateComponent);
+    app.component('SubscriberTraceComponent', SubscriberTraceComponent);
 
     // Cryptography snippets
     app.component('EncryptDecryptComponent', EncryptDecryptComponent);
