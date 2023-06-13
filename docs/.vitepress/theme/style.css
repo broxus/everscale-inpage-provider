@@ -483,6 +483,7 @@ summary::-webkit-details-marker {
 }
 .tsd-kind-parameter {
   color: var(--color-ts-parameter) !important;
+  font-weight: 400 !important;
 }
 .tsd-kind-type-literal {
   color: var(--color-ts-type-literal) !important;
@@ -587,9 +588,9 @@ a.tsd-index-link {
   margin-right: 0.8rem;
 }
 
-.tsd-panel {
+/* .tsd-panel {
   margin-bottom: 2.5rem;
-}
+} */
 .tsd-panel.tsd-member {
   margin-bottom: 4rem;
 }
@@ -655,12 +656,12 @@ a.tsd-index-link {
 }
 
 .tsd-signature-type {
-  font-style: italic;
+  /* font-style: italic; */
   font-weight: normal;
 }
 
 .tsd-signatures {
-  padding: 0;
+  padding: 0 !important;
   margin: 0 0 1em 0;
   list-style-type: none;
 }
@@ -678,17 +679,17 @@ ul.tsd-parameter-list,
 ul.tsd-type-parameter-list {
   list-style: square;
   margin: 0;
-  padding-left: 20px;
+  padding-left: 20px !important;
 }
 ul.tsd-parameter-list > li.tsd-parameter-signature,
 ul.tsd-type-parameter-list > li.tsd-parameter-signature {
   list-style: none;
-  margin-left: -20px;
+  margin-left: -20px !important;
 }
 ul.tsd-parameter-list h5,
 ul.tsd-type-parameter-list h5 {
   font-size: 16px;
-  margin: 1em 0 0.5em 0;
+  margin: 1em 0 0.5em 0 !important;
 }
 .tsd-sources {
   margin-top: 1rem;
@@ -699,8 +700,8 @@ ul.tsd-type-parameter-list h5 {
   /* text-decoration: underline; */
 }
 .tsd-sources ul {
-  list-style: none;
-  padding: 0;
+  list-style: none !important;
+  padding: 0 !important;
 }
 
 .tsd-page-toolbar {
@@ -1028,7 +1029,7 @@ input[type='checkbox']:checked ~ svg .tsd-checkbox-checkmark {
 
 .tsd-group-title {
   font-size: 20px;
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
 .tsd-member {
   position: relative;
@@ -1036,7 +1037,7 @@ input[type='checkbox']:checked ~ svg .tsd-checkbox-checkmark {
 
 .tsd-member-title {
   font-size: 20px !important;
-  margin-bottom: 28px !important;
+  margin-bottom: 10px !important;
 }
 .tsd-member .tsd-anchor + h3 {
   display: flex;
@@ -1150,11 +1151,28 @@ input[type='checkbox']:checked ~ svg .tsd-checkbox-checkmark {
   font-size: 20px !important;
 } */
 
-/* a {
-  color: initial !important;
-  text-decoration: initial !important;
-} */
+.vp-doc a {
+  font-weight: 400 !important;
+}
 
 ul {
   list-style-type: none !important;
 }
+
+/* .page-content ul:not(.toc-contents ul) {
+  padding: 0 !important;
+} */
+.page-content ul:not(.toc-contents ul) {
+  padding: 0 !important;
+}
+.outline-link {
+  /* word-wrap: break-word !important;
+  white-space: normal !important;
+  line-height: 28px !important; */
+  /* padding-left: 10px;
+  text-indent: -10px; */
+}
+
+/* .outline-link {
+  text-indent: -30px !important; 
+} */

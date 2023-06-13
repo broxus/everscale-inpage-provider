@@ -48,6 +48,14 @@ export default defineComponent({
         this.transactions.push(data);
       });
 
+      const flatMappedStream = stream.flatMap(item => {
+        return item.transactions.map(transaction => ({
+          address: item.address,
+          transaction: transaction,
+          info: item.info,
+        }));
+      });
+
       return stream;
     },
     unsubscribeTransactions() {

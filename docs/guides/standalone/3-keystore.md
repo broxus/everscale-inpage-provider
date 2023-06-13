@@ -64,8 +64,10 @@ import { SimpleKeystore } from 'everscale-standalone-client';
 
 const keystore = new SimpleKeystore({
   0: {
-    publicKey: '4038a63fb2b95c0b85516f289fe87b8fc87860b7ba0920cd285e0bad53cff8a5',
-    secretKey: 'ae218eb9c8df7ab217ee4ecef0e74f178efdb8b9f697be6f6b72a7681110716a',
+    publicKey:
+      '4038a63fb2b95c0b85516f289fe87b8fc87860b7ba0920cd285e0bad53cff8a5',
+    secretKey:
+      'ae218eb9c8df7ab217ee4ecef0e74f178efdb8b9f697be6f6b72a7681110716a',
   },
 });
 ```

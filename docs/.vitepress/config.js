@@ -96,17 +96,18 @@ module.exports = {
       // { text: 'Guide', link: '/pages/guide.md' },
     ],
     sidebar: [
-      { text: 'Overview', link: './../../' },
+      { text: 'Overview', link: '/' },
       {
         text: 'Guide',
         collapsable: false,
         items: [
-          { text: 'Introduction', link: '/pages/guides/1-introduction.md' },
-          { text: 'Installation and Configuration', link: '/pages/guides/2-installation.md' },
-          { text: 'Working with Cells', link: '/pages/guides/3.1-working-with-cells.md' },
-          { text: 'Interaction with Contracts', link: '/pages/guides/3.2-working-with-contracts.md' },
-          { text: 'Subscriptions', link: '/pages/guides/3.3-subscriptions.md' },
-          { text: 'Cryptography & Security', link: '/pages/guides/3.4-cryptography.md' },
+          { text: 'Introduction', link: 'guides/1-introduction.md' },
+          { text: 'Installation & Setup', link: 'guides/2-installation.md' },
+          { text: 'Working with Cells', link: 'guides/3.1-working-with-cells.md' },
+          { text: 'Interaction with Contracts', link: 'guides/3.2-working-with-contracts.md' },
+          { text: 'Subscriptions', link: 'guides/3.3-subscriptions.md' },
+          { text: 'Cryptography & Security', link: 'guides/3.4-cryptography.md' },
+          { text: 'Deploy a Contract', link: 'guides/4-deploy.md' },
 
           // { text: 'Standalone Section', link: '/pages/standalone-section.md' },
           // {
@@ -127,11 +128,11 @@ module.exports = {
         collapsable: false,
 
         items: [
-          { text: 'Introduction', link: '/pages/guides/standalone/1-introduction.md' },
-          { text: 'Installation & Setup', link: '/pages/guides/standalone/2-installation-and-setup.md' },
-          { text: 'Keystore', link: '/pages/guides/standalone/3-keystore.md' },
-          { text: 'Account Storage', link: '/pages/guides/standalone/4-account-storage.md' },
-          { text: 'Time manipulation', link: '/pages/guides/standalone/5-time-manipulation.md' },
+          { text: 'Introduction', link: 'guides/standalone/1-introduction.md' },
+          { text: 'Installation & Setup', link: 'guides/standalone/2-installation-and-setup.md' },
+          { text: 'Keystore', link: 'guides/standalone/3-keystore.md' },
+          { text: 'Account Storage', link: 'guides/standalone/4-account-storage.md' },
+          { text: 'Time manipulation', link: 'guides/standalone/5-time-manipulation.md' },
         ],
       },
 
@@ -143,15 +144,15 @@ module.exports = {
           {
             text: 'Everscale Inpage Provider',
             collapsable: false,
-            link: '/pages/index.md',
+            link: '/api-reference/index.md',
             items: [
-              { text: 'Provider', link: '/pages/provider.md' },
-              { text: 'Contract', link: '/pages/contract.md' },
-              { text: 'Stream', link: '/pages/stream.md' },
-              { text: 'Models', link: '/pages/models.md' },
-              { text: 'Provider API', link: '/pages/provider-api.md' },
-              { text: 'Utils', link: '/pages/utils.md' },
-              { text: 'Other', link: '/pages/other.md' },
+              { text: 'Provider', link: '/api-reference/provider.md' },
+              { text: 'Contract', link: '/api-reference/contract.md' },
+              { text: 'Stream', link: '/api-reference/stream.md' },
+              { text: 'Models', link: '/api-reference/models.md' },
+              { text: 'Provider API', link: '/api-reference/provider-api.md' },
+              { text: 'Utils', link: '/api-reference/utils.md' },
+              { text: 'Other', link: '/api-reference/other.md' },
             ],
           },
         ],

@@ -1,11 +1,14 @@
 import './style.css';
 
 import DefaultTheme from 'vitepress/theme';
-//import Layout from './Layout.vue';
+import Layout from './Layout.vue';
 import Page from '../components/Page.vue';
+import OutlineComponent from '../components/shared/outline/Outline.vue';
+import OutlineItem from '../components/shared/outline/OutlineItem.vue';
 import AccordionComponent from './../components/shared/Accordion.vue';
 import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
 import ArrowComponent from './../components/shared/Arrow.vue';
+import DisconnectIcon from './../components/shared/DisconnectIcon.vue';
 // import TypeRendererComponent from './../components/shared/type/components/TypeRenderer.vue';
 // import ArrayTypeComponent from './../components/shared/type/components/ArrayType.vue';
 import GetProviderStateComponent from './../components/snippets/GetProviderState.vue';
@@ -57,13 +60,17 @@ import ToastComponent from './../components/shared/Toast.vue';
 
 export default {
   ...DefaultTheme,
+  Layout: Layout,
   enhanceApp({ app }) {
     DefaultTheme.enhanceApp({ app });
     // app.component('Layout', Layout);
     app.component('Page', Page);
+    app.component('OutlineComponent', OutlineComponent);
+    app.component('OutlineItem', OutlineItem);
     app.component('LinkComponent', AnchorLinkComponent);
     app.component('ArrowComponent', ArrowComponent);
     app.component('AccordionComponent', AccordionComponent);
+    app.component('DisconnectIcon', DisconnectIcon);
 
     app.component('GetProviderStateComponent', GetProviderStateComponent);
     app.component('GetComplexStateAndPrefixedSecondComponent', GetComplexStateAndPrefixedSecondComponent);

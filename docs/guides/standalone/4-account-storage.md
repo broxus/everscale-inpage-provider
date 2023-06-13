@@ -28,6 +28,47 @@ There are several types of accounts available in the `everscale-standalone-clien
 - `HighloadWalletV2`: A highload wallet account of version 2.
 - `EverWalletAccount`: An EverWallet account.
 
+## Creating a Custom Account
+
+If the predefined account types provided by `everscale-standalone-client` do not fit your needs, it's possible to create a custom account type. To do so, you need to create a class that implements the `Account` interface.
+
+```typescript
+import {
+  Account,
+  AccountsStorageContext,
+  PrepareMessageParams,
+  Address,
+} from 'everscale-standalone-client';
+
+class CustomAccount implements Account {
+  readonly address: Address;
+
+  constructor(address: Address) {
+    this.address = address;
+  }
+
+  async fetchPublicKey(ctx: AccountsStorageContext): Promise<string> {
+    // Implement fetching public key logic here
+  }
+
+  async prepareMessage(
+    args: PrepareMessageParams,
+    ctx: AccountsStorageContext,
+  ): Promise<nt.SignedMessage> {
+    // Implement preparing message logic here
+  }
+}
+```
+
+You can add this custom account to your `SimpleAccountsStorage` in the same way as the predefined account types:
+
+```typescript
+const customAccount = new CustomAccount(/* ... */);
+accountsStorage.addAccount(customAccount);
+```
+
+The `fetchPublicKey` and `prepareMessage` methods must be implemented according to your custom contract logic. `fetchPublicKey` is used to fetch the public key of the contract account, while `prepareMessage` is used to prepare and sign an external message for this account. The specifics of these methods depend on the particular functionalities of your contract and its interactions with the `AccountsStorageContext`.
+
 ## SimpleAccountsStorage
 
 `SimpleAccountsStorage` is a class that implements the `AccountsStorage` interface. It provides basic functionality to manage accounts. It uses a map to store accounts based on their address.
@@ -59,7 +100,7 @@ accountsStorage.addAccount(everWalletAccount);
 
 ## Adding, Checking, and Removing Accounts
 
-You can add accounts to the `SimpleAccountsStorage` using the `addAccount` method. You can check if an account exists in the `SimpleAccountsStorage` using the `hasAccount` method, and you can remove accounts from the `SimpleAccountsStorage` using the `removeAccount` method. All these methods operate based on the account address.
+You can check if an account exists in the `SimpleAccountsStorage` using the `hasAccount` method, and you can remove accounts from the `SimpleAccountsStorage` using the `removeAccount` method. All these methods operate based on the account address.
 
 ```typescript
 // Adding an account

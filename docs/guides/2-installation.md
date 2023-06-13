@@ -54,7 +54,7 @@ const changeAccount = async () => {
 
 </script>
 
-# Quick Start
+# Installation & Setup
 
 ## Basic Setup
 
@@ -118,10 +118,13 @@ At the moment there are only two permissions:
 
 ```typescript
 // You can subscribe to permission changes in one place
-(await provider.subscribe('permissionsChanged')).on('data', permissions => {
-  // You can update component state here
-  console.log(permissions);
-});
+(await provider.subscribe('permissionsChanged')).on(
+  'data',
+  permissions => {
+    // You can update component state here
+    console.log(permissions);
+  },
+);
 
 // NOTE: subscription object can be used during the disposal:
 //   const subscription = await provider.subscribe('permissionsChanged');
@@ -171,14 +174,10 @@ await provider.changeAccount();
 
 > NOTE: `changeAccount` requires `accountInteraction` permissions
 
-## Detecting Provider-enabled browsers
+## Detecting Provider
 
 To determine whether your browser has an `Provider`, you can use the `hasEverscaleProvider()` function.
 Here's an example of how to use it:
-
-#### Using the hasEverscaleProvider() function
-
-Import the `hasEverscaleProvider()` function from the 'everscale-inpage-provider' package and use it to check if your browser supports TVM-compatible blockchains.
 
 ```typescript
 import { hasEverscaleProvider } from 'everscale-inpage-provider';

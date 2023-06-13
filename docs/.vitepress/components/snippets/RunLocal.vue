@@ -1,14 +1,13 @@
 <template>
   <div class="demo">
     <button @click="runLocal">Run Local</button>
-    <pre class="run-local-output" v-if="runLocalResult.value">Run local output: {{ runLocalResult.value.output }}</pre>
-    <pre class="run-local-code" v-if="runLocalResult.value">TVM execution code: {{ runLocalResult.value.code }}</pre>
+    <pre class="run-local-output" v-if="runLocalResult.value">Run local output: {{ runLocalResult.value }}</pre>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
+import { ProviderRpcClient, Address } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
 
@@ -28,19 +27,8 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const exampleAddress = testContract.address;
-
-      this.runLocalResult.value = await provider.rawApi.runLocal({
-        address: exampleAddress,
-
-        functionCall: {
-          abi: JSON.stringify(testContract.ABI),
-          method: 'setVariable',
-          params: {
-            someParam: 1400,
-          },
-        },
-      });
+      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      this.runLocalResult.value = await exampleContract.methods.setVariable({ someParam: 1 }).call();
     },
   },
 });
