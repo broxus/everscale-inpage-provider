@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: cd docs && npm install --force
 
+      - name: Display directory structure
+        run: cd docs && ls -R
+
       - name: Build website
         run: cd docs && npm run docs:build
 
