@@ -24,7 +24,7 @@ import UnpackCellComponent from './../components/snippets/UnpackCell.vue';
 import GetBocHashComponent from './../components/snippets/GetBocHash.vue';
 import ExtractPKComponent from './../components/snippets/ExtractPK.vue';
 import MergeSplitTvcComponent from './../components/snippets/MergeSplitTvc.vue';
-import CodeToTvcComponent from '/.vitepress/components/snippets/CodeToTvc.vue';
+import CodeToTvcComponent from './../components/snippets/CodeToTvc.vue';
 import GetSetSaltComponent from './../components/snippets/GetSetSalt.vue';
 import GetExpectedAddressComponent from './../components/snippets/GetExpectedAddress.vue';
 
