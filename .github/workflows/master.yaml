@@ -25,7 +25,7 @@ jobs:
         run: cd docs && ls .vitepress -R
 
       - name: Build website
-        run: cd docs && npm run docs:build
+        run: cd docs && npx vitepress build
 
       # - name: Set CNAME
       #   run: echo 'web3.ever.rs' > ./guide/.vitepress/dist/CNAME
