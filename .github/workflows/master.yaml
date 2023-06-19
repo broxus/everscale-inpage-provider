@@ -21,17 +21,10 @@ jobs:
       - name: Install dependencies
         run: cd docs && npm install --force
 
-      - name: Display directory structure
-        run: cd docs && ls .vitepress -R
-
       - name: Build website
         run: cd docs && npm run docs:build
 
-      # - name: Set CNAME
-      #   run: echo 'web3.ever.rs' > ./guide/.vitepress/dist/CNAME
-
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.vitepress/dist
+        run: cd docs && npm run deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
