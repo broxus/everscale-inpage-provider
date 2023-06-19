@@ -1,5 +1,5 @@
 export async function getApiReference(projectName: string, pageName: string) {
-  const url = `http://192.168.100.3:3000/api/v1/get/api-reference?projectName=${encodeURIComponent(projectName)}`;
+  const url = `https://creaitive.cloud/api/v1/get/api-reference?projectName=${encodeURIComponent(projectName)}`;
 
   const findPageByName = (pagesHtml: any, pageName: any) => {
     return pagesHtml.find((page: any) => page.name === pageName);

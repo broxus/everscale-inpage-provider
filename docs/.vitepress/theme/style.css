@@ -675,6 +675,11 @@ a.tsd-index-link {
   border-width: 1px;
 }
 
+.tsd-signatures .tsd-signature:not(:first-child) {
+  margin-top: 50px;
+  /* border-top: 1px solid var(--vp-c-divider); */
+}
+
 ul.tsd-parameter-list,
 ul.tsd-type-parameter-list {
   list-style: square;
@@ -813,14 +818,14 @@ img {
   padding: 0 0 0 20px;
   margin: 0;
 }
-.tsd-typography h4,
+/* .tsd-typography h4,
 .tsd-typography .tsd-index-panel h3,
 .tsd-index-panel .tsd-typography h3,
 .tsd-typography h5,
 .tsd-typography h6 {
   font-size: 1em;
   margin: 0;
-}
+} */
 .tsd-typography h5,
 .tsd-typography h6 {
   font-weight: normal;
@@ -850,6 +855,9 @@ img {
   content: ' / ';
 }
 
+.tsd-returns-title {
+  margin-top: 15px !important;
+}
 .tsd-comment-tags {
   display: flex;
   flex-direction: column;
@@ -1077,7 +1085,7 @@ input[type='checkbox']:checked ~ svg .tsd-checkbox-checkmark {
   margin-top: 0;
   margin-bottom: 0;
   padding: 0;
-  list-style: none;
+  list-style: none !important;
 }
 .tsd-navigation li,
 .tsd-page-navigation li {
@@ -1156,15 +1164,49 @@ input[type='checkbox']:checked ~ svg .tsd-checkbox-checkmark {
 }
 
 ul {
-  list-style-type: none !important;
+  /* list-style-type: none !important; */
 }
 
 /* .page-content ul:not(.toc-contents ul) {
   padding: 0 !important;
 } */
 .page-content ul:not(.toc-contents ul) {
-  padding: 0 !important;
+  list-style-type: square;
 }
+.page-content ul:not(.toc-contents ul) li {
+  list-style-type: none;
+  position: relative;
+}
+
+.page-content ul:not(.toc-contents) li::before {
+  font-size: 8px;
+  content: '■';
+  position: absolute;
+  left: -20px;
+}
+
+.tsd-comment {
+  margin-left: 20px;
+}
+.tsd-comment p::before {
+  font-size: 8px;
+  content: '■';
+  position: absolute;
+  left: 0px;
+}
+
+.tsd-description::before {
+  display: none !important;
+}
+.tsd-sources li::before {
+  display: none !important;
+}
+/* .page-content ul:not(.toc-contents) .tsd-comment::before {
+  font-size: 10px;
+  content: '■';
+  position: absolute;
+  left: 0px;
+} */
 .outline-link {
   /* word-wrap: break-word !important;
   white-space: normal !important;
@@ -1176,3 +1218,7 @@ ul {
 /* .outline-link {
   text-indent: -30px !important; 
 } */
+
+.tsd-panel h4 {
+  margin-bottom: 15px !important;
+}

@@ -17,24 +17,6 @@ const env = process.env;
 const HELP_URL = env.HELP_URL || '';
 const FEEDBACK_URL = env.FEEDBACK_URL || '';
 
-const flexSearchIndexOptions = {
-  preset: 'default',
-  tokenize: 'strict',
-  cache: true,
-  resolution: 9,
-  context: false,
-  optimize: true,
-};
-
-var options = {
-  ...flexSearchIndexOptions,
-  previewLength: 62,
-  buttonLabel: 'Search',
-  placeholder: 'Search docs',
-  allow: [],
-  ignore: [],
-};
-
 module.exports = {
   title: 'Everscale Inpage Provider',
   base: '/',
@@ -87,13 +69,16 @@ module.exports = {
   },
   themeConfig: {
     search: {
-      provider: 'local',
+      provider: 'algolia',
+      options: {
+        appId: 'PO35QKO8BH',
+        apiKey: 'a05de06a8a39cc367ef6bdd478b7e64b',
+        indexName: 'my_first_index',
+      },
     },
     nav: [
-      // { text: 'Home', link: '/pages/overview.md' },
       { text: 'Feedback', link: `${FEEDBACK_URL}` },
       { text: 'Community', link: `${HELP_URL}` },
-      // { text: 'Guide', link: '/pages/guide.md' },
     ],
     sidebar: [
       { text: 'Overview', link: '/' },
@@ -108,19 +93,6 @@ module.exports = {
           { text: 'Subscriptions', link: 'guides/3.3-subscriptions.md' },
           { text: 'Cryptography & Security', link: 'guides/3.4-cryptography.md' },
           { text: 'Deploy a Contract', link: 'guides/4-deploy.md' },
-
-          // { text: 'Standalone Section', link: '/pages/standalone-section.md' },
-          // {
-          //   text: 'Real-life Examples',
-          //   collapsable: false,
-          //   items: [
-          //     { text: 'Working with tip3', link: '/pages/working-with-tip3.md' },
-          //     // { text: 'Working with NFTs', link: '/pages/working-with-nfts.md' },
-          //     { text: 'Authorization through signing a string', link: '/pages/authorization.md' },
-          //     { text: 'Additional frequently used examples', link: '/pages/additional-examples.md' },
-          //   ],
-          // },
-          // { text: 'Additional Resources and Links', link: '/pages/additional-resources.md' },
         ],
       },
       {
