@@ -1,14 +1,18 @@
 <template>
-  <div v-if="!apiReference.content">Loading...</div>
-  <div class="page-container" v-else>
+  <div v-if="apiReference.content === '' || apiReference.content === undefined">Loading...</div>
+  <div v-else class="page-container">
     <div class="page-content" v-html="apiReference.content"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick, provide } from 'vue';
+import { defineComponent, ref, onMounted, nextTick } from 'vue';
+
 import { getApiReference } from './../../api';
-// import Outline from './shared/outline/Outline.vue';
+
+interface ApiResponse {
+  content: string;
+}
 
 export default defineComponent({
   name: 'Page',
@@ -17,19 +21,22 @@ export default defineComponent({
     pageName: String,
   },
   setup(props) {
-    const apiReference = ref({} as any);
-    const { projectName, pageName } = props;
+    const apiReference = ref<ApiResponse>({ content: '' });
 
     onMounted(async () => {
-      const response = await getApiReference(projectName!, pageName!);
-      apiReference.value = await response;
+      const response = await getApiReference(props.projectName, props.pageName);
+      if (response) {
+        apiReference.value = response;
+      }
 
       await nextTick();
 
       const hash = window.location.hash;
       if (hash) {
         const element = document.getElementById(hash.substring(1));
-        if (element) element.scrollIntoView({ behavior: 'smooth' });
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     });
 
@@ -42,8 +49,6 @@ export default defineComponent({
 .page-container {
   display: flex;
   flex-direction: row;
-
-  /* justify-content: space-around; */
 }
 
 .page-outline {
