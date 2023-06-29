@@ -18,7 +18,7 @@
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
-    "broxus-docs-kit-dev": "^1.0.7",
+    "broxus-docs-kit-dev": "^1.0.9",
     "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
