@@ -9,9 +9,11 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent, ref, onMounted } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
+
 import DisconnectIcon from './shared/DisconnectIcon.vue';
+import { ProviderRpcClient } from 'everscale-inpage-provider';
 
 export default defineComponent({
   name: 'WalletControl',
@@ -24,16 +26,17 @@ export default defineComponent({
 
     onMounted(async () => {
       const subscription = await provider.subscribe('permissionsChanged');
-      subscription.on('data', permissions => {
-        connected.value = permissions.permissions.accountInteraction == null;
+      subscription.on('data', (permissions: any) => {
+        connected.value = !!providerState.permissions.accountInteraction;
       });
 
       const providerState = await provider.getProviderState();
-      connected.value = !!providerState.permissions.accountInteraction == null;
+
+      connected.value = !!providerState.permissions.accountInteraction;
     });
 
     const requestPermissions = async () => {
-      await provider.requestPermissions({ permissions: ['accountInteraction'] });
+      await provider.requestPermissions({ permissions: ['basic', 'accountInteraction'] });
       connected.value = true;
     };
 
