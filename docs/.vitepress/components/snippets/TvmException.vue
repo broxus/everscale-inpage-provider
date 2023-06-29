@@ -37,7 +37,9 @@ export default defineComponent({
       const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
 
       try {
-        await example.methods.computeSmth({ offset: 1444, answerId: 2 }).call({ responsible: true });
+        await example.methods
+          .computeSmth({ offset: 1444, answerId: 2 })
+          .call({ responsible: true });
       } catch (e) {
         if (e instanceof TvmException) {
           this.exceptionCode = e.code;

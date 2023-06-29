@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { ProviderRpcClient } from 'everscale-inpage-provider';
-import { testContract } from '../../helpers';
+import { testContract } from './../../helpers';
 const provider = new ProviderRpcClient();
 
 export default defineComponent({

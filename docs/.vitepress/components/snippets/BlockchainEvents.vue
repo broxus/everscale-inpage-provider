@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent, onUnmounted, reactive, ref, toRefs, Ref } from 'vue';
 import { Address, ProviderRpcClient, Subscription } from 'everscale-inpage-provider';
-import { testContract } from '../../helpers';
+import { testContract } from './../../helpers';
 const provider = new ProviderRpcClient();
 export default defineComponent({
   name: 'BlockchainEvents',
@@ -32,7 +32,9 @@ export default defineComponent({
       let subscription;
       switch (event) {
         case 'transactionsFound':
-          subscription = await provider.subscribe('transactionsFound', { address: new Address(testContract.address) });
+          subscription = await provider.subscribe('transactionsFound', {
+            address: new Address(testContract.address),
+          });
           break;
         case 'contractStateChanged':
           subscription = await provider.subscribe('contractStateChanged', {
