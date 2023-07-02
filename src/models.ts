@@ -71,6 +71,7 @@ export type Transaction<Addr = Address> = {
   totalFees: string;
   inMessage: Message<Addr>;
   outMessages: Message<Addr>[];
+  boc: string;
 };
 
 /**
@@ -109,6 +110,7 @@ export function serializeTransaction(transaction: Transaction): RawTransaction {
     totalFees: transaction.totalFees,
     inMessage: serializeMessage(transaction.inMessage),
     outMessages: transaction.outMessages.map(serializeMessage),
+    boc: transaction.boc
   };
 }
 
@@ -135,6 +137,7 @@ export type Message<Addr = Address> = {
   bounced: boolean;
   body?: string;
   bodyHash?: string;
+  boc: string;
 };
 
 /**
@@ -156,6 +159,7 @@ export function serializeMessage(message: Message): RawMessage {
     bounced: message.bounced,
     body: message.body,
     bodyHash: message.bodyHash,
+    boc: message.boc
   };
 }
 
