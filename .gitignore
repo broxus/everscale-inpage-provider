@@ -2,5 +2,7 @@
 node_modules/
 dist/
 vanilla/
+docs/.vitepress/cache
+docs/build
 
 package-lock.json
