@@ -27,7 +27,7 @@ module.exports = {
       'script',
       {
         async: true,
-        src: 'https://www.googletagmanager.com/gtag/js?id=G-T6WMP40ZQ6',
+        src: 'https://www.googletagmanager.com/gtag/js?id=G-SL17528F6E',
       },
     ],
     [
