@@ -70,12 +70,12 @@ module.exports = {
   },
   themeConfig: {
     search: {
-      provider: 'algolia',
-      options: {
-        appId: 'PO35QKO8BH',
-        apiKey: 'a05de06a8a39cc367ef6bdd478b7e64b',
-        indexName: 'my_first_index',
-      },
+      provider: 'local',
+      // options: {
+      //   appId: 'PO35QKO8BH',
+      //   apiKey: 'a05de06a8a39cc367ef6bdd478b7e64b',
+      //   indexName: 'my_first_index',
+      // },
     },
     nav: [
       { text: 'Feedback', link: `${FEEDBACK_URL}` },
