@@ -2,6 +2,24 @@
 title: Broxus Documentations
 ---
 
+<script setup>
+import { onMounted } from 'vue';
+
+
+onMounted(async () => {
+  const vpSidebar = document.getElementsByClassName('VPSidebar')[0];
+  const curtain = document.querySelector('.VPSidebar .curtain');
+
+  const bsgColor = getComputedStyle(document.documentElement).getPropertyValue('--vp-c-bg');
+
+  curtain.style.backgroundColor = bsgColor;
+  vpSidebar.style.backgroundColor = bsgColor;
+});
+//
+
+
+</script>
+
 # Welcome to Broxus docs
 
 Broxus is TVM premier infrastructure developer. We have developed a range of DeFi solutions for the Everscale and Venom ecosystem, including FlatQube, Octus Bridge, EVER Wallet and more.
@@ -24,9 +42,9 @@ Broxus is TVM premier infrastructure developer. We have developed a range of DeF
   link="https://locklift-docs.netlify.app/"
 />
 
-<style>
+<!-- <style scoped>
   .VPSidebar,
   .curtain {
-    background-color: var(--vp-sidebar-bg-color-1) !important;
+    background-color: var(--vp-c-bg) !important;
   }
-</style>
+</style> -->

@@ -3,6 +3,20 @@ title: Everscale Inpage Provider
 outline: deep
 ---
 
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(async () => {
+  const vpSidebar = document.getElementsByClassName('VPSidebar')[0];
+  const curtain = document.querySelector('.VPSidebar .curtain');
+  const bsgColor = getComputedStyle(document.documentElement).getPropertyValue('--vp-sidebar-bg-color');
+
+  vpSidebar.style.backgroundColor = bsgColor;
+  curtain.style.backgroundColor = bsgColor;
+
+});
+</script>
+
 # Overview
 
 Before integrating with the blockchain, it is important to understand how it works. The following will be a brief description of the
@@ -286,7 +300,7 @@ Note, that this will be an approximate value as it depends on time and will be a
 
 [the whitepaper]: https://ton.org/tblkch.pdf
 
-<style>
+<style scoped>
   .VPSidebar,
   .curtain {
     background-color: var(--vp-sidebar-bg-color) !important;
