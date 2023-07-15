@@ -24,7 +24,7 @@ module.exports = {
   rewrites: {
     'src/index.md': 'index.md',
     //everscale-inpage-provider
-    'src/everscale-inpage-provider/index.md': 'everscale-inpage-provider/index.md',
+    'src/everscale-inpage-provider/overview.md': 'everscale-inpage-provider/overview.md',
     'src/everscale-inpage-provider/guides/introduction.md': 'everscale-inpage-provider/guides/introduction.md',
     'src/everscale-inpage-provider/guides/installation.md': 'everscale-inpage-provider/guides/installation.md',
     'src/everscale-inpage-provider/guides/working-with-cells.md':
@@ -118,7 +118,7 @@ module.exports = {
         {
           text: 'Everscale Inpage Provider',
 
-          link: '/everscale-inpage-provider/',
+          link: '/everscale-inpage-provider/overview.md',
         },
         {
           text: 'OctusBridge Integration',
@@ -128,7 +128,7 @@ module.exports = {
         { text: 'Locklift', link: 'https://locklift-docs.netlify.app/' },
       ],
       '/everscale-inpage-provider/': [
-        { text: 'Overview', link: '/everscale-inpage-provider/' },
+        { text: 'Overview', link: '/everscale-inpage-provider/overview.md' },
         {
           text: 'Guide',
           collapsable: false,

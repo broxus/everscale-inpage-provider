@@ -9,7 +9,7 @@ Broxus is TVM premier infrastructure developer. We have developed a range of DeF
 <ProjectCard
   title="Everscale Inpage Provider →"
   description="This library seeks to be a powerful tool for building web3 applications that work with TVM-compatible blockchains. It helps you build  statically type checked contract interaction, pack/unpack complex cell data structures or write elegant transaction parsers using streams and a bunch of  combinators."
-  link="https://docs.broxus.com/everscale-inpage-provider/"
+  link="https://everscale-inpage-provider.netlify.app/everscale-inpage-provider/overview.html"
 />
 <br>
 <ProjectCard
