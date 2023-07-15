@@ -9,6 +9,7 @@ import AccordionComponent from './../components/shared/Accordion.vue';
 import AnchorLinkComponent from './../components/shared/AnchorLink.vue';
 import ArrowComponent from './../components/shared/Arrow.vue';
 import DisconnectIcon from './../components/shared/DisconnectIcon.vue';
+import ProjectCard from './../components/shared/ProjectCard.vue';
 // import TypeRendererComponent from './../components/shared/type/components/TypeRenderer.vue';
 // import ArrayTypeComponent from './../components/shared/type/components/ArrayType.vue';
 import GetProviderStateComponent from './../components/snippets/GetProviderState.vue';
@@ -71,6 +72,7 @@ export default {
     app.component('ArrowComponent', ArrowComponent);
     app.component('AccordionComponent', AccordionComponent);
     app.component('DisconnectIcon', DisconnectIcon);
+    app.component('ProjectCard', ProjectCard);
 
     app.component('GetProviderStateComponent', GetProviderStateComponent);
     app.component('GetComplexStateAndPrefixedSecondComponent', GetComplexStateAndPrefixedSecondComponent);

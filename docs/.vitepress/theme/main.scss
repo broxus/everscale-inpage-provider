@@ -1,6 +1,16 @@
 @import './styles/api-reference.scss';
 @import './styles/demo-сomponent.scss';
 
+:root {
+  --vp-c-text-4: var(--vp-c-text-2);
+  --pj-card-box-shadow: none;
+}
+
+.dark {
+  --vp-c-text-4: #dfdfd8;
+  --pj-card-box-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
 .vp-doc {
   h2 {
     font-size: 28px !important;
