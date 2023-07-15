@@ -1,3 +1,7 @@
+---
+title: Everscale Inpage Provider
+---
+
 # Everscale Inpage Provider
 
 The Inpage Provider's main features include:

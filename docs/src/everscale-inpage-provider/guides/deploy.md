@@ -1,3 +1,7 @@
+---
+title: Everscale Inpage Provider
+---
+
 # Deploy a Contract
 
 This guide will walk you through the process of deploying a simple contract using the `ProviderRpcClient`. The process involves generating the expected uninitialized contract address, funding this address, and finally calling the constructor of the contract to initialize it. Make sure to replace the `base64Contract` variable with the actual `base64-encoded` TON Virtual Machine-compatible contract (TVC) of your contract.

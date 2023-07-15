@@ -18,10 +18,45 @@ const HELP_URL = env.HELP_URL || '';
 const FEEDBACK_URL = env.FEEDBACK_URL || '';
 
 module.exports = {
-  title: 'Everscale Inpage Provider',
+  title: ' ', // It's hack to different navBarTitle's
   base: '/',
   description: 'Web3-like interface to the TVM-compatible blockchains.',
+  rewrites: {
+    'src/index.md': 'index.md',
+    //everscale-inpage-provider
+    'src/everscale-inpage-provider/index.md': 'everscale-inpage-provider/index.md',
+    'src/everscale-inpage-provider/guides/introduction.md': 'everscale-inpage-provider/guides/introduction.md',
+    'src/everscale-inpage-provider/guides/installation.md': 'everscale-inpage-provider/guides/installation.md',
+    'src/everscale-inpage-provider/guides/working-with-cells.md':
+      'everscale-inpage-provider/guides/working-with-cells.md',
+    'src/everscale-inpage-provider/guides/working-with-contracts.md':
+      'everscale-inpage-provider/guides/working-with-contracts.md',
+    'src/everscale-inpage-provider/guides/subscriptions.md': 'everscale-inpage-provider/guides/subscriptions.md',
+    'src/everscale-inpage-provider/guides/cryptography.md': 'everscale-inpage-provider/guides/cryptography.md',
+    'src/everscale-inpage-provider/guides/deploy.md': 'everscale-inpage-provider/guides/deploy.md',
+    //api-reference
+    'src/everscale-inpage-provider/api-reference/index.md': 'everscale-inpage-provider/api-reference/index.md',
+    'src/everscale-inpage-provider/api-reference/provider.md': 'everscale-inpage-provider/api-reference/provider.md',
+    'src/everscale-inpage-provider/api-reference/contract.md': 'everscale-inpage-provider/api-reference/contract.md',
+    'src/everscale-inpage-provider/api-reference/stream.md': 'everscale-inpage-provider/api-reference/stream.md',
+    'src/everscale-inpage-provider/api-reference/models.md': 'everscale-inpage-provider/api-reference/models.md',
+    'src/everscale-inpage-provider/api-reference/provider-api.md':
+      'everscale-inpage-provider/api-reference/provider-api.md',
+    'src/everscale-inpage-provider/api-reference/utils.md': 'everscale-inpage-provider/api-reference/utils.md',
+    'src/everscale-inpage-provider/api-reference/other.md': 'everscale-inpage-provider/api-reference/other.md',
 
+    //standalone
+    'src/everscale-inpage-provider/guides/standalone/introduction.md':
+      'everscale-inpage-provider/guides/standalone/introduction.md',
+    'src/everscale-inpage-provider/guides/standalone/installation-and-setup.md':
+      'everscale-inpage-provider/guides/standalone/installation-and-setup.md',
+    'src/everscale-inpage-provider/guides/standalone/keystore.md':
+      'everscale-inpage-provider/guides/standalone/keystore.md',
+    'src/everscale-inpage-provider/guides/standalone/account-storage.md':
+      'everscale-inpage-provider/guides/standalone/account-storage.md',
+    'src/everscale-inpage-provider/guides/standalone/time-manipulation.md':
+      'everscale-inpage-provider/guides/standalone/time-manipulation.md',
+  },
   head: [
     [
       'script',
@@ -42,9 +77,6 @@ module.exports = {
     vueJsx(),
     typescript(),
     nodePolyfills({ fs: true }),
-    // nodeExternals({
-    //   allowList: ['vue', 'vue-toastification', 'js-base64'],
-    // }),
 
     externals({
       externals: ['fs', 'path', 'assert', 'util', 'typedoc'],
@@ -81,56 +113,74 @@ module.exports = {
       { text: 'Feedback', link: `${FEEDBACK_URL}` },
       { text: 'Community', link: `${HELP_URL}` },
     ],
-    sidebar: [
-      { text: 'Overview', link: '/' },
-      {
-        text: 'Guide',
-        collapsable: false,
-        items: [
-          { text: 'Introduction', link: 'guides/1-introduction.md' },
-          { text: 'Installation & Setup', link: 'guides/2-installation.md' },
-          { text: 'Working with Cells', link: 'guides/3.1-working-with-cells.md' },
-          { text: 'Interaction with Contracts', link: 'guides/3.2-working-with-contracts.md' },
-          { text: 'Subscriptions', link: 'guides/3.3-subscriptions.md' },
-          { text: 'Cryptography & Security', link: 'guides/3.4-cryptography.md' },
-          { text: 'Deploy a Contract', link: 'guides/4-deploy.md' },
-        ],
-      },
-      {
-        text: 'Standalone Client',
-        collapsable: false,
+    sidebar: {
+      '/': [
+        {
+          text: 'Everscale Inpage Provider',
 
-        items: [
-          { text: 'Introduction', link: 'guides/standalone/1-introduction.md' },
-          { text: 'Installation & Setup', link: 'guides/standalone/2-installation-and-setup.md' },
-          { text: 'Keystore', link: 'guides/standalone/3-keystore.md' },
-          { text: 'Account Storage', link: 'guides/standalone/4-account-storage.md' },
-          { text: 'Time manipulation', link: 'guides/standalone/5-time-manipulation.md' },
-        ],
-      },
+          link: '/everscale-inpage-provider/',
+        },
+        {
+          text: 'OctusBridge Integration',
 
-      {
-        text: 'API Reference',
-        collapsable: false,
+          link: 'https://octus-bridge-integration-demo.vercel.app/',
+        },
+        { text: 'Locklift', link: 'https://locklift-docs.netlify.app/' },
+      ],
+      '/everscale-inpage-provider/': [
+        { text: 'Overview', link: '/everscale-inpage-provider/' },
+        {
+          text: 'Guide',
+          collapsable: false,
+          items: [
+            { text: 'Introduction', link: '/everscale-inpage-provider/guides/introduction.md' },
+            { text: 'Installation & Setup', link: '/everscale-inpage-provider/guides/installation.md' },
+            { text: 'Working with Cells', link: '/everscale-inpage-provider/guides/working-with-cells.md' },
+            { text: 'Interaction with Contracts', link: '/everscale-inpage-provider/guides/working-with-contracts.md' },
+            { text: 'Subscriptions', link: '/everscale-inpage-provider/guides/subscriptions.md' },
+            { text: 'Cryptography & Security', link: '/everscale-inpage-provider/guides/cryptography.md' },
+            { text: 'Deploy a Contract', link: '/everscale-inpage-provider/guides/deploy.md' },
+          ],
+        },
+        {
+          text: 'Standalone Client',
+          collapsable: false,
 
-        items: [
-          {
-            text: 'Everscale Inpage Provider',
-            collapsable: false,
-            link: '/api-reference/index.md',
-            items: [
-              { text: 'Provider', link: '/api-reference/provider.md' },
-              { text: 'Contract', link: '/api-reference/contract.md' },
-              { text: 'Stream', link: '/api-reference/stream.md' },
-              { text: 'Models', link: '/api-reference/models.md' },
-              { text: 'Provider API', link: '/api-reference/provider-api.md' },
-              { text: 'Utils', link: '/api-reference/utils.md' },
-              { text: 'Other', link: '/api-reference/other.md' },
-            ],
-          },
-        ],
-      },
-    ],
+          items: [
+            { text: 'Introduction', link: '/everscale-inpage-provider/guides/standalone/introduction.md' },
+            {
+              text: 'Installation & Setup',
+              link: '/everscale-inpage-provider/guides/standalone/installation-and-setup.md',
+            },
+            { text: 'Keystore', link: '/everscale-inpage-provider/guides/standalone/keystore.md' },
+            { text: 'Account Storage', link: '/everscale-inpage-provider/guides/standalone/account-storage.md' },
+            { text: 'Time manipulation', link: '/everscale-inpage-provider/guides/standalone/time-manipulation.md' },
+          ],
+        },
+
+        {
+          text: 'API Reference',
+          collapsable: false,
+
+          items: [
+            {
+              text: 'Everscale Inpage Provider',
+              collapsable: false,
+              link: '/everscale-inpage-provider/api-reference/index.md',
+              items: [
+                { text: 'Provider', link: '/everscale-inpage-provider/api-reference/provider.md' },
+                { text: 'Contract', link: '/everscale-inpage-provider/api-reference/contract.md' },
+                { text: 'Stream', link: '/everscale-inpage-provider/api-reference/stream.md' },
+                { text: 'Models', link: '/everscale-inpage-provider/api-reference/models.md' },
+                { text: 'Provider API', link: '/everscale-inpage-provider/api-reference/provider-api.md' },
+                { text: 'Utils', link: '/everscale-inpage-provider/api-reference/utils.md' },
+                { text: 'Other', link: '/everscale-inpage-provider/api-reference/other.md' },
+              ],
+            },
+          ],
+        },
+      ],
+    },
     socialLinks: [{ icon: 'github', link: 'https://github.com/broxus/everscale-inpage-provider' }],
   },
   build: {

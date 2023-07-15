@@ -1,4 +1,5 @@
 ---
+title: Everscale Inpage Provider
 outline: deep
 ---
 
@@ -80,7 +81,7 @@ Depending on your use case, you can use different kinds of providers:
   Depending on `forceUseFallback` parameter it will either always use fallback or only
   when injected rpc object was not found.
 
-  For more information on setting up and using the Everscale Standalone Client, please refer to the [Standalone Client Guide](./standalone/1-introduction.md).
+  For more information on setting up and using the Everscale Standalone Client, please refer to the [Standalone Client Guide](./standalone/introduction.md).
 
 Right after provider is initialized its state can be retrieved:
 

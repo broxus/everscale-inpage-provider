@@ -1,4 +1,5 @@
 ---
+title: Everscale Inpage Provider
 outline: deep
 ---
 

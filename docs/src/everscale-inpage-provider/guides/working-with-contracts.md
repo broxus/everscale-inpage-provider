@@ -1,4 +1,5 @@
 ---
+title: Everscale Inpage Provider
 outline: deep
 ---
 
@@ -533,7 +534,7 @@ _Please refer to [the docs](https://github.com/tonlabs/TON-Solidity-Compiler/blo
 
 ## Sending Messages
 
-To learn more about these messages, you can refer to the [overview](./../api-reference/overview.md).
+To learn more about these messages, you can refer to the [Overview](./../index.md).
 
 ### External Msg
 

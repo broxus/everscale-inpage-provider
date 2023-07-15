@@ -1,9 +1,13 @@
+---
+title: Everscale Inpage Provider
+---
+
 # Working with cells
 
 Cells are the basic storage elements in the blockchain, used to represent and manipulate data in contracts. In this guide, we will explore the basic methods for working with cells provided by `everscale-inpage-provider`.
 
 :::info
-Note that it is also possible to work with accounts, but we will cover that in the [next section](./3.2-working-with-contracts.md#).
+Note that it is also possible to work with accounts, but we will cover that in the [next section](./working-with-contracts.md).
 :::
 
 Here is the ABI definition we'll use in our examples:

@@ -1,3 +1,7 @@
+---
+title: Everscale Inpage Provider
+---
+
 # Account Storage
 
 Account Storage provides an abstraction layer over account management. This abstraction helps with securely managing accounts, as well as signing messages and transactions with the appropriate account. The `EverscaleStandaloneClient` requires an `AccountsStorage` for managing accounts and performing blockchain operations.

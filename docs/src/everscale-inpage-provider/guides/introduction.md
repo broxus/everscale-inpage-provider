@@ -1,3 +1,7 @@
+---
+title: Everscale Inpage Provider
+---
+
 # Introduction
 
 This library seeks to be a powerful tool for building web3 applications that work with TVM-compatible blockchains.
