@@ -23,3 +23,10 @@ Broxus is TVM premier infrastructure developer. We have developed a range of DeF
   description="Development environment for TVM-compatible blockchains. Node JS framework designed to facilitate the building, testing, running, and maintaining of smart contracts for TVM (Threaded Virtual Machine) blockchains like Everscale, Venom, Gosh and TON."
   link="https://locklift-docs.netlify.app/"
 />
+
+<style>
+  .VPSidebar,
+  .curtain {
+    background-color: var(--vp-sidebar-bg-color-1) !important;
+  }
+</style>
