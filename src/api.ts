@@ -194,7 +194,14 @@ export type ProviderApi<Addr = Address> = {
    * ---
    * Required permissions: none
    */
-  setPollingInterval: number;
+  setPollingInterval: {
+    input: {
+      /**
+       * Polling interval in milliseconds
+       */
+      interval: number;
+    }
+  };
 
   /**
    * Fully unsubscribe from all contracts
