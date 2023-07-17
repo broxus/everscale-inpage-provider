@@ -792,6 +792,20 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Sets polling interval for contract updates
+   *
+   * ---
+   * Required permissions: `none`
+   */
+  public async setPollingInterval(interval: number): Promise<undefined> {
+    await this.ensureInitialized();
+    await this._api.setPollingInterval({
+      interval,
+    });
+    return undefined;
+  }
+
+  /**
    * Merges code and data into state init
    *
    * ---
