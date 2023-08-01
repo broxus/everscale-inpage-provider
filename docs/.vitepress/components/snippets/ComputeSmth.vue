@@ -7,8 +7,9 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
+import { Address } from 'everscale-inpage-provider';
 
+import { useProvider } from './../../../src/provider/useProvider';
 import { testContract } from './../../helpers';
 
 export default defineComponent({
@@ -20,7 +21,8 @@ export default defineComponent({
   },
   methods: {
     async computeSmth() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
 
       await provider.requestPermissions({

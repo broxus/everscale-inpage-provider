@@ -14,9 +14,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ProviderRpcClient, Stream, TransactionId } from 'everscale-inpage-provider';
+import { Stream } from 'everscale-inpage-provider';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
+
 const subscriber = new provider.Subscriber();
 
 export default defineComponent({
@@ -60,9 +62,6 @@ export default defineComponent({
         this.traceStream.stopProducer();
         this.traceStream = null;
       }
-    },
-    async testTransaction() {
-      // the same as in the previous component
     },
   },
 });

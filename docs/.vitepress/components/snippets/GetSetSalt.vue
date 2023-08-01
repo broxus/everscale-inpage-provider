@@ -19,11 +19,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
 
 import { testContract } from '../../helpers';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
 
 export default defineComponent({
   setup() {
@@ -57,7 +57,7 @@ export default defineComponent({
       await provider.requestPermissions({ permissions: [`basic`] });
 
       const codeSalt = await provider.getCodeSalt({ code: testContract.boc });
-      this.retrievedSalt = codeSalt;
+      this.retrievedSalt = codeSalt!;
     },
   },
 });

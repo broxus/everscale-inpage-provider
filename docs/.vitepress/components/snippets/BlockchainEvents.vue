@@ -11,9 +11,12 @@
 </template>
 <script lang="ts">
 import { defineComponent, onUnmounted, reactive, ref, toRefs, Ref } from 'vue';
-import { Address, ProviderRpcClient, Subscription } from 'everscale-inpage-provider';
-import { testContract } from './../../helpers';
-const provider = new ProviderRpcClient();
+import { Address } from 'everscale-inpage-provider';
+import { testContract, tryCatchToast } from './../../helpers';
+
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
+
 export default defineComponent({
   name: 'BlockchainEvents',
   setup() {
@@ -66,7 +69,7 @@ export default defineComponent({
         unsubscribeEvent(event);
         subscriptions[event] = null;
       } else {
-        subscriptions[event] = await subscribeEvent(event);
+        subscriptions[event] = tryCatchToast(async () => await subscribeEvent(event));
       }
     };
 
@@ -91,12 +94,6 @@ export default defineComponent({
     };
   },
   methods: {
-    async requestPermissions() {
-      await provider.ensureInitialized();
-      await provider.requestPermissions({
-        permissions: ['basic', 'accountInteraction'],
-      });
-    },
     async disconnect() {
       await provider.ensureInitialized();
       await provider.disconnect();

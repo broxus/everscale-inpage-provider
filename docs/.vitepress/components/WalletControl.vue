@@ -13,21 +13,24 @@
 import { defineComponent, ref, onMounted } from 'vue';
 
 import DisconnectIcon from './shared/DisconnectIcon.vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
+
+import { useProvider } from './../../src/provider/useProvider';
 
 export default defineComponent({
   name: 'WalletControl',
   components: {
     DisconnectIcon,
   },
+
   setup() {
-    const provider = new ProviderRpcClient();
+    const { provider, connectToWallet, changeAccount, disconnect } = useProvider();
+
     const connected = ref(false);
 
     onMounted(async () => {
       const subscription = await provider.subscribe('permissionsChanged');
       subscription.on('data', (permissions: any) => {
-        connected.value = !!providerState.permissions.accountInteraction;
+        connected.value = !!permissions.permissions.accountInteraction;
       });
 
       const providerState = await provider.getProviderState();
@@ -36,17 +39,18 @@ export default defineComponent({
     });
 
     const requestPermissions = async () => {
-      await provider.requestPermissions({ permissions: ['basic', 'accountInteraction'] });
+      await connectToWallet();
+
       connected.value = true;
     };
 
     const disconnectWallet = async () => {
-      await provider.disconnect();
+      await disconnect();
       connected.value = false;
     };
 
     const changeAccountWallet = async () => {
-      await provider.changeAccount();
+      await changeAccount();
     };
 
     return { connected, requestPermissions, disconnectWallet, changeAccountWallet };

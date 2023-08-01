@@ -15,9 +15,11 @@ Parsed function call output: {{ executeLocalResult.value.output }}</pre
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 export default defineComponent({
   name: 'ExecuteLocal',
@@ -28,7 +30,6 @@ export default defineComponent({
   },
   methods: {
     async executeLocal() {
-      const provider = new ProviderRpcClient();
       await provider.ensureInitialized();
 
       const { accountInteraction } = await provider.requestPermissions({
@@ -39,7 +40,7 @@ export default defineComponent({
         address: testContract.address,
         messageHeader: {
           type: 'internal',
-          sender: accountInteraction.address.toString(),
+          sender: accountInteraction!.address.toString(),
           amount: (1 * 10 ** 9).toString(),
           bounce: true,
         },

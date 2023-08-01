@@ -11,10 +11,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ProviderRpcClient, Stream, Address } from 'everscale-inpage-provider';
+import { Stream, Address } from 'everscale-inpage-provider';
 import { testContract, toNano } from '../../helpers';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
+
 const subscriber = new provider.Subscriber();
 
 export default defineComponent({
@@ -55,7 +57,8 @@ export default defineComponent({
       }
     },
     async testStateChange() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
       const { accountInteraction } = await provider.requestPermissions({
         permissions: ['basic', 'accountInteraction'],

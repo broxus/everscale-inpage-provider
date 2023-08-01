@@ -21,12 +21,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
+import { defineComponent, ref, onMounted } from 'vue';
+import { Address } from 'everscale-inpage-provider';
 
 import { testContract, toNano } from './../../helpers';
 
 import AccordionComponent from './../shared/Accordion.vue';
+import { useProvider } from './../../../src/provider/useProvider';
 
 export default defineComponent({
   name: 'SendInternalDelayedMessage',
@@ -38,13 +39,15 @@ export default defineComponent({
     const messageInfo = ref();
     const transaction = ref();
     const someParam = ref(1337);
+    const contractState = ref('');
 
-    const provider = new ProviderRpcClient();
-
+    const { provider } = useProvider();
     const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
-    const state = await exampleContract.methods.simpleState().call();
 
-    const contractState = ref(JSON.stringify(state, null, 2));
+    onMounted(async () => {
+      const state = await exampleContract.methods.simpleState().call();
+      contractState.value = JSON.stringify(state, null, 2);
+    });
 
     return { transactionExecuted, messageInfo, contractState, someParam, transaction };
   },
@@ -60,7 +63,8 @@ export default defineComponent({
   methods: {
     async sendInternalDelayedMessage() {
       this.messageInfo = null;
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
       const { accountInteraction } = await provider.requestPermissions({
         permissions: ['basic', 'accountInteraction'],

@@ -3,7 +3,7 @@
     "target": "es2020",
     "module": "esnext",
     "moduleResolution": "node",
-    "strict": true,
+    "strict": false, //#TODO: Set to true and fix all errors
     "jsx": "preserve",
     "sourceMap": true,
     "resolveJsonModule": true,

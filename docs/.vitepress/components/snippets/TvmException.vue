@@ -14,8 +14,9 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient, TvmException, Address } from 'everscale-inpage-provider';
+import { TvmException, Address } from 'everscale-inpage-provider';
 
+import { useProvider } from './../../../src/provider/useProvider';
 import { testContract } from './../../helpers';
 
 export default defineComponent({
@@ -27,7 +28,8 @@ export default defineComponent({
   },
   methods: {
     async throwTvmException() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
 
       await provider.requestPermissions({
@@ -37,9 +39,7 @@ export default defineComponent({
       const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
 
       try {
-        await example.methods
-          .computeSmth({ offset: 1444, answerId: 2 })
-          .call({ responsible: true });
+        await example.methods.computeSmth({ offset: 1444, answerId: 2 }).call({ responsible: true });
       } catch (e) {
         if (e instanceof TvmException) {
           this.exceptionCode = e.code;

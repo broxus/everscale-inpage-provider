@@ -12,9 +12,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
+import { Address } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
+import { useProvider } from './../../../src/provider/useProvider';
 
 export default defineComponent({
   name: 'GetComplexStateAndPrefixedSecond',
@@ -27,7 +28,8 @@ export default defineComponent({
   },
   methods: {
     async getComplexState() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
 
       await provider.requestPermissions({
@@ -42,7 +44,8 @@ export default defineComponent({
       this.prefixedSecond = null;
     },
     async getPrefixedSecond() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
 
       await provider.requestPermissions({

@@ -9,10 +9,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
 import { Base64 } from 'js-base64';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 export default defineComponent({
   setup() {

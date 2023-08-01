@@ -18,11 +18,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
 
 import { testContract } from '../../helpers';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
 
 export default defineComponent({
   setup() {
@@ -43,8 +43,8 @@ export default defineComponent({
       this.mergedTvc = merged.tvc;
 
       const { code, data } = await provider.splitTvc(merged.tvc);
-      this.splitCode = code;
-      this.splitData = data;
+      this.splitCode = code!;
+      this.splitData = data!;
     },
   },
 });

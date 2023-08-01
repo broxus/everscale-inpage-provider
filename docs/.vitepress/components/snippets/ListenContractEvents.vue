@@ -10,10 +10,12 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
+import { Address } from 'everscale-inpage-provider';
 import { testContract } from '../../helpers';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 export default defineComponent({
   name: 'ListenContractEvents',

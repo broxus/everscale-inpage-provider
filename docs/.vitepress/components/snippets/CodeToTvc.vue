@@ -11,9 +11,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
+
 import { testContract } from './../../helpers';
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 export default defineComponent({
   name: 'CodeToTVC',

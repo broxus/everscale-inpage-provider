@@ -15,12 +15,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
+import { defineComponent, ref, onMounted } from 'vue';
+import { Address } from 'everscale-inpage-provider';
 
 import { testContract, errorExtractor } from './../../helpers';
 
 import AccordionComponent from './../shared/Accordion.vue';
+import { useProvider } from './../../../src/provider/useProvider';
 
 export default defineComponent({
   name: 'SendExternalMessage',
@@ -30,14 +31,15 @@ export default defineComponent({
   async setup() {
     const transactionData = ref();
     const someParam = ref(42);
+    const simpleState = ref('');
 
-    const provider = new ProviderRpcClient();
-
+    const { provider } = useProvider();
     const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
-    const state = await exampleContract.methods.simpleState().call();
 
-    const simpleState = ref(JSON.stringify(state, null, 2));
-
+    onMounted(async () => {
+      const state = await exampleContract.methods.simpleState().call();
+      simpleState.value = JSON.stringify(state, null, 2);
+    });
     return { transactionData, simpleState, someParam };
   },
   computed: {
@@ -51,7 +53,8 @@ export default defineComponent({
   },
   methods: {
     async sendExternalMessage() {
-      const provider = new ProviderRpcClient();
+      const { provider } = useProvider();
+
       await provider.ensureInitialized();
       await provider.requestPermissions({
         permissions: ['basic', 'accountInteraction'],
@@ -62,20 +65,6 @@ export default defineComponent({
       if (!senderPublicKey) {
         throw new Error('No public key');
       }
-
-      // const payload = {
-      //   abi: JSON.stringify(testContract.ABI),
-      //   method: 'setVariableExternal',
-      //   params: {
-      //     someParam: this.someParam,
-      //   },
-      // };
-      // const { transaction: tr, output } = await provider.rawApi.sendExternalMessage({
-      //   publicKey: senderPublicKey?.toString(),
-      //   recipient: testContract.address,
-      //   payload,
-      // });
-      // console.log('Transaction:', tr);
 
       const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
 

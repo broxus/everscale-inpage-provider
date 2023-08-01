@@ -12,10 +12,13 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient, GetExpectedAddressParams, Contract } from 'everscale-inpage-provider';
+import { GetExpectedAddressParams, Contract } from 'everscale-inpage-provider';
 
 import { toNano, testContract, errorExtractor } from '../../helpers';
-import { EverscaleStandaloneClient } from 'everscale-standalone-client';
+
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
   publicKey: string | undefined;
@@ -24,7 +27,7 @@ type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
 export default defineComponent({
   name: 'DeployAccount',
   setup() {
-    const deployedContract = ref(null);
+    const deployedContract = ref('');
     const tx = ref(null);
 
     const exampleAbi = testContract.ABI;
@@ -33,22 +36,6 @@ export default defineComponent({
   },
   methods: {
     async deployAccount() {
-      // const provider = new ProviderRpcClient({
-      //   fallback: () =>
-      //     EverscaleStandaloneClient.create({
-      //       connection: {
-      //         id: 1000,
-      //         group: 'venom_testnet',
-      //         type: 'jrpc',
-      //         data: {
-      //           endpoint: 'https://jrpc-testnet.venom.foundation/rpc',
-      //         },
-      //       },
-      //     }),
-      //   forceUseFallback: true,
-      // });
-      const provider = new ProviderRpcClient();
-
       await provider.ensureInitialized();
 
       // Request permissions from the user to execute API methods using the provider.
@@ -75,15 +62,6 @@ export default defineComponent({
 
       const stateInit = await provider.getStateInit(testContract.ABI, deployParams);
 
-      // const constructorPayload = {
-      //   abi: JSON.stringify(ABI),
-      //   method: 'constructor',
-      //   params: {
-      //     someParam: someParam.toString(),
-      //     second: secondParam,
-      //   },
-      // };
-
       await errorExtractor(
         provider.sendMessage({
           sender: senderAddress,
@@ -91,7 +69,6 @@ export default defineComponent({
           amount: toNano(1),
           bounce: false,
           stateInit: stateInit.stateInit,
-          //payload: constructorPayload,
         }),
       );
 
@@ -112,7 +89,7 @@ export default defineComponent({
           }),
       );
 
-      this.deployedContract = expectedAddress;
+      this.deployedContract = expectedAddress.toString();
     },
   },
 });

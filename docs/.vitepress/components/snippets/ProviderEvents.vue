@@ -24,8 +24,10 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, ref, Ref } from 'vue';
-import { ProviderRpcClient, Subscription } from 'everscale-inpage-provider';
-const provider = new ProviderRpcClient();
+import { Subscription } from 'everscale-inpage-provider';
+import { useProvider } from './../../../src/provider/useProvider';
+const { provider } = useProvider();
+
 export default defineComponent({
   name: 'AllEventsDemo',
   setup() {

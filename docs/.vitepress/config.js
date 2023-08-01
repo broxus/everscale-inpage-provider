@@ -2,13 +2,7 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import typescript from '@rollup/plugin-typescript';
 
-// import { createHtmlPlugin as html } from 'vite-plugin-html';
-import { viteExternalsPlugin as externals } from 'vite-plugin-externals';
-//import vueJsx from '@vitejs/plugin-vue-jsx';
 import dotenv from 'dotenv';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
-import virtualPlainText from 'vite-plugin-virtual-plain-text';
-import vueJsx from '@vitejs/plugin-vue-jsx';
 
 dotenv.config({ path: resolve(__dirname, './../', '.env') });
 
@@ -71,17 +65,7 @@ module.exports = {
       "window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'G-SL17528F6E');",
     ],
   ],
-  plugins: [
-    virtualPlainText(['fs', 'typedoc']),
-    vue(),
-    vueJsx(),
-    typescript(),
-    nodePolyfills({ fs: true }),
-
-    externals({
-      externals: ['fs', 'path', 'assert', 'util', 'typedoc'],
-    }),
-  ],
+  plugins: [vue(), typescript()],
   resolve: {
     SimpleSearch: {},
     alias: {

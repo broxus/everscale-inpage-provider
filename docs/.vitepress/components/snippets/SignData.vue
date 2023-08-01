@@ -13,10 +13,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { ProviderRpcClient } from 'everscale-inpage-provider';
 import { Base64 } from 'js-base64';
 
-const provider = new ProviderRpcClient();
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
 
 export default defineComponent({
   name: 'SignAndSignRaw',
@@ -31,7 +32,6 @@ export default defineComponent({
     async signData() {
       await provider.ensureInitialized();
       const permissions = await provider.requestPermissions({ permissions: ['basic', 'accountInteraction'] });
-      console.log(permissions);
       const publicKey = permissions.accountInteraction?.publicKey!;
 
       this.signedData = await provider.signData({
@@ -43,7 +43,7 @@ export default defineComponent({
       await provider.ensureInitialized();
       const permissions = await provider.requestPermissions({ permissions: ['basic', 'accountInteraction'] });
       const publicKey = permissions.accountInteraction?.publicKey!;
-      console.log(publicKey);
+
       this.signedDataRaw = await provider.signDataRaw({
         publicKey: publicKey,
         data: Base64.encode(this.data),
