@@ -5,7 +5,8 @@ pages:
     - cd docs
     - npm install
     - npx vitepress build
-    - mv .vitepress/dist public
+    - mkdir -p public
+    - cp -r .vitepress/dist/* public/
   artifacts:
     paths:
       - public
