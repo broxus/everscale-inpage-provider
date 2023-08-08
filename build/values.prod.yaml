@@ -1,20 +1,19 @@
 service:
   port: 80
-
 ingress:
   enabled: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
     kubernetes.io/tls-acme: 'true'
   hosts:
-    - host: broxus.gitlab.io/everscale-inpage-provider
+    - host: everscale-inpage-provider.broxus.gitlab.io
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
-    - secretName: broxus.gitlab.io-everscale-inpage-provider-tls
+    - secretName: everscale-inpage-provider.broxus.gitlab.io-tls
       hosts:
-        - broxus.gitlab.io/everscale-inpage-provider
+        - everscale-inpage-provider.broxus.gitlab.io
 
 livenessProbe:
   tcpSocket:
