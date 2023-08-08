@@ -41,9 +41,6 @@ onUpdated(async () => {
 
 <template>
   <Layout>
-    <template #nav-bar-title-before>
-      {{ frontmatter.title }}
-    </template>
     <template #nav-bar-content-after>
       <Suspense>
         <WalletControl />

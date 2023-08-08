@@ -3,6 +3,7 @@ title: Everscale Inpage Provider
 outline: deep
 ---
 
+<!--
 <script setup>
 import { onMounted } from 'vue';
 
@@ -15,7 +16,7 @@ onMounted(async () => {
   curtain.style.backgroundColor = bsgColor;
 
 });
-</script>
+</script> -->
 
 # Overview
 
