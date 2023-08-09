@@ -300,10 +300,3 @@ Based on the above, the cost of executing a transaction can only be calculated b
 Note, that this will be an approximate value as it depends on time and will be a bit greater at the time the transaction is executed.
 
 [the whitepaper]: https://ton.org/tblkch.pdf
-
-<style scoped>
-  .VPSidebar,
-  .curtain {
-    background-color: var(--vp-sidebar-bg-color) !important;
-  }
-</style>
