@@ -77,7 +77,7 @@ console.log('Unpacked data:', unpacked.data);
 
 ## BOC Hash Computation
 
-Before diving into the specifics of how to compute the hash of a `base64` encoded BOC (Bag of Cells) using the `getBocHash` method provided by the `everscale-inpage-provider`, it's important to understand what a cell hash represents in the context of EverScale.
+Before diving into the specifics of how to compute the hash of a `base64` encoded BOC (Bag of Cells) using the `getBocHash` method provided by the `everscale-inpage-provider`.
 
 At the most fundamental level, everything in Blockchain is a _cell_. Each _cell_ consists of up to **1023 data bits** and **up to 4 references** to other cells. Cells are organized in a tree-like structure, with each cell potentially referencing up to four other cells. The hash of a cell is a kind of complex hash derived from the cell's representation in a specific format.
 
@@ -102,7 +102,7 @@ console.log('BOC hash:', hash);
 <GetBocHashComponent />
 
 ::: warning
-In this case, `getBocHash` takes the base64 representation of the cell (or Bag of Cells - BOC) and computes the hash using the specific hashing method suitable for this data structure. Remember to keep the nature of cell hashes in mind when working with these in EverScale.
+In this case, `getBocHash` takes the `base64` representation of the cell (or BOC) and computes the hash using the specific hashing method suitable for this data structure.
 :::
 
 ---
