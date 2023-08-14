@@ -15,6 +15,7 @@ module.exports = {
   title: 'Everscale Inpage Provider',
   base: '/',
   description: 'Web3-like interface to the TVM-compatible blockchains.',
+  lastUpdated: true,
   rewrites: {
     'src/pages/index.md': 'index.md',
     //everscale-inpage-provider
@@ -77,6 +78,9 @@ module.exports = {
     },
   },
   themeConfig: {
+    editLink: {
+      pattern: 'https://github.com/cyace84/everscale-inpage-provider/edit/docs/docs/:path',
+    },
     search: {
       provider: 'local',
       // options: {
