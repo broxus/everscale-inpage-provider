@@ -478,7 +478,7 @@ try {
 
 ::: details Known TVM Exceptions
 
-### Basic exceptions
+#### Basic exceptions
 
 _Please refer to [the whitepaper](https://test.ton.org/tvm.pdf) 4.5.7_
 
@@ -497,7 +497,7 @@ _Please refer to [the whitepaper](https://test.ton.org/tvm.pdf) 4.5.7_
 | 12   | Fatal error       | Thrown by TVM in situations deemed impossible                                                                                    |
 | 13   | Out of gas        | Thrown by TVM when the remaining gas (g r ) becomes negative                                                                     |
 
-### Solidity exceptions
+#### Solidity exceptions
 
 _Please refer to [the docs](https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#solidity-runtime-errors)_
 
