@@ -1,6 +1,3 @@
-variables:
-  GIT_DEPTH: '0'
-
 include:
   - project: 'infrastructure/gitlab-ci'
     ref: main
