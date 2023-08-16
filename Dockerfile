@@ -2,7 +2,7 @@
 FROM node:18 as builder
 
 WORKDIR /app
-
+RUN ls -lah
 COPY .git ./.git
 COPY docs/ .
 
