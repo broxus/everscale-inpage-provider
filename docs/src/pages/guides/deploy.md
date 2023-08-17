@@ -19,6 +19,8 @@ const tvc = await provider.codeToTvc(base64Contract);
 console.log('TVC:', tvc);
 ```
 
+<CodeToTvcComponent />
+
 ## TVC Merge & Split
 
 During development and testing, you may need to modify or inspect the contract code and data independently. The `mergeTvc` and `splitTvc` methods allow you to manage the contract's code and data separately or combined into a single state init.
@@ -33,6 +35,8 @@ const mergedTvc = await provider.mergeTvc({
 // Split state init into code and data
 const { code, data } = await provider.splitTvc(mergedTvc.tvc);
 ```
+
+<MergeSplitTvcComponent />
 
 ## Code Salt Management
 
@@ -74,6 +78,8 @@ const expectedAddress = await provider.getExpectedAddress(
 
 console.log('Expected address:', expectedAddress);
 ```
+
+<GetExpectedAddressComponent />
 
 ## Deploying the Sample Contract
 
