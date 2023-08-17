@@ -73,6 +73,7 @@ export default {
 
     app.config.errorHandler = function (err, vm, info) {
       toast(err.message, 0);
+      console.error(err, vm);
     };
     app.use(Toast, {
       position: 'top-right',

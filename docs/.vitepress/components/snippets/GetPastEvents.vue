@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 import { testContract } from '../../helpers';
 
@@ -22,15 +22,16 @@ export default defineComponent({
   setup() {
     const pastEvents = ref(null);
     const timestamp = ref(Math.round(Date.now() / 1000));
+    const testAddress: Address = inject('testAddress')!;
 
-    return { pastEvents, timestamp };
+    return { pastEvents, timestamp, testAddress };
   },
   methods: {
     async getPastEvents() {
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: ['basic'] });
 
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, this.testAddress);
 
       this.pastEvents = await exampleContract.getPastEvents({
         filter: 'StateChanged',

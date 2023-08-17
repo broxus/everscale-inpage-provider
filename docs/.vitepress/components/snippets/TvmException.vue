@@ -1,19 +1,15 @@
 <template>
   <div class="demo">
     <button @click="throwTvmException">computeSmth</button>
-    <a
-      v-if="exceptionCode != null"
-      target="_blank"
-      href="https://github.com/tonlabs/ton-labs-contracts/blob/e7821cec3514869979f702047348b2faf35b7b3f/solidity/depool/DePool.sol#L1428"
-    >
-      <pre>require(offset &lt; 1000, 1337);</pre>
-    </a>
+
+    <pre>require(offset &lt; 1000, 1337);</pre>
+
     <pre v-if="exceptionCode">TVM Exception: {{ exceptionCode }}</pre>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { TvmException, Address } from 'everscale-inpage-provider';
 
 import { useProvider } from './../../../src/provider/useProvider';
@@ -23,8 +19,9 @@ export default defineComponent({
   name: 'TvmException',
   setup() {
     const exceptionCode = ref();
+    const testAddress: Address = inject('testAddress')!;
 
-    return { exceptionCode };
+    return { exceptionCode, testAddress };
   },
   methods: {
     async throwTvmException() {
@@ -36,7 +33,7 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
 
       try {
         await example.methods.computeSmth({ offset: 1444, answerId: 2 }).call({ responsible: true });

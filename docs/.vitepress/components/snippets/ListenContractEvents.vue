@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted, ref } from 'vue';
+import { defineComponent, inject, onUnmounted, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 import { testContract } from '../../helpers';
 
@@ -34,12 +34,13 @@ export default defineComponent({
         buttonLabel.value = 'Unsubscribe';
       }
     };
+    const testAddress: Address = inject('testAddress')!;
 
     const subscribeEvent = async () => {
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: ['basic'] });
 
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, testAddress);
       const subscriber = new provider.Subscriber();
 
       const contractEvents = exampleContract.events(subscriber);
@@ -63,7 +64,7 @@ export default defineComponent({
         permissions: ['basic', 'accountInteraction'],
       });
 
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, testAddress);
       const senderPublicKey = accountInteraction?.publicKey!;
 
       await exampleContract.methods.setVariableExternal({ someParam: '1337' }).sendExternal({

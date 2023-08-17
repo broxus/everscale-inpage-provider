@@ -10,9 +10,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onUnmounted, reactive, ref, toRefs, Ref } from 'vue';
+import { defineComponent, onUnmounted, reactive, ref, toRefs, inject } from 'vue';
 import { Address } from 'everscale-inpage-provider';
-import { testContract, tryCatchToast } from './../../helpers';
+import { tryCatchToast } from './../../helpers';
 
 import { useProvider } from './../../../src/provider/useProvider';
 const { provider } = useProvider();
@@ -27,6 +27,7 @@ export default defineComponent({
       contractStateChanged: null,
       messageStatusUpdated: null,
     });
+    const testAddress: Address = inject('testAddress')!;
 
     const subscribeEvent = async (event: string) => {
       await provider.ensureInitialized();
@@ -36,12 +37,12 @@ export default defineComponent({
       switch (event) {
         case 'transactionsFound':
           subscription = await provider.subscribe('transactionsFound', {
-            address: new Address(testContract.address),
+            address: testAddress,
           });
           break;
         case 'contractStateChanged':
           subscription = await provider.subscribe('contractStateChanged', {
-            address: new Address(testContract.address),
+            address: testAddress,
           });
           break;
         case 'messageStatusUpdated':

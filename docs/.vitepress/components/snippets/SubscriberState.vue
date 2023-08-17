@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, inject } from 'vue';
 import { Stream, Address } from 'everscale-inpage-provider';
 import { testContract, toNano } from '../../helpers';
 
@@ -21,6 +21,12 @@ const subscriber = new provider.Subscriber();
 
 export default defineComponent({
   name: 'SubscriberState',
+  setup() {
+    const testAddress: Address = inject('testAddress')!;
+    return {
+      testAddress,
+    };
+  },
   data() {
     return {
       states: [],
@@ -42,7 +48,8 @@ export default defineComponent({
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: ['basic'] });
 
-      const stream = subscriber.states(new Address(testContract.address));
+      const testAddress: Address = inject('testAddress')!;
+      const stream = subscriber.states(testAddress);
       stream.on(data => {
         console.log('State changed:', data);
         this.states.push(data);
@@ -78,10 +85,10 @@ export default defineComponent({
           someParam: 1337,
         },
       };
-
+      const testAddress: Address = inject('testAddress')!;
       await provider.sendMessage({
         sender: senderAddress,
-        recipient: new Address(testContract.address),
+        recipient: testAddress,
         amount: toNano(1),
         bounce: true,
         payload: payload,

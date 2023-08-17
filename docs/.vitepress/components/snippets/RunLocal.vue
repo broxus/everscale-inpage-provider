@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 import { useProvider } from './../../../src/provider/useProvider';
 
@@ -16,6 +16,7 @@ export default defineComponent({
   name: 'RunLocal',
   setup() {
     const runLocalResult: Record<any, any> = ref({});
+    const testAddress: Address = inject('testAddress')!;
 
     return { runLocalResult };
   },
@@ -29,7 +30,7 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, this.testAddress);
       this.runLocalResult.value = await exampleContract.methods.setVariable({ someParam: 1 }).call();
     },
   },

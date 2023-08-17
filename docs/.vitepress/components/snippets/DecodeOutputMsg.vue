@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 import { testContract } from './../../helpers';
 
@@ -23,14 +23,15 @@ export default defineComponent({
   setup() {
     const decodedOutputMessage = ref(null);
     const outputMessageBody = ref(`te6ccgEBAgEAEQABEFM5yKUAAABXAQAIdGVzdA==`);
-
-    return { decodedOutputMessage, outputMessageBody };
+    const testAddress: Address = inject('testAddress')!;
+    return { decodedOutputMessage, outputMessageBody, testAddress };
   },
   methods: {
     async decodeOutputMessage() {
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: [`basic`, `accountInteraction`] });
-      const contract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+
+      const contract = new provider.Contract(testContract.ABI, this.testAddress);
 
       this.decodedOutputMessage = await contract.decodeOutputMessage({
         body: this.outputMessageBody,

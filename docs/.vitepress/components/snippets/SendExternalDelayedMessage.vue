@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, inject } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
@@ -42,14 +42,15 @@ export default defineComponent({
     const simpleState = ref('');
 
     const { provider } = useProvider();
-    const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+    const testAddress: Address = inject('testAddress')!;
+    const exampleContract = new provider.Contract(testContract.ABI, testAddress);
 
     onMounted(async () => {
       const state = await exampleContract.methods.simpleState().call();
       simpleState.value = JSON.stringify(state, null, 2);
     });
 
-    return { transactionExecuted, transaction, messageInfo, simpleState, someParam };
+    return { transactionExecuted, transaction, messageInfo, simpleState, someParam, testAddress };
   },
   computed: {
     parsedSimpleState() {
@@ -77,7 +78,7 @@ export default defineComponent({
         throw new Error('No public key');
       }
 
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, this.testAddress);
 
       const { transaction, messageHash, expireAt } = await exampleContract.methods
         .setVariableExternal({ someParam: this.someParam })

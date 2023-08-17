@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 import { testContract } from './../../helpers';
 
@@ -23,8 +23,8 @@ export default defineComponent({
   setup() {
     const decodedTransaction = ref(null);
     const transactionHash = ref('46e15231f113995b3075379066307374660391dd0a643574dad2092a1358d7eb');
-
-    return { decodedTransaction, transactionHash };
+    const testAddress: Address = inject('testAddress')!;
+    return { decodedTransaction, transactionHash, testAddress };
   },
   methods: {
     async decodeTransaction() {
@@ -32,7 +32,8 @@ export default defineComponent({
 
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: [`basic`, `accountInteraction`] });
-      const contract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+
+      const contract = new provider.Contract(testContract.ABI, this.testAddress);
 
       const tx = await provider.getTransaction({
         hash: this.transactionHash,

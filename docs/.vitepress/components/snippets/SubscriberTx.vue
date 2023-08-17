@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, inject } from 'vue';
 import { Stream, Address } from 'everscale-inpage-provider';
 import { testContract, toNano } from '../../helpers';
 
@@ -24,6 +24,12 @@ const subscriber = new provider.Subscriber();
 
 export default defineComponent({
   name: 'SubscriberTx',
+  setup() {
+    const testAddress: Address = inject('testAddress')!;
+    return {
+      testAddress,
+    };
+  },
   data() {
     return {
       transactions: [],
@@ -45,7 +51,7 @@ export default defineComponent({
       await provider.ensureInitialized();
       await provider.requestPermissions({ permissions: ['basic'] });
 
-      const stream = subscriber.transactions(new Address(testContract.address));
+      const stream = subscriber.transactions(this.testAddress);
       stream.on(data => {
         console.log('New transactions:', data);
         this.transactions.push(data);
@@ -92,7 +98,7 @@ export default defineComponent({
 
       await provider.sendMessage({
         sender: senderAddress,
-        recipient: new Address(testContract.address),
+        recipient: this.testAddress,
         amount: toNano(1),
         bounce: true,
         payload: payload,

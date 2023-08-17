@@ -1,22 +1,6 @@
 ---
-title: Everscale Inpage Provider
 outline: deep
 ---
-
-<!--
-<script setup>
-import { onMounted } from 'vue';
-
-onMounted(async () => {
-  const vpSidebar = document.getElementsByClassName('VPSidebar')[0];
-  const curtain = document.querySelector('.VPSidebar .curtain');
-  const bsgColor = getComputedStyle(document.documentElement).getPropertyValue('--vp-sidebar-bg-color');
-
-  vpSidebar.style.backgroundColor = bsgColor;
-  curtain.style.backgroundColor = bsgColor;
-
-});
-</script> -->
 
 # Overview
 

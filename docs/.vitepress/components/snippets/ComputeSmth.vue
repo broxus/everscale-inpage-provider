@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 
 import { useProvider } from './../../../src/provider/useProvider';
@@ -16,8 +16,8 @@ export default defineComponent({
   name: 'ComputeSmth',
   setup() {
     const computedResult = ref('');
-
-    return { computedResult };
+    const testAddress: Address = inject('testAddress')!;
+    return { computedResult, testAddress };
   },
   methods: {
     async computeSmth() {
@@ -29,7 +29,7 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
 
       const offset = 42;
       const computedResult = await example.methods.computeSmth({ offset, answerId: 13 }).call({ responsible: true });

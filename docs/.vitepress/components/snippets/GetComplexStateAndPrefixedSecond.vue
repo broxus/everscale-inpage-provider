@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
@@ -23,8 +23,8 @@ export default defineComponent({
     const complexState = ref();
     const prefixedSecond = ref();
     const prefix = ref('');
-
-    return { complexState, prefixedSecond, prefix };
+    const testAddress: Address = inject('testAddress')!;
+    return { complexState, prefixedSecond, prefix, testAddress };
   },
   methods: {
     async getComplexState() {
@@ -36,7 +36,7 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
 
       const { value0: complexState } = await example.methods.getComplexState().call();
 
@@ -52,8 +52,8 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
-      const state = await provider.getFullContractState({ address: new Address(testContract.address) })!;
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
+      const state = await provider.getFullContractState({ address: this.testAddress })!;
       const { value0: secondElementWithPrefix } = await example.methods
         .getSecondElementWithPrefix({ prefix: 'foo' })
         .call({ cachedState: state.state });

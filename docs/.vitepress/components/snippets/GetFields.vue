@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Address, ProviderRpcClient } from 'everscale-inpage-provider';
 
 import { testContract } from './../../helpers';
@@ -16,8 +16,8 @@ export default defineComponent({
   name: 'GetContractFields',
   setup() {
     const contractFields = ref('');
-
-    return { contractFields };
+    const testAddress: Address = inject('testAddress')!;
+    return { contractFields, testAddress };
   },
   methods: {
     async getContractFields() {
@@ -29,7 +29,7 @@ export default defineComponent({
         permissions: ['basic'],
       });
 
-      const example = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
       const { fields, state } = await example.getFields();
 
       this.contractFields = JSON.stringify({ fields, state }, null, 2);

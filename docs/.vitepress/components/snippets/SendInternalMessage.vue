@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, inject } from 'vue';
 import { Address } from 'everscale-inpage-provider';
 
 import { testContract, errorExtractor, toNano } from './../../helpers';
@@ -31,13 +31,15 @@ export default defineComponent({
     const contractState = ref('');
 
     const { provider } = useProvider();
-    const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+
+    const testAddress: Address = inject('testAddress')!;
+    const exampleContract = new provider.Contract(testContract.ABI, testAddress);
 
     onMounted(async () => {
       const state = await exampleContract.methods.simpleState().call();
       contractState.value = JSON.stringify(state, null, 2);
     });
-    return { transaction, contractState, someParam };
+    return { transaction, contractState, someParam, testAddress };
   },
   computed: {
     parsedContractState() {
@@ -63,7 +65,7 @@ export default defineComponent({
       if (!senderPublicKey) {
         throw new Error('No public key');
       }
-      const exampleContract = new provider.Contract(testContract.ABI, new Address(testContract.address));
+      const exampleContract = new provider.Contract(testContract.ABI, this.testAddress);
 
       const payload = {
         abi: JSON.stringify(testContract.ABI),
@@ -75,7 +77,7 @@ export default defineComponent({
       const tx = await errorExtractor(
         provider.sendMessage({
           sender: senderAddress,
-          recipient: new Address(testContract.address),
+          recipient: this.testAddress,
           amount: toNano(1),
           bounce: true,
           payload: payload,

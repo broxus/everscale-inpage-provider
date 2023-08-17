@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { createApp, h, nextTick, ref, shallowRef, watch } from 'vue';
+import { createApp, h, inject, nextTick, provide, reactive, ref, shallowRef, watch } from 'vue';
 
 import {
   Permissions,
@@ -11,6 +11,7 @@ import {
   RawProviderRequest,
   RawProviderApiResponse,
   RawProviderEventData,
+  Address,
 } from 'everscale-inpage-provider';
 
 import ProviderSelector from './../../.vitepress/components/ProviderSelector.vue';
