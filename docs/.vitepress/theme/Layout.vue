@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onMounted, computed, ref, Ref, onUpdated } from 'vue';
+import { onMounted, computed, ref, Ref, onUpdated, provide, reactive } from 'vue';
 import { useRoute, useData } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
 import Outline from './../components/shared/outline/Outline.vue';
 import WalletControl from './../components/WalletControl.vue';
 import { getApiReference } from '../../api';
+import { testContract } from '../helpers';
+import { Address } from 'everscale-inpage-provider';
 
 const { Layout } = DefaultTheme;
 const route = useRoute();
@@ -22,6 +24,11 @@ let apiReference: Ref<{ content: string }> = ref({ content: '' });
 const isApiReferencePage = computed(() => {
   return frontmatter.value.apiReference ?? false;
 });
+
+const addresses = testContract.getAddress();
+const testAddress = reactive(new Address(addresses.address));
+
+provide('testAddress', testAddress);
 
 onMounted(async () => {
   if (!isApiReferencePage.value) return;
