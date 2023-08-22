@@ -16,8 +16,8 @@ const NAV = [
     text: 'Broxus Docs',
     items: [
       { text: 'Home', link: 'https://docs.broxus.com' },
-      { text: 'Locklift', link: '/' },
       { text: 'Inpage Provider', link: '/' },
+      { text: 'Locklift', link: 'https://docs.locklift.io/' },
       { text: 'OctusBridge Integration', link: 'https://integrate.octusbridge.io/' },
       {
         text: 'TIP-3 Api Reference',
