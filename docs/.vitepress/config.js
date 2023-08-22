@@ -11,6 +11,24 @@ const env = process.env;
 const HELP_URL = env.HELP_URL || '';
 const FEEDBACK_URL = env.FEEDBACK_URL || '';
 
+const NAV = [
+  {
+    text: 'Broxus Docs',
+    items: [
+      { text: 'Home', link: 'https://docs.broxus.com' },
+      { text: 'Locklift', link: '/' },
+      { text: 'Inpage Provider', link: '/' },
+      { text: 'OctusBridge Integration', link: 'https://integrate.octusbridge.io/' },
+      {
+        text: 'TIP-3 Api Reference',
+        link: 'https://tip3-api-reference.netlify.app/',
+      },
+    ],
+  },
+  { text: 'Feedback', link: FEEDBACK_URL },
+  { text: 'Community', link: HELP_URL },
+];
+
 module.exports = {
   title: 'Everscale Inpage Provider',
   base: '/',
@@ -89,10 +107,7 @@ module.exports = {
       //   indexName: 'my_first_index',
       // },
     },
-    nav: [
-      { text: 'Feedback', link: `${FEEDBACK_URL}` },
-      { text: 'Community', link: `${HELP_URL}` },
-    ],
+    nav: NAV,
     sidebar: [
       { text: 'Overview', link: '/' },
       {
