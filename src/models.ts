@@ -16,8 +16,13 @@ export interface ContractState {
 /**
  * @category Models
  */
-export interface FullContractState extends ContractState {
+export interface FullContractState {
   boc: string;
+  balance: string;
+  genTimings: GenTimings;
+  lastTransactionId?: LastTransactionId;
+  isDeployed: boolean;
+  codeHash?: string;
 }
 
 /**
