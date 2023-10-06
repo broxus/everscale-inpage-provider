@@ -18,6 +18,7 @@ const NAV = [
       { text: 'Home', link: 'https://docs.broxus.com' },
       { text: 'Inpage Provider', link: '/' },
       { text: 'Locklift', link: 'https://docs.locklift.io/' },
+      { text: 'Nekoton Python', link: 'https://nekoton-py-docs.broxus.com/' },
       { text: 'OctusBridge Integration', link: 'https://integrate.octusbridge.io/' },
       {
         text: 'TIP-3 Api Reference',
