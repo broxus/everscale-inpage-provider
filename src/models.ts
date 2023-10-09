@@ -322,12 +322,13 @@ export type AbiVersion = '1.0' | '2.0' | '2.1' | '2.2' | '2.3';
 /**
  * @category Models
  */
+// NOTE: `boolean` must be after `string` due to JS being itself - https://github.com/vuejs/core/issues/9253
 export type TokenValue<Addr = Address> =
   | null
-  | boolean
   | string
   | number
   | Addr
+  | boolean
   | { [K in string]: TokenValue<Addr> }
   | TokenValue<Addr>[]
   | (readonly [TokenValue<Addr>, TokenValue<Addr>])[];
