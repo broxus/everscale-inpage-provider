@@ -18,7 +18,7 @@ export default defineComponent({
     const runLocalResult: Record<any, any> = ref({});
     const testAddress: Address = inject('testAddress')!;
 
-    return { runLocalResult };
+    return { runLocalResult, testAddress };
   },
   methods: {
     async runLocal() {

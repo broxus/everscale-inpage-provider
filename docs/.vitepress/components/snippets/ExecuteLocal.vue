@@ -14,10 +14,11 @@ Parsed function call output: {{ executeLocalResult.value.output }}</pre
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 
 import { testContract } from './../../helpers';
 import { useProvider } from './../../../src/provider/useProvider';
+import { Address } from 'everscale-inpage-provider';
 
 const { provider } = useProvider();
 
@@ -26,7 +27,9 @@ export default defineComponent({
   setup() {
     const executeLocalResult: Record<any, any> = ref({});
 
-    return { executeLocalResult };
+    const testAddress: Address = inject('testAddress')!;
+
+    return { executeLocalResult, testAddress };
   },
   methods: {
     async executeLocal() {
@@ -37,16 +40,30 @@ export default defineComponent({
       });
 
       this.executeLocalResult.value = await provider.rawApi.executeLocal({
-        address: testContract.address,
+        address: this.testAddress,
         messageHeader: {
           type: 'internal',
-          sender: accountInteraction!.address.toString(),
+          sender: accountInteraction.address.toString(),
           amount: (1 * 10 ** 9).toString(),
           bounce: true,
         },
         payload: {
           abi: JSON.stringify(testContract.ABI),
           method: 'setVariable',
+          params: {
+            someParam: 42,
+          },
+        },
+      });
+      this.executeLocalResult.value = await provider.rawApi.executeLocal({
+        address: this.testAddress,
+        messageHeader: {
+          type: 'external',
+          publicKey: accountInteraction.publicKey,
+        },
+        payload: {
+          abi: JSON.stringify(testContract.ABI),
+          method: 'setVariableExternal',
           params: {
             someParam: 42,
           },

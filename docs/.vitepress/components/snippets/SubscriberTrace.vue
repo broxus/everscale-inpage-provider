@@ -4,11 +4,14 @@
       Transaction Hash:
       <input type="text" v-model="transactionHash" />
     </label>
-    <button @click="toggleTrace">{{ traceStream ? 'Unsubscribe from' : 'Subscribe to' }} transaction traces</button>
-    <div v-for="(trace, index) in transactionTraces" :key="index">
+    <button @click="toggleTrace">Trace Transaction</button>
+    <div>
+      <pre>{{ JSON.stringify(transactionTraces[0], null, 2) }}</pre>
+    </div>
+    <!-- <div v-for="(trace, index) in transactionTraces" :key="index">
       <h3>Trace {{ index + 1 }}</h3>
       <pre>{{ JSON.stringify(trace, null, 2) }}</pre>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -27,7 +30,7 @@ export default defineComponent({
     return {
       transactionTraces: [],
       traceStream: null as null | Stream<any, any, any>,
-      transactionHash: '5eb6c0150d768f5f4612fac65c6ec6dd0a754081eeae3dc4cb257280587ae64d',
+      transactionHash: '2a7c997e25c5849460057e0e066525647d0b0f657195c81d5f7ffa522ab1d552',
     };
   },
   beforeDestroy() {
@@ -48,10 +51,10 @@ export default defineComponent({
       const tx = await provider.getTransaction({
         hash: this.transactionHash,
       });
+
       const traceStream = subscriber.trace(tx.transaction);
 
       traceStream.on(data => {
-        console.log('Child transactions:', data);
         this.transactionTraces.push(data);
       });
 

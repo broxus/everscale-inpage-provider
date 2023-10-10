@@ -776,5 +776,3 @@ console.log(
   executeLocalResultWithCustomExecutor.output,
 );
 ```
-
-By using the local execution methods provided by the Everscale Provider API, you can simulate contract calls and observe their effects without sending messages to the blockchain. This can be particularly useful for testing, debugging, or estimating gas usage of your smart contracts.
