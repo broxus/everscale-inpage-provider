@@ -8,7 +8,7 @@ This guide will walk you through the process of deploying a simple contract usin
 
 ## Code to TVC
 
-Before deploying a contract, you need to convert the base64 encoded contract code into a TVC (TVM Container) file with default init data. The `codeToTvc` method is used for this conversion. The TVC format stores the contract's code and data in a compact binary form, suitable for execution on the TON Virtual Machine.
+Before deploying a contract, you need to convert the base64 encoded contract code into TVC (TVM Code) format. The `codeToTvc` method is used for this conversion. The TVC format represents a compact binary representation of the contract's code and a layout for future initData, designed for execution on the TON Virtual Machine.
 
 ```typescript
 const base64Contract = `te6ccgECJAEABNsAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBCSK7VMg4wMgwP/jAiDA/uMC8gshBQQjAtztRNDXScMB+GaNCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT4aSHbPN=YgAK+Eby4EwCEPSkIPS98sBOIyIAFHNvbCAwLjY2LjAAAA==`;
