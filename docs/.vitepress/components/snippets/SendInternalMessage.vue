@@ -84,8 +84,6 @@ export default defineComponent({
         }),
       );
 
-      const s = await exampleContract.waitForEvent({ filter: event => event.event === 'StateChanged' });
-      console.log(JSON.stringify(s, null, 2));
       const state = await exampleContract.methods.simpleState().call();
       this.contractState = JSON.stringify(state, null, 2);
       this.transaction = JSON.stringify(tx.transaction, null, 2);

@@ -43,7 +43,6 @@ const { code, data } = await provider.splitTvc(mergedTvc.tvc);
 The `setCodeSalt` and `getCodeSalt` methods enable you to manage the salt value associated with a contract's code. The salt value is an optional component that can be used to ensure the uniqueness of a contract's code, preventing collisions or other issues when deploying multiple instances of the same contract.
 
 ```typescript
-saltParams;
 // Set code salt
 const saltParams = { structure: exampleAbi, data: saltData };
 const saltedCode = await provider.setCodeSalt({

@@ -22,7 +22,7 @@ export default defineComponent({
   name: 'DecodeTransaction',
   setup() {
     const decodedTransaction = ref(null);
-    const transactionHash = ref('46e15231f113995b3075379066307374660391dd0a643574dad2092a1358d7eb');
+    const transactionHash = ref('1ee4e54aae183b683d65149a4d34a822942b49e391fe33b7b8c80f7b0898f7b8');
     const testAddress: Address = inject('testAddress')!;
     return { decodedTransaction, transactionHash, testAddress };
   },
@@ -39,10 +39,28 @@ export default defineComponent({
         hash: this.transactionHash,
       });
 
-      this.decodedTransaction = await contract.decodeTransaction({
-        transaction: tx.transaction!,
-        methods: ['setVariable'],
+      if (!tx.transaction) {
+        this.decodedTransaction = null;
+        throw new Error(`Transaction not found`);
+      }
+
+      const decodedTransaction = await contract.decodeTransaction({
+        transaction: tx.transaction,
+        methods: [
+          'setVariable',
+          'setVariableExternal',
+          'getSecondElementWithPrefix',
+          'getComplexState',
+          'simpleState',
+          'computeSmth',
+        ],
       });
+
+      if (!decodedTransaction) {
+        this.decodedTransaction = null;
+        throw new Error(`Decoding failed`);
+      }
+      this.decodedTransaction = decodedTransaction;
     },
   },
 });

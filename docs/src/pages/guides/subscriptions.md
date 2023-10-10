@@ -282,7 +282,7 @@ const contract = provider.Contract(exampleAbi, exampleAddress);
 // Decode transaction
 const decodedTransaction = await contract.decodeTransaction({
   transaction: tx,
-  methods: ['setVariable'],
+  methods: ['setVariable', 'setVariableExternal'],
 });
 
 console.log('Decoded transaction:', decodedTransaction);
@@ -308,7 +308,7 @@ To decode an input message, use the `decodeInputMessage` method. You need to pro
 
 ```typescript
 // Input message
-const msgBody = `te6ccgEBAQEAFgAAKGcHYA4AAAAAAAAAAAAAAAAAAACZ`;
+const msgBody = `te6ccgEBAQEAFgAAKDja0OwAAAAAAAAAAAAAAAAAAAU5`;
 
 // Decode input message
 const decodedInputMessage = await contract.decodeInputMessage({
@@ -327,13 +327,13 @@ console.log('Decoded input message:', decodedInputMessage);
 To decode an output message, use the `decodeOutputMessage` method. Provide the output message to decode, and the method used in the message.
 
 ```typescript
-const outputMessageBoc =
+const outputMessageBody =
   'te6ccgEBAQEAXwAAubiFxSVsWc7pJv2rkYyWYKvwhEOmZGICZRAKKG5WEpBwpXUHtcgRydSCYKC3EUaic0ikBcBORHMb3we6tyRwQUAAADD6jXh5aABF7kAAAAAAAAAAAAAAAAAAAArwA==';
 
 // Decode output message
 const decodedOutputMessage = await contract.decodeOutputMessage({
-  body: outputMessageBoc,
-  methods: ['SetVariable'],
+  body: outputMessageBody,
+  methods: ['setVariable'],
 });
 
 console.log('Decoded output message:', decodedOutputMessage);

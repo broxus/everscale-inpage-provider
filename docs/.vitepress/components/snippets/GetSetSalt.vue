@@ -44,10 +44,12 @@ export default defineComponent({
       const saltParams = { structure: ABI, data: { s: 'vasya' } };
       const { boc } = await provider.packIntoCell(saltParams);
       const tvc = await provider.codeToTvc(testContract.base64);
+
       const { code, hash } = await provider.setCodeSalt({
         code: tvc,
         salt: boc,
       });
+
       this.saltedCode = code;
       this.hash = hash;
     },

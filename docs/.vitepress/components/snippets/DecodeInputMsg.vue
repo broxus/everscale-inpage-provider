@@ -1,9 +1,5 @@
 <template>
   <div class="demo">
-    <div>
-      <label for="inputMessageBody">Input Message Body:</label>
-      <input id="inputMessageBody" type="text" v-model="inputMessageBody" />
-    </div>
     <button @click="decodeInputMessage">Decode Input Message</button>
     <pre v-if="decodedInputMessage">Decoded Input Message: {{ decodedInputMessage }}</pre>
   </div>
@@ -22,7 +18,7 @@ export default defineComponent({
   name: 'DecodeInputMessage',
   setup() {
     const decodedInputMessage = ref(null);
-    const inputMessageBody = ref('te6ccgEBAQEAFgAAKGcHYA4AAAAAAAAAAAAAAAAAAACZ');
+    const inputMessageBody = ref('te6ccgEBAQEAFgAAKDja0OwAAAAAAAAAAAAAAAAAAAU5');
     const testAddress: Address = inject('testAddress')!;
     return { decodedInputMessage, inputMessageBody, testAddress };
   },
