@@ -1,6 +1,7 @@
 import {
   AbiVersion,
   AbiParam,
+  AccountStatus,
   AssetType,
   AssetTypeParams,
   ContractState,
@@ -261,6 +262,55 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
+   * Compute storage fee
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  computeStorageFee: {
+    input: {
+      /**
+       * Existing contract state
+       */
+      state: FullContractState;
+      /**
+       * Whether to assume that the contract is in the masterchain. Default: false
+       */
+      masterchain?: boolean;
+      /**
+       * Optional UNIX timestamp (in seconds) of the moment up to which the storage fee is calculated.
+       * Default: current timestamp
+       *
+       * NOTE: for a time that was earlier than the last state update, the `last_paid` time will be used.
+       */
+      timestamp?: number;
+    };
+    output: {
+      /**
+       * The total storage fee amount in nano EVER for the contract state up to the specified timestamp.
+       */
+      storageFee: string;
+      /**
+       * The minimum amount in nano EVER of debt that must be paid so that the contract is not frozen
+       * or deleted.
+       */
+      storageFeeDebt?: string;
+      /**
+       * Account status after charging a storage fee
+       */
+      accountStatus: AccountStatus;
+      /**
+       * The amount of debt in nano EVER after which the contract will be frozen
+       */
+      freezeDueLimit: string;
+      /**
+       * The amount of debt in nano EVER after which the contract will be deleted
+       */
+      deleteDueLimit: string;
+    };
+  };
+
+  /**
    * Requests accounts with specified code hash
    *
    * ---
@@ -450,41 +500,43 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Message header
        */
-      messageHeader: {
-        /**
-         * External message header
-         */
-        type: 'external',
-        /**
-         * The public key of the signer.
-         */
-        publicKey: string;
-        /**
-         * Whether to prepare this message without signature. Default: false
-         */
-        withoutSignature?: boolean;
-      } | {
-        /**
-         * Internal message header
-         */
-        type: 'internal',
-        /**
-         * Message source address
-         */
-        sender: Addr;
-        /**
-         * Amount of nano EVER to attach to the message
-         */
-        amount: string;
-        /**
-         * Whether to bounce message back on error
-         */
-        bounce: boolean;
-        /**
-         * Whether the constructed message is bounced. Default: false
-         */
-        bounced?: boolean;
-      };
+      messageHeader:
+        | {
+            /**
+             * External message header
+             */
+            type: 'external';
+            /**
+             * The public key of the signer.
+             */
+            publicKey: string;
+            /**
+             * Whether to prepare this message without signature. Default: false
+             */
+            withoutSignature?: boolean;
+          }
+        | {
+            /**
+             * Internal message header
+             */
+            type: 'internal';
+            /**
+             * Message source address
+             */
+            sender: Addr;
+            /**
+             * Amount of nano EVER to attach to the message
+             */
+            amount: string;
+            /**
+             * Whether to bounce message back on error
+             */
+            bounce: boolean;
+            /**
+             * Whether the constructed message is bounced. Default: false
+             */
+            bounced?: boolean;
+          };
 
       /**
        * Optional executor parameters used during local contract execution
@@ -619,11 +671,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Optional hex encoded public key
        */
-      publicKey: string | undefined,
+      publicKey: string | undefined;
       /**
        * State init params
        */
-      initParams: TokensObject<Addr>,
+      initParams: TokensObject<Addr>;
     };
   };
 
@@ -1606,8 +1658,8 @@ export type ProviderMethod = keyof ProviderApi;
  * @category Provider Api
  */
 export type ProviderApiRequestParams<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
-    input: infer I;
-  }
+  input: infer I;
+}
   ? I
   : undefined;
 
@@ -1620,8 +1672,8 @@ export type RawProviderApiRequestParams<T extends ProviderMethod> = ProviderApiR
  * @category Provider Api
  */
 export type ProviderApiResponse<T extends ProviderMethod, Addr = Address> = ProviderApi<Addr>[T] extends {
-    output: infer O;
-  }
+  output: infer O;
+}
   ? O
   : undefined;
 

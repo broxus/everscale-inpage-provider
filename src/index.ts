@@ -590,6 +590,32 @@ export class ProviderRpcClient {
   }
 
   /**
+   * Compute storage fee
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async computeStorageFee(
+    args: ProviderApiRequestParams<'computeStorageFee'>,
+  ): Promise<ProviderApiResponse<'computeStorageFee'>> {
+    await this.ensureInitialized();
+    return (await this._api.computeStorageFee({
+      state: {
+        boc: args.state.boc,
+        balance: args.state.balance,
+        genTimings: {
+          ...args.state.genTimings,
+        },
+        lastTransactionId: args.state.lastTransactionId != null ? { ...args.state.lastTransactionId } : undefined,
+        isDeployed: args.state.isDeployed,
+        codeHash: args.state.codeHash,
+      },
+      masterchain: args.masterchain,
+      timestamp: args.timestamp,
+    })) as ProviderApiResponse<'computeStorageFee'>;
+  }
+
+  /**
    * Requests accounts with specified code hash
    *
    * ---
@@ -1113,9 +1139,10 @@ export class ProviderNotInitializedException extends Error {
 /**
  * @category Provider
  */
-export type RawRpcMethod<P extends ProviderMethod> = RawProviderApiRequestParams<P> extends undefined
-  ? () => Promise<RawProviderApiResponse<P>>
-  : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>;
+export type RawRpcMethod<P extends ProviderMethod> =
+  RawProviderApiRequestParams<P> extends undefined
+    ? () => Promise<RawProviderApiResponse<P>>
+    : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>;
 
 /**
  * @category Provider
