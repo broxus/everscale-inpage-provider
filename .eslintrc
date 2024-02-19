@@ -20,7 +20,8 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "dist/*"
+    "dist/*",
+    "docs/*"
   ],
   "rules": {
     "no-constant-condition": "off",
