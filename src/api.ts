@@ -17,6 +17,7 @@ import {
   FunctionCall,
   TokensObject,
   DelayedMessage,
+  Network,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -1631,6 +1632,51 @@ export type ProviderApi<Addr = Address> = {
        */
       message: DelayedMessage<Addr>;
     };
+  };
+
+  /**
+   * Get a list of available networks.
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  getAvailableNetworks: {
+    output: Network[];
+  };
+
+  /**
+   * Request user to add a new network.
+   * Shows an approval window to the user.
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  addNetwork: {
+    input: {
+      /**
+       * Network info
+       */
+      network: Omit<Network, 'description'>;
+      /**
+       * Whether to switch to the added network (false by default)
+       */
+      switchNetwork?: boolean;
+    };
+    output: Network | null;
+  };
+
+  /**
+   * Request user to change selected network.
+   * Shows an approval window to the user.
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  changeNetwork: {
+    input: {
+      networkId: number;
+    };
+    output: Network | null;
   };
 };
 

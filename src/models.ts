@@ -312,6 +312,76 @@ export type EncryptedData = {
   nonce: string;
 };
 
+/* Network stuff */
+
+/**
+ * @category Models
+ */
+export type NetworkDescription = {
+  globalId: number;
+  capabilities: string;
+  signatureId: number | undefined;
+};
+
+/**
+ * @category Models
+ */
+export type NetworkConfig = {
+  symbol?: string;
+  explorerBaseUrl?: string;
+  tokensManifestUrl?: string;
+};
+
+/**
+ * @category Models
+ */
+export type GqlSocketParams = {
+  /**
+   * Path to graphql api endpoints
+   */
+  endpoints: string[]
+  /**
+   * Frequency of sync latency detection
+   */
+  latencyDetectionInterval: number
+  /**
+   * Maximum value for the endpoint's blockchain data sync latency
+   */
+  maxLatency: number
+  /**
+   * Gql node type
+   */
+  local: boolean
+};
+
+/**
+ * @category Models
+ */
+export type JrpcSocketParams = {
+  /**
+   * Path to jrpc api endpoint
+   */
+  endpoint: string
+};
+
+/**
+ * @category Models
+ */
+export type ProtoSocketParams = JrpcSocketParams & {};
+
+/**
+ * @category Models
+ */
+export type Network = {
+  name: string;
+  config: NetworkConfig;
+  description: NetworkDescription;
+} & (
+  | { type: 'graphql', data: GqlSocketParams }
+  | { type: 'jrpc', data: JrpcSocketParams }
+  | { type: 'proto', data: ProtoSocketParams }
+);
+
 /* ABI stuff */
 
 /**
