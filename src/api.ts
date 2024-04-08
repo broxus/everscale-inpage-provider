@@ -18,6 +18,7 @@ import {
   TokensObject,
   DelayedMessage,
   Network,
+  AddNetwork,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -1656,13 +1657,15 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Network info
        */
-      network: Omit<Network, 'description'>;
+      network: AddNetwork;
       /**
        * Whether to switch to the added network (false by default)
        */
       switchNetwork?: boolean;
     };
-    output: Network | null;
+    output: {
+      network: Network | null
+    };
   };
 
   /**
@@ -1676,7 +1679,9 @@ export type ProviderApi<Addr = Address> = {
     input: {
       networkId: number;
     };
-    output: Network | null;
+    output: {
+      network: Network | null;
+    };
   };
 };
 

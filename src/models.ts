@@ -369,18 +369,29 @@ export type JrpcSocketParams = {
  */
 export type ProtoSocketParams = JrpcSocketParams & {};
 
+export type GqlConnection = { type: 'graphql', data: GqlSocketParams };
+export type JrpcConnection = { type: 'jrpc', data: JrpcSocketParams };
+export type ProtoConnection = { type: 'proto', data: ProtoSocketParams };
+
 /**
  * @category Models
  */
 export type Network = {
   name: string;
-  config: NetworkConfig;
   description: NetworkDescription;
-} & (
-  | { type: 'graphql', data: GqlSocketParams }
-  | { type: 'jrpc', data: JrpcSocketParams }
-  | { type: 'proto', data: ProtoSocketParams }
-);
+  connection: GqlConnection | JrpcConnection | ProtoConnection | any;
+  config: NetworkConfig;
+};
+
+/**
+ * @category Models
+ */
+export type AddNetwork = {
+  name: string;
+  networkId: number;
+  connection: GqlConnection | JrpcConnection | ProtoConnection | any;
+  config?: NetworkConfig;
+};
 
 /* ABI stuff */
 

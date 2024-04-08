@@ -1059,7 +1059,7 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async addNetwork(args: ProviderApiRequestParams<'addNetwork'>): Promise<Network | null> {
+  public async addNetwork(args: ProviderApiRequestParams<'addNetwork'>): Promise<ProviderApiResponse<'addNetwork'>> {
     await this.ensureInitialized();
     return await this._api.addNetwork(args);
   }
@@ -1071,7 +1071,9 @@ export class ProviderRpcClient {
    * ---
    * Required permissions: `basic`
    */
-  public async changeNetwork(args: ProviderApiRequestParams<'changeNetwork'>): Promise<Network | null> {
+  public async changeNetwork(
+    args: ProviderApiRequestParams<'changeNetwork'>,
+  ): Promise<ProviderApiResponse<'changeNetwork'>> {
     await this.ensureInitialized();
     return await this._api.changeNetwork(args);
   }
