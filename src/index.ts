@@ -1042,17 +1042,6 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Get a list of available networks.
-   *
-   * ---
-   * Required permissions: `basic`
-   */
-  public async getAvailableNetworks(): Promise<Network[]> {
-    await this.ensureInitialized();
-    return await this._api.getAvailableNetworks();
-  }
-
-  /**
    * Request user to add a new network.
    * Shows an approval window to the user.
    *

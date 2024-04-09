@@ -1636,16 +1636,6 @@ export type ProviderApi<Addr = Address> = {
   };
 
   /**
-   * Get a list of available networks.
-   *
-   * ---
-   * Required permissions: `basic`
-   */
-  getAvailableNetworks: {
-    output: Network[];
-  };
-
-  /**
    * Request user to add a new network.
    * Shows an approval window to the user.
    *
