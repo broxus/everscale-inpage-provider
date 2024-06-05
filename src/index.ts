@@ -26,7 +26,6 @@ import {
   parsePartialTokensObject,
   parseTransaction,
   serializeTokensObject,
-  Network,
 } from './models';
 import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
