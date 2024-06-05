@@ -312,6 +312,87 @@ export type EncryptedData = {
   nonce: string;
 };
 
+/* Network stuff */
+
+/**
+ * @category Models
+ */
+export type NetworkDescription = {
+  globalId: number;
+  capabilities: string;
+  signatureId: number | undefined;
+};
+
+/**
+ * @category Models
+ */
+export type NetworkConfig = {
+  symbol?: string;
+  explorerBaseUrl?: string;
+  tokensManifestUrl?: string;
+};
+
+/**
+ * @category Models
+ */
+export type GqlSocketParams = {
+  /**
+   * Path to graphql api endpoints
+   */
+  endpoints: string[]
+  /**
+   * Frequency of sync latency detection
+   */
+  latencyDetectionInterval: number
+  /**
+   * Maximum value for the endpoint's blockchain data sync latency
+   */
+  maxLatency: number
+  /**
+   * Gql node type
+   */
+  local: boolean
+};
+
+/**
+ * @category Models
+ */
+export type JrpcSocketParams = {
+  /**
+   * Path to jrpc api endpoint
+   */
+  endpoint: string
+};
+
+/**
+ * @category Models
+ */
+export type ProtoSocketParams = JrpcSocketParams & {};
+
+export type GqlConnection = { type: 'graphql', data: GqlSocketParams };
+export type JrpcConnection = { type: 'jrpc', data: JrpcSocketParams };
+export type ProtoConnection = { type: 'proto', data: ProtoSocketParams };
+
+/**
+ * @category Models
+ */
+export type Network = {
+  name: string;
+  description: NetworkDescription;
+  connection: GqlConnection | JrpcConnection | ProtoConnection | any;
+  config: NetworkConfig;
+};
+
+/**
+ * @category Models
+ */
+export type AddNetwork = {
+  name: string;
+  networkId: number;
+  connection: GqlConnection | JrpcConnection | ProtoConnection | any;
+  config?: NetworkConfig;
+};
+
 /* ABI stuff */
 
 /**

@@ -26,6 +26,7 @@ import {
   parsePartialTokensObject,
   parseTransaction,
   serializeTokensObject,
+  Network,
 } from './models';
 import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
@@ -1038,6 +1039,32 @@ export class ProviderRpcClient {
       expireAt: message.expireAt,
       transaction,
     };
+  }
+
+  /**
+   * Request user to add a new network.
+   * Shows an approval window to the user.
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async addNetwork(args: ProviderApiRequestParams<'addNetwork'>): Promise<ProviderApiResponse<'addNetwork'>> {
+    await this.ensureInitialized();
+    return await this._api.addNetwork(args);
+  }
+
+  /**
+   * Request user to change selected network.
+   * Shows an approval window to the user.
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async changeNetwork(
+    args: ProviderApiRequestParams<'changeNetwork'>,
+  ): Promise<ProviderApiResponse<'changeNetwork'>> {
+    await this.ensureInitialized();
+    return await this._api.changeNetwork(args);
   }
 
   private _registerEventHandlers(provider: Provider) {
