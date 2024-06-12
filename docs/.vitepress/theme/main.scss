@@ -1,0 +1,27 @@
+@import './styles/api-reference.scss';
+@import './styles/demo-сomponent.scss';
+
+:root {
+  --vp-c-text-4: var(--vp-c-text-2);
+  --pj-card-box-shadow: none;
+}
+
+.dark {
+  --vp-c-text-4: #dfdfd8;
+}
+
+.router-page-bar {
+  --vp-sidebar-bg-color: var(--vp-c-bg);
+}
+
+.vp-doc {
+  h2 {
+    font-size: 28px !important;
+  }
+  h3 {
+    font-size: 24px !important;
+  }
+  a {
+    font-weight: 400 !important;
+  }
+}

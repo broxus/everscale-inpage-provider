@@ -1,0 +1,65 @@
+<template>
+  <div class="demo">
+    <button @click="getComplexState">getComplexState</button>
+    <button @click="getPrefixedSecond">getSecondElementWithPrefix</button>
+
+    <div class="contract-state" v-if="complexState || prefixedSecond">
+      <pre v-if="complexState">Complex State: {{ complexState }}</pre>
+      <pre v-if="prefixedSecond">Prefixed Second: {{ prefixedSecond }}</pre>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, inject, ref } from 'vue';
+import { Address } from 'everscale-inpage-provider';
+
+import { testContract } from './../../helpers';
+import { useProvider } from './../../../src/provider/useProvider';
+
+export default defineComponent({
+  name: 'GetComplexStateAndPrefixedSecond',
+  setup() {
+    const complexState = ref();
+    const prefixedSecond = ref();
+    const prefix = ref('');
+    const testAddress: Address = inject('testAddress')!;
+    return { complexState, prefixedSecond, prefix, testAddress };
+  },
+  methods: {
+    async getComplexState() {
+      const { provider } = useProvider();
+
+      await provider.ensureInitialized();
+
+      await provider.requestPermissions({
+        permissions: ['basic'],
+      });
+
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
+
+      const { value0: complexState } = await example.methods.getComplexState().call();
+
+      this.complexState = JSON.stringify(complexState, null, 2);
+      this.prefixedSecond = null;
+    },
+    async getPrefixedSecond() {
+      const { provider } = useProvider();
+
+      await provider.ensureInitialized();
+
+      await provider.requestPermissions({
+        permissions: ['basic'],
+      });
+
+      const example = new provider.Contract(testContract.ABI, this.testAddress);
+      const state = await provider.getFullContractState({ address: this.testAddress })!;
+      const { value0: secondElementWithPrefix } = await example.methods
+        .getSecondElementWithPrefix({ prefix: 'foo' })
+        .call({ cachedState: state.state });
+      this.prefixedSecond = secondElementWithPrefix;
+      this.complexState = null;
+    },
+  },
+});
+</script>
