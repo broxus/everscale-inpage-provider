@@ -726,7 +726,8 @@ class StreamImpl<P, T, F extends boolean> implements Stream<P, T, F> {
         this.extractor(event, (item) => {
           if (state.index < n) {
             ++state.index;
-            return handler(item);
+            // NOTE: Execute the handler and ensure that `false` is returned right after the Nth call
+            return handler(item) && state.index < n;
           } else {
             return false;
           }
