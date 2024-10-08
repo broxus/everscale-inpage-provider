@@ -48,25 +48,43 @@ export {
 
 /**
  * @category Provider
+ * @tocSection 1. Interfaces
+ * @tocDescription Define the structure and expected behavior of the Provider,
+ * Subscription, and other types in the module.
  */
 export interface Provider {
+  /**
+   * Sends request to the provider.
+   *
+   * @subCategory Request Method
+   */
   request<T extends ProviderMethod>(data: RawProviderRequest<T>): Promise<RawProviderApiResponse<T>>;
 
+  /**
+   * Adds a listener for the specified event.
+   *
+   * @subCategory Event Listener Methods
+   */
   addListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
-
+  /**
+   * Removes a listener for the specified event.
+   */
   removeListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 
+  /**
+   * @subCategory Event Management Methods
+   */
   on<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
-
   once<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
-
   prependListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
-
   prependOnceListener<T extends ProviderEvent>(eventName: T, listener: (data: RawProviderEventData<T>) => void): this;
 }
 
 /**
  * @category Provider
+ * @tocSection 2. Types
+ * @tocDescription Declare custom data types, such as AssetType, Address, and others,
+ * to be used throughout the module.
  */
 export type ProviderProperties = {
   /***
@@ -81,6 +99,9 @@ export type ProviderProperties = {
   fallback?: () => Promise<Provider>;
 };
 
+/**
+ * @category Provider
+ */
 declare global {
   interface Window {
     __ever: Provider | undefined;
@@ -107,6 +128,7 @@ const getProvider = (): Provider | undefined => (isBrowser ? window.__ever || wi
 
 /**
  * @category Provider
+ * @tocSection 4. Functions
  */
 export async function hasEverscaleProvider(): Promise<boolean> {
   if (!isBrowser) {
@@ -119,6 +141,9 @@ export async function hasEverscaleProvider(): Promise<boolean> {
 
 /**
  * @category Provider
+ * @tocSection 3. Classes
+ * @tocDescription Implement the main class, ProviderRpcClient, which contains
+ * methods and properties for interacting with the Everscale blockchain.
  */
 export class ProviderRpcClient {
   private readonly _properties: ProviderProperties;
@@ -231,10 +256,35 @@ export class ProviderRpcClient {
       }
     });
   }
+  /**
+   * Creates typed contract wrapper.
+   *
+   * @param abi Readonly object (must be declared with `as const`)
+   * @param address Default contract address
+   *
+   * @deprecated `new ever.Contract(abi, address)` should be used instead
+   *
+   * @subCategory Factory methods
+   */
+
+  public createContract<Abi>(abi: Abi, address: Address): contract.Contract<Abi> {
+    return new this.Contract<Abi>(abi, address);
+  }
+
+  /**
+   * Creates subscriptions group
+   *
+   * @deprecated `new ever.Subscriber()` should be used instead
+   */
+  public createSubscriber(): subscriber.Subscriber {
+    return new this.Subscriber();
+  }
 
   /**
    * Checks whether this page has injected Everscale provider or
    * there is a fallback provider.
+   *
+   * @subCategory Initialization and provider related methods
    */
   public async hasProvider(): Promise<boolean> {
     if (this._properties.fallback != null) {
@@ -281,33 +331,14 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Creates typed contract wrapper.
-   *
-   * @param abi Readonly object (must be declared with `as const`)
-   * @param address Default contract address
-   *
-   * @deprecated `new ever.Contract(abi, address)` should be used instead
-   */
-  public createContract<Abi>(abi: Abi, address: Address): contract.Contract<Abi> {
-    return new this.Contract<Abi>(abi, address);
-  }
-
-  /**
-   * Creates subscriptions group
-   *
-   * @deprecated `new ever.Subscriber()` should be used instead
-   */
-  public createSubscriber(): subscriber.Subscriber {
-    return new this.Subscriber();
-  }
-
-  /**
    * Requests new permissions for current origin.
    * Shows an approval window to the user.
    * Will overwrite already existing permissions
    *
    * ---
    * Required permissions: none
+   *
+   * @subCategory Account and Permissions management
    */
   public async requestPermissions(
     args: ProviderApiRequestParams<'requestPermissions'>,
@@ -340,6 +371,8 @@ export class ProviderRpcClient {
 
   /**
    * Called every time contract state changes
+   *
+   * @subCategory Subscription management
    */
   public subscribe(
     eventName: 'contractStateChanged',
@@ -551,6 +584,8 @@ export class ProviderRpcClient {
    *
    * ---
    * Required permissions: none
+   *
+   * @subCategory Contract & Data Handling
    */
   public async getProviderState(): Promise<ProviderApiResponse<'getProviderState'>> {
     await this.ensureInitialized();
@@ -635,45 +670,6 @@ export class ProviderRpcClient {
   }
 
   /**
-   * Requests contract transactions
-   *
-   * ---
-   * Required permissions: `basic`
-   */
-  public async getTransactions(
-    args: ProviderApiRequestParams<'getTransactions'>,
-  ): Promise<ProviderApiResponse<'getTransactions'>> {
-    await this.ensureInitialized();
-    const { transactions, continuation, info } = await this._api.getTransactions({
-      ...args,
-      address: args.address.toString(),
-    });
-    return {
-      transactions: transactions.map(parseTransaction),
-      continuation,
-      info,
-    } as ProviderApiResponse<'getTransactions'>;
-  }
-
-  /**
-   * Searches transaction by hash
-   *
-   * ---
-   * Required permissions: `basic`
-   */
-  public async getTransaction(
-    args: ProviderApiRequestParams<'getTransaction'>,
-  ): Promise<ProviderApiResponse<'getTransaction'>> {
-    await this.ensureInitialized();
-    const { transaction } = await this._api.getTransaction({
-      ...args,
-    });
-    return {
-      transaction: transaction ? parseTransaction(transaction) : undefined,
-    } as ProviderApiResponse<'getTransaction'>;
-  }
-
-  /**
    * Computes contract address from code and init params
    *
    * ---
@@ -729,21 +725,6 @@ export class ProviderRpcClient {
       publicKey,
       initParams: parsePartialTokensObject((abi as any).data as AbiParam[], initParams) as DecodedAbiInitData<Abi>,
     };
-  }
-
-  /**
-   * Computes hash of base64 encoded BOC
-   *
-   * ---
-   * Required permissions: `basic`
-   */
-  public async getBocHash(boc: string): Promise<string> {
-    await this.ensureInitialized();
-    return await this._api
-      .getBocHash({
-        boc,
-      })
-      .then(({ hash }) => hash);
   }
 
   /**
@@ -902,59 +883,45 @@ export class ProviderRpcClient {
     });
   }
 
-  public async verifySignature(
-    args: ProviderApiRequestParams<'verifySignature'>,
-  ): Promise<ProviderApiResponse<'verifySignature'>> {
+  /**
+   * Requests contract transactions
+   *
+   * ---
+   * Required permissions: `basic`
+   *
+   * @subCategory Transactions
+   */
+  public async getTransactions(
+    args: ProviderApiRequestParams<'getTransactions'>,
+  ): Promise<ProviderApiResponse<'getTransactions'>> {
     await this.ensureInitialized();
-    return await this._api.verifySignature(args);
+    const { transactions, continuation, info } = await this._api.getTransactions({
+      ...args,
+      address: args.address.toString(),
+    });
+    return {
+      transactions: transactions.map(parseTransaction),
+      continuation,
+      info,
+    } as ProviderApiResponse<'getTransactions'>;
   }
 
   /**
-   * Signs arbitrary data.
-   *
-   * NOTE: hashes data before signing. Use `signDataRaw` to sign without hash.
+   * Searches transaction by hash
    *
    * ---
-   * Requires permissions: `accountInteraction`
+   * Required permissions: `basic`
    */
-  public async signData(args: ProviderApiRequestParams<'signData'>): Promise<ProviderApiResponse<'signData'>> {
+  public async getTransaction(
+    args: ProviderApiRequestParams<'getTransaction'>,
+  ): Promise<ProviderApiResponse<'getTransaction'>> {
     await this.ensureInitialized();
-    return await this._api.signData(args);
-  }
-
-  /**
-   * Signs arbitrary data without hashing it
-   *
-   * ---
-   * Requires permissions: `accountInteraction`
-   */
-  public async signDataRaw(args: ProviderApiRequestParams<'signDataRaw'>): Promise<ProviderApiResponse<'signDataRaw'>> {
-    await this.ensureInitialized();
-    return await this._api.signDataRaw(args);
-  }
-
-  /**
-   * Encrypts arbitrary data with specified algorithm for each specified recipient
-   *
-   * ---
-   * Requires permissions: `accountInteraction`
-   */
-  public async encryptData(args: ProviderApiRequestParams<'encryptData'>): Promise<EncryptedData[]> {
-    await this.ensureInitialized();
-    const { encryptedData } = await this._api.encryptData(args);
-    return encryptedData;
-  }
-
-  /**
-   * Decrypts encrypted data. Returns base64 encoded data
-   *
-   * ---
-   * Requires permissions: `accountInteraction`
-   */
-  public async decryptData(encryptedData: EncryptedData): Promise<string> {
-    await this.ensureInitialized();
-    const { data } = await this._api.decryptData({ encryptedData });
-    return data;
+    const { transaction } = await this._api.getTransaction({
+      ...args,
+    });
+    return {
+      transaction: transaction ? parseTransaction(transaction) : undefined,
+    } as ProviderApiResponse<'getTransaction'>;
   }
 
   /**
@@ -1101,10 +1068,83 @@ export class ProviderRpcClient {
       });
     }
   }
+
+  /**
+   * Computes hash of base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `basic`
+   *
+   * @subCategory Cryptography & Security
+   */
+  public async getBocHash(boc: string): Promise<string> {
+    await this.ensureInitialized();
+    return await this._api
+      .getBocHash({
+        boc,
+      })
+      .then(({ hash }) => hash);
+  }
+
+  public async verifySignature(
+    args: ProviderApiRequestParams<'verifySignature'>,
+  ): Promise<ProviderApiResponse<'verifySignature'>> {
+    await this.ensureInitialized();
+    return await this._api.verifySignature(args);
+  }
+
+  /**
+   * Signs arbitrary data.
+   *
+   * NOTE: hashes data before signing. Use `signDataRaw` to sign without hash.
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async signData(args: ProviderApiRequestParams<'signData'>): Promise<ProviderApiResponse<'signData'>> {
+    await this.ensureInitialized();
+    return await this._api.signData(args);
+  }
+
+  /**
+   * Signs arbitrary data without hashing it
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async signDataRaw(args: ProviderApiRequestParams<'signDataRaw'>): Promise<ProviderApiResponse<'signDataRaw'>> {
+    await this.ensureInitialized();
+    return await this._api.signDataRaw(args);
+  }
+
+  /**
+   * Encrypts arbitrary data with specified algorithm for each specified recipient
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async encryptData(args: ProviderApiRequestParams<'encryptData'>): Promise<EncryptedData[]> {
+    await this.ensureInitialized();
+    const { encryptedData } = await this._api.encryptData(args);
+    return encryptedData;
+  }
+
+  /**
+   * Decrypts encrypted data. Returns base64 encoded data
+   *
+   * ---
+   * Requires permissions: `accountInteraction`
+   */
+  public async decryptData(encryptedData: EncryptedData): Promise<string> {
+    await this.ensureInitialized();
+    const { data } = await this._api.decryptData({ encryptedData });
+    return data;
+  }
 }
 
 /**
  * @category Provider
+ * @tocRef 1
  */
 export interface Subscription<T extends ProviderEvent> {
   /**
@@ -1142,10 +1182,14 @@ export interface Subscription<T extends ProviderEvent> {
   unsubscribe: () => Promise<void>;
 }
 
+/**
+ * @tocRef 1
+ */
 type SubscriptionEvent = 'data' | 'subscribed' | 'unsubscribed';
 
 /**
  * @category Provider
+ * @tocRef 3
  */
 export class ProviderNotFoundException extends Error {
   constructor() {
@@ -1155,6 +1199,7 @@ export class ProviderNotFoundException extends Error {
 
 /**
  * @category Provider
+ * @tocRef 3
  */
 export class ProviderNotInitializedException extends Error {
   constructor() {
@@ -1164,6 +1209,7 @@ export class ProviderNotInitializedException extends Error {
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type RawRpcMethod<P extends ProviderMethod> =
   RawProviderApiRequestParams<P> extends undefined
@@ -1172,6 +1218,7 @@ export type RawRpcMethod<P extends ProviderMethod> =
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type RawProviderApiMethods = {
   [P in ProviderMethod]: RawRpcMethod<P>;
@@ -1179,6 +1226,7 @@ export type RawProviderApiMethods = {
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D }
   ? {
@@ -1203,6 +1251,7 @@ export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D }
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
   /**
@@ -1232,6 +1281,7 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type GetCodeSaltParams = {
   /**
@@ -1242,6 +1292,7 @@ export type GetCodeSaltParams = {
 
 /**
  * @category Provider
+ * @tocRef 2
  */
 export type AddAssetParams<T extends AssetType> = {
   /**

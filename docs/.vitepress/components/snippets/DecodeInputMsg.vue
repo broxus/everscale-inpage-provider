@@ -1,0 +1,42 @@
+<template>
+  <div class="demo">
+    <button @click="decodeInputMessage">Decode Input Message</button>
+    <pre v-if="decodedInputMessage">Decoded Input Message: {{ decodedInputMessage }}</pre>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, inject, ref } from 'vue';
+import { Address } from 'everscale-inpage-provider';
+import { testContract } from './../../helpers';
+
+import { useProvider } from './../../../src/provider/useProvider';
+
+const { provider } = useProvider();
+
+export default defineComponent({
+  name: 'DecodeInputMessage',
+  setup() {
+    const decodedInputMessage = ref(null);
+    const inputMessageBody = ref('te6ccgEBAQEAFgAAKDja0OwAAAAAAAAAAAAAAAAAAAU5');
+    const testAddress: Address = inject('testAddress')!;
+    return { decodedInputMessage, inputMessageBody, testAddress };
+  },
+  methods: {
+    async decodeInputMessage() {
+      if (!this.inputMessageBody) return;
+
+      await provider.ensureInitialized();
+      await provider.requestPermissions({ permissions: [`basic`, `accountInteraction`] });
+
+      const contract = new provider.Contract(testContract.ABI, this.testAddress);
+
+      this.decodedInputMessage = await contract.decodeInputMessage({
+        internal: true,
+        body: this.inputMessageBody,
+        methods: ['setVariable'],
+      });
+    },
+  },
+});
+</script>

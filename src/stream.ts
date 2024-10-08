@@ -947,7 +947,8 @@ class TraceTransactionsScanner implements Scanner {
               resolve = () => resolvePromise();
               state.reject = () => rejectPromise();
             });
-            state.timeout = setTimeout(resolve!, timeout);
+            // TODO: fix types
+            state.timeout = setTimeout(resolve!, timeout) as any;
             await promise;
             if (state.stopped) {
               return;
