@@ -30,7 +30,9 @@ import {
 import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
 import * as contract from './contract';
+import { EverscaleProviderAdapter, isProviderAdapter, ProviderAdapter, StaticProviderAdapter } from './adapters';
 
+export * from './adapters';
 export * from './api';
 export * from './models';
 export * from './contract';
@@ -70,58 +72,24 @@ export interface Provider {
  */
 export type ProviderProperties = {
   /***
-   * Ignore injected provider and try to use `fallback` instead.
-   * @default false
+   * Provider or provider adapter to use
+   * @default EverscaleProviderAdapter
    */
-  forceUseFallback?: boolean;
-  /***
-   * Provider factory which will be called if injected provider was not found.
-   * Can be used for initialization of the standalone Everscale client
-   */
-  fallback?: () => Promise<Provider>;
+  provider?: Promise<Provider> | Provider | ProviderAdapter;
 };
 
-declare global {
-  interface Window {
-    __ever: Provider | undefined;
-    __hasEverscaleProvider: boolean | undefined;
-    ton: Provider | undefined;
-    hasTonProvider: boolean | undefined;
-  }
-}
-
-const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-
-let ensurePageLoaded: Promise<void>;
-if (!isBrowser || document.readyState === 'complete') {
-  ensurePageLoaded = Promise.resolve();
-} else {
-  ensurePageLoaded = new Promise<void>(resolve => {
-    window.addEventListener('load', () => {
-      resolve();
-    });
-  });
-}
-
-const getProvider = (): Provider | undefined => (isBrowser ? window.__ever || window.ton : undefined);
-
-/**
- * @category Provider
- */
-export async function hasEverscaleProvider(): Promise<boolean> {
-  if (!isBrowser) {
-    return false;
-  }
-
-  await ensurePageLoaded;
-  return window.__hasEverscaleProvider === true || window.hasTonProvider === true;
+function getAdapter(properties: ProviderProperties): ProviderAdapter {
+  if (!properties.provider) return new EverscaleProviderAdapter();
+  return isProviderAdapter(properties.provider)
+    ? properties.provider
+    : new StaticProviderAdapter(properties.provider);
 }
 
 /**
  * @category Provider
  */
 export class ProviderRpcClient {
-  private readonly _properties: ProviderProperties;
+  private readonly _adapter: ProviderAdapter;
   private readonly _api: RawProviderApiMethods;
   private readonly _initializationPromise: Promise<void>;
   private readonly _subscriptions: { [K in ProviderEvent]: Map<number, (data: ProviderEventData<K>) => void> } = {
@@ -141,7 +109,7 @@ export class ProviderRpcClient {
   public Subscriber: new () => subscriber.Subscriber;
 
   constructor(properties: ProviderProperties = {}) {
-    this._properties = properties;
+    this._adapter = getAdapter(properties);
 
     const self = this;
 
@@ -169,64 +137,24 @@ export class ProviderRpcClient {
       {
         get:
           <K extends ProviderMethod>(_object: ProviderRpcClient, method: K) =>
-          (params: RawProviderApiRequestParams<K>) => {
-            if (this._provider != null) {
-              return this._provider.request({ method, params });
-            } else {
-              throw new ProviderNotInitializedException();
-            }
-          },
+            (params: RawProviderApiRequestParams<K>) => {
+              if (this._provider != null) {
+                return this._provider.request({ method, params });
+              } else {
+                throw new ProviderNotInitializedException();
+              }
+            },
       },
     ) as unknown as RawProviderApiMethods;
 
-    if (properties.forceUseFallback === true) {
-      this._initializationPromise =
-        properties.fallback != null
-          ? properties.fallback().then(provider => {
-              this._provider = provider;
-            })
-          : Promise.resolve();
-    } else {
-      // Initialize provider with injected object by default
-      this._provider = getProvider();
-      if (this._provider != null) {
-        // Provider as already injected
-        this._initializationPromise = Promise.resolve();
-      } else {
-        // Wait until page is loaded and initialization complete
-        this._initializationPromise = hasEverscaleProvider()
-          .then(
-            hasProvider =>
-              new Promise<void>(resolve => {
-                if (!hasProvider) {
-                  // Fully loaded page doesn't even contain provider flag
-                  return resolve();
-                }
-
-                // Wait injected provider initialization otherwise
-                this._provider = getProvider();
-                if (this._provider != null) {
-                  resolve();
-                } else {
-                  const eventName = window.__hasEverscaleProvider === true ? 'ever#initialized' : 'ton#initialized';
-                  window.addEventListener(eventName, _ => {
-                    this._provider = getProvider();
-                    resolve();
-                  });
-                }
-              }),
-          )
-          .then(async () => {
-            if (this._provider == null && properties.fallback != null) {
-              this._provider = await properties.fallback();
-            }
-          });
-      }
-    }
+    const providerPromise = Promise.resolve(this._adapter.getProvider());
+    this._initializationPromise = providerPromise.then(provider => {
+      this._provider = provider;
+    });
 
     // Will only register handlers for successfully loaded injected provider
     this._initializationPromise.then(() => {
-      if (this._provider != null) {
+      if (this._provider) {
         this._registerEventHandlers(this._provider);
       }
     });
@@ -237,10 +165,7 @@ export class ProviderRpcClient {
    * there is a fallback provider.
    */
   public async hasProvider(): Promise<boolean> {
-    if (this._properties.fallback != null) {
-      return true;
-    }
-    return hasEverscaleProvider();
+    return this._adapter.hasProvider();
   }
 
   /**
@@ -405,7 +330,7 @@ export class ProviderRpcClient {
       constructor(
         private readonly _subscribe: (s: SubscriptionImpl<T>) => Promise<void>,
         private readonly _unsubscribe: () => Promise<void>,
-      ) {}
+      ) { }
 
       on(eventName: 'data', listener: (data: ProviderEventData<T>) => void): this;
       on(eventName: 'subscribed', listener: () => void): this;
@@ -973,10 +898,10 @@ export class ProviderRpcClient {
       bounce: args.bounce,
       payload: args.payload
         ? {
-            abi: args.payload.abi,
-            method: args.payload.method,
-            params: serializeTokensObject(args.payload.params),
-          }
+          abi: args.payload.abi,
+          method: args.payload.method,
+          params: serializeTokensObject(args.payload.params),
+        }
         : undefined,
       stateInit: args.stateInit,
     });
@@ -1017,10 +942,10 @@ export class ProviderRpcClient {
         bounce: args.bounce,
         payload: args.payload
           ? {
-              abi: args.payload.abi,
-              method: args.payload.method,
-              params: serializeTokensObject(args.payload.params),
-            }
+            abi: args.payload.abi,
+            method: args.payload.method,
+            params: serializeTokensObject(args.payload.params),
+          }
           : undefined,
         stateInit: args.stateInit,
       })
@@ -1167,8 +1092,8 @@ export class ProviderNotInitializedException extends Error {
  */
 export type RawRpcMethod<P extends ProviderMethod> =
   RawProviderApiRequestParams<P> extends undefined
-    ? () => Promise<RawProviderApiResponse<P>>
-    : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>;
+  ? () => Promise<RawProviderApiResponse<P>>
+  : (args: RawProviderApiRequestParams<P>) => Promise<RawProviderApiResponse<P>>;
 
 /**
  * @category Provider
@@ -1182,23 +1107,23 @@ export type RawProviderApiMethods = {
  */
 export type GetExpectedAddressParams<Abi> = Abi extends { data: infer D }
   ? {
-      /**
-       * Base64 encoded TVC file
-       */
-      tvc: string;
-      /**
-       * Contract workchain. 0 by default
-       */
-      workchain?: number;
-      /**
-       * Public key, which will be injected into the contract. 0 by default
-       */
-      publicKey?: string;
-      /**
-       * State init params
-       */
-      initParams: MergeInputObjectsArray<D>;
-    }
+    /**
+     * Base64 encoded TVC file
+     */
+    tvc: string;
+    /**
+     * Contract workchain. 0 by default
+     */
+    workchain?: number;
+    /**
+     * Public key, which will be injected into the contract. 0 by default
+     */
+    publicKey?: string;
+    /**
+     * State init params
+     */
+    initParams: MergeInputObjectsArray<D>;
+  }
   : never;
 
 /**
@@ -1213,21 +1138,21 @@ export type SetCodeSaltParams<P extends readonly ReadonlyAbiParam[]> = {
    * Base64 encoded salt (as BOC) or params of boc encoder
    */
   salt:
-    | string
-    | {
-        /**
-         * ABI version. 2.2 if not specified otherwise
-         */
-        abiVersion?: AbiVersion;
-        /**
-         * Cell structure
-         */
-        structure: P;
-        /**
-         * Cell data
-         */
-        data: MergeInputObjectsArray<P>;
-      };
+  | string
+  | {
+    /**
+     * ABI version. 2.2 if not specified otherwise
+     */
+    abiVersion?: AbiVersion;
+    /**
+     * Cell structure
+     */
+    structure: P;
+    /**
+     * Cell data
+     */
+    data: MergeInputObjectsArray<P>;
+  };
 };
 
 /**
