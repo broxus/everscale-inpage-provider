@@ -42,6 +42,7 @@ export function hasEverscaleProvider(): Promise<boolean> {
  * A static implementation of the `ProviderAdapter` interface that wraps a given provider instance or a promise that resolves to a provider.
  * This adapter always indicates the presence of a provider.
  * @category Provider
+ * @implements {ProviderAdapter}
  */
 export class StaticProviderAdapter implements ProviderAdapter {
     private readonly _provider: Promise<Provider> | Provider;
@@ -62,6 +63,7 @@ export class StaticProviderAdapter implements ProviderAdapter {
 /**
  * An implementation of the `ProviderAdapter` interface that wraps Ever Wallet provider.
  * @category Provider
+ * @implements {ProviderAdapter}
  */
 export class EverscaleProviderAdapter implements ProviderAdapter {
     public async getProvider(): Promise<Provider | undefined> {
@@ -88,6 +90,7 @@ export class EverscaleProviderAdapter implements ProviderAdapter {
 /**
  * An implementation of the `ProviderAdapter` interface that wraps Sparx provider.
  * @category Provider
+ * @implements {ProviderAdapter}
  */
 export class SparxProviderAdapter implements ProviderAdapter {
     public async getProvider(): Promise<Provider | undefined> {
@@ -108,6 +111,40 @@ export class SparxProviderAdapter implements ProviderAdapter {
 
     public hasProvider(): Promise<boolean> {
         return hasEverscaleProvider();
+    }
+}
+
+
+/**
+ * The `FallbackProviderAdapter` class implements the `ProviderAdapter` interface
+ * and provides a mechanism to use multiple provider adapters in a fallback manner.
+ * It attempts to use the primary adapter first, and if it fails, it falls back to
+ * the subsequent adapters in the order they were provided.
+ *
+ * @category Provider
+ * @implements {ProviderAdapter}
+ */
+export class FallbackProviderAdapter implements ProviderAdapter {
+    private readonly _adapters: [ProviderAdapter, ...ProviderAdapter[]];
+
+    constructor(adapter: ProviderAdapter, ...fallbacks: ProviderAdapter[]) {
+        this._adapters = [adapter, ...fallbacks];
+    }
+
+    public async getProvider(): Promise<Provider | undefined> {
+        for (const adapter of this._adapters) {
+            const provider = await adapter.getProvider();
+            if (provider) return provider;
+        }
+
+        return undefined;
+    }
+
+    public async hasProvider(): Promise<boolean> {
+        for (const adapter of this._adapters) {
+            if (await adapter.hasProvider()) return true;
+        }
+        return false;
     }
 }
 
