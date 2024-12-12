@@ -447,6 +447,28 @@ export type FunctionCall<Addr = Address> = {
   params: TokensObject<Addr>;
 };
 
+/**
+ * @category Models
+ */
+export type GetterCall<Addr = Address> = {
+  /**
+   * Specific getter identifier
+   */
+  method: string;
+  /**
+   * Input data structure
+   */
+  inputStructure: AbiParam[];
+  /**
+   * Output data structure
+   */
+  outputStructure: AbiParam[];
+  /**
+   * Input data
+   */
+  inputData: TokensObject<Addr>;
+};
+
 type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
 type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
 type AbiParamKindVarUint = 'varuint16' | 'varuint32';
