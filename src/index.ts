@@ -26,6 +26,7 @@ import {
   parsePartialTokensObject,
   parseTransaction,
   serializeTokensObject,
+  FullContractState,
 } from './models';
 import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
@@ -991,6 +992,36 @@ export class ProviderRpcClient {
     return await this._api.changeNetwork(args);
   }
 
+  /**
+   * Creates base64 encoded BOC
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  public async runGetter<I extends readonly ReadonlyAbiParam[], O extends readonly ReadonlyAbiParam[]>(
+    args: RunGetterParams<I, O>,
+  ): Promise<{ output?: MergeOutputObjectsArray<O>, exitCode: number, isOk: boolean }> {
+    await this.ensureInitialized();
+    const result = await this._api.runGetter({
+      address: args.address.toString(),
+      cachedState: args.cachedState,
+      withSignatureId: args.withSignatureId,
+      getterCall: {
+        method: args.method,
+        inputStructure: args.inputStructure as unknown as AbiParam[],
+        outputStructure: args.outputStructure as unknown as AbiParam[],
+        inputData: serializeTokensObject(args.inputData),
+      },
+    });
+    return {
+      output: result.output
+        ? parseTokensObject(args.outputStructure as unknown as AbiParam[], result.output) as MergeOutputObjectsArray<O>
+        : undefined,
+      exitCode: result.exitCode,
+      isOk: result.isOk,
+    };
+  }
+
   private _registerEventHandlers(provider: Provider) {
     const knownEvents: { [K in ProviderEvent]: (data: RawProviderEventData<K>) => ProviderEventData<K> } = {
       connected: data => data,
@@ -1182,6 +1213,43 @@ export type AddAssetParams<T extends AssetType> = {
    * Asset parameters
    */
   params: AssetTypeParams<T>;
+};
+
+/**
+ * @category Provider
+ */
+export type RunGetterParams<I extends readonly ReadonlyAbiParam[], O extends readonly ReadonlyAbiParam[]> = {
+  /**
+   * Contract address
+   */
+  address: Address;
+  /**
+   * Cached contract state
+   */
+  cachedState?: FullContractState;
+  /**
+   * Whether to use the signature id during verification (true by default).
+   * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+   * - If `false`, forces signature check to ignore any signature id.
+   * - If `number`, uses the specified number as a signature id.
+   */
+  withSignatureId?: boolean | number;
+  /**
+   * Specific getter identifier
+   */
+  method: string;
+  /**
+   * Input data structure
+   */
+  inputStructure: I;
+  /**
+   * Output data structure
+   */
+  outputStructure: O;
+  /**
+   * Input data
+   */
+  inputData: MergeInputObjectsArray<I>;
 };
 
 function foldSubscriptions(
