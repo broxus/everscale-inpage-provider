@@ -328,6 +328,7 @@ export type NetworkDescription = {
  */
 export type NetworkConfig = {
   symbol?: string;
+  decimals?: number;
   explorerBaseUrl?: string;
   tokensManifestUrl?: string;
 };
