@@ -394,6 +394,21 @@ export type AddNetwork = {
   config?: NetworkConfig;
 };
 
+/**
+ * @category Models
+ */
+export type IgnoreTransactionTreeSimulationError<Addr = Address> = {
+  /**
+   * Contract address.
+   * If not specified, the error will be ignored for all contracts.
+   */
+  address?: Addr;
+  /**
+   * Error code to be ignored
+   */
+  code: number;
+};
+
 /* ABI stuff */
 
 /**
