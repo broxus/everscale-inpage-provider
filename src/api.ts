@@ -19,6 +19,7 @@ import {
   DelayedMessage,
   Network,
   AddNetwork,
+  IgnoreTransactionTreeSimulationError,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -1485,6 +1486,14 @@ export type ProviderApi<Addr = Address> = {
        * NOTE: If the selected contract do not support this, an error is returned
        */
       stateInit?: string;
+      /**
+       * Optional compute phase error codes to be ignored during transaction tree simulation
+       */
+      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      /**
+       * Optional action phase error codes to be ignored during transaction tree simulation
+       */
+      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError[];
     };
     output: {
       /**
@@ -1532,6 +1541,14 @@ export type ProviderApi<Addr = Address> = {
        * NOTE: If the selected contract do not support this, an error is returned
        */
       stateInit?: string;
+      /**
+       * Optional compute phase error codes to be ignored during transaction tree simulation
+       */
+      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      /**
+       * Optional action phase error codes to be ignored during transaction tree simulation
+       */
+      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError[];
     };
     output: {
       /**
