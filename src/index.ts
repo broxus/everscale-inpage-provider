@@ -26,6 +26,7 @@ import {
   parsePartialTokensObject,
   parseTransaction,
   serializeTokensObject,
+  serializeIgnoreCode,
 } from './models';
 import { Address, DelayedTransactions, getUniqueId } from './utils';
 import * as subscriber from './stream';
@@ -904,8 +905,8 @@ export class ProviderRpcClient {
         }
         : undefined,
       stateInit: args.stateInit,
-      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
-      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
+      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes?.map(serializeIgnoreCode),
+      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes?.map(serializeIgnoreCode),
     });
     return {
       transaction: parseTransaction(transaction),
@@ -950,8 +951,8 @@ export class ProviderRpcClient {
           }
           : undefined,
         stateInit: args.stateInit,
-        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
-        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
+        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes?.map(serializeIgnoreCode),
+        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes?.map(serializeIgnoreCode),
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);

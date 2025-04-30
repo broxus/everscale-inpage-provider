@@ -575,6 +575,15 @@ function serializeTokenValue(token: TokenValue): RawTokenValue {
 /**
  * @category Models
  */
+export function serializeIgnoreCode(
+  object: IgnoreTransactionTreeSimulationError,
+): IgnoreTransactionTreeSimulationError<string> {
+  return { address: object.address?.toString(), code: object.code };
+}
+
+/**
+ * @category Models
+ */
 export function parseTokensObject(params: AbiParam[], object: RawTokensObject): TokensObject {
   const result: TokensObject = {};
   for (const param of params) {

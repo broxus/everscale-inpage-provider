@@ -24,6 +24,7 @@ import {
   parseTokensObject,
   serializeTransaction,
   IgnoreTransactionTreeSimulationError,
+  serializeIgnoreCode,
 } from './models';
 import { Stream, Subscriber } from './stream';
 import { ProviderApiResponse, ProviderRpcClient } from './index';
@@ -609,8 +610,8 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         params: this.params,
       },
       stateInit: args.stateInit,
-      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
-      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
+      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes?.map(serializeIgnoreCode),
+      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes?.map(serializeIgnoreCode),
     });
     return parseTransaction(transaction);
   }
@@ -640,8 +641,8 @@ class ContractMethodImpl implements ContractMethod<any, any> {
           params: this.params,
         },
         stateInit: args.stateInit,
-        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
-        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
+        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes?.map(serializeIgnoreCode),
+        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes?.map(serializeIgnoreCode),
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);

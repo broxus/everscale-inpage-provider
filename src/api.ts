@@ -1489,11 +1489,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Optional compute phase error codes to be ignored during transaction tree simulation
        */
-      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError<Addr>[];
       /**
        * Optional action phase error codes to be ignored during transaction tree simulation
        */
-      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError<Addr>[];
     };
     output: {
       /**
@@ -1544,11 +1544,11 @@ export type ProviderApi<Addr = Address> = {
       /**
        * Optional compute phase error codes to be ignored during transaction tree simulation
        */
-      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError<Addr>[];
       /**
        * Optional action phase error codes to be ignored during transaction tree simulation
        */
-      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError[];
+      ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError<Addr>[];
     };
     output: {
       /**
