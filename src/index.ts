@@ -904,6 +904,8 @@ export class ProviderRpcClient {
         }
         : undefined,
       stateInit: args.stateInit,
+      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
+      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
     });
     return {
       transaction: parseTransaction(transaction),
@@ -948,6 +950,8 @@ export class ProviderRpcClient {
           }
           : undefined,
         stateInit: args.stateInit,
+        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
+        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);

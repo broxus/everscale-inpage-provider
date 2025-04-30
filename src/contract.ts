@@ -23,6 +23,7 @@ import {
   parseTransaction,
   parseTokensObject,
   serializeTransaction,
+  IgnoreTransactionTreeSimulationError,
 } from './models';
 import { Stream, Subscriber } from './stream';
 import { ProviderApiResponse, ProviderRpcClient } from './index';
@@ -608,6 +609,8 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         params: this.params,
       },
       stateInit: args.stateInit,
+      ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
+      ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
     });
     return parseTransaction(transaction);
   }
@@ -637,6 +640,8 @@ class ContractMethodImpl implements ContractMethod<any, any> {
           params: this.params,
         },
         stateInit: args.stateInit,
+        ignoredActionPhaseCodes: args.ignoredActionPhaseCodes,
+        ignoredComputePhaseCodes: args.ignoredComputePhaseCodes,
       })
       .catch(e => {
         subscription.unsubscribe().catch(console.error);
@@ -970,6 +975,14 @@ export type SendInternalParams = {
    * an error is returned
    */
   stateInit?: string;
+  /**
+   * Optional compute phase error codes to be ignored during transaction tree simulation
+   */
+  ignoredComputePhaseCodes?: IgnoreTransactionTreeSimulationError[];
+  /**
+   * Optional action phase error codes to be ignored during transaction tree simulation
+   */
+  ignoredActionPhaseCodes?: IgnoreTransactionTreeSimulationError[];
 };
 
 /**
