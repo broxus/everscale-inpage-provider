@@ -25,6 +25,11 @@ import {
   serializeTransaction,
   IgnoreTransactionTreeSimulationError,
   serializeIgnoreCode,
+  AbiGetterName,
+  AbiGetter,
+  AbiGetterInputsWithDefault,
+  DecodedAbiGetterOutputs,
+  AbiGetterInputs,
 } from './models';
 import { Stream, Subscriber } from './stream';
 import { ProviderApiResponse, ProviderRpcClient } from './index';
@@ -37,9 +42,11 @@ export class Contract<Abi> {
   private readonly _abi: string;
   private readonly _address: Address;
   private readonly _methods: ContractMethods<Abi>;
+  private readonly _getters: ContractGetters<Abi>;
   private readonly _fields: ContractFields<Abi>;
 
   public readonly methodsAbi: { [K in AbiFunctionName<Abi>]: AbiFunction<Abi, K> };
+  public readonly gettersAbi: { [K in AbiGetterName<Abi>]: AbiGetter<Abi, K> };
   public readonly eventsAbi: { [K in AbiEventName<Abi>]: AbiEvent<Abi, K> };
   public readonly fieldsAbi: AbiFields<Abi>;
 
@@ -67,6 +74,18 @@ export class Contract<Abi> {
       return functions;
     }, {} as typeof Contract.prototype.methodsAbi);
 
+    this.gettersAbi = ((abi as any).getters as ContractFunction[]).reduce((getters, item) => {
+      if (item.inputs == null) {
+        item.inputs = [];
+      }
+      if (item.outputs == null) {
+        item.outputs = [];
+      }
+
+      (getters as any)[item.name] = item;
+      return getters;
+    }, {} as typeof Contract.prototype.gettersAbi);
+
     this.eventsAbi = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
       if (item.inputs == null) {
         item.inputs = [];
@@ -88,6 +107,17 @@ export class Contract<Abi> {
         },
       },
     ) as unknown as ContractMethods<Abi>;
+    
+    this._getters = new Proxy(
+      {},
+      {
+        get: <K extends AbiGetterName<Abi>>(_object: Record<string, unknown>, getter: K) => {
+          const rawAbi = this.gettersAbi[getter];
+          return (params: TokensObject = {}) =>
+            new ContractGetterImpl(this._provider, rawAbi, this._abi, this._address, getter, params);
+        },
+      },
+    ) as unknown as ContractGetters<Abi>;
 
     this._fields = new Proxy(
       {},
@@ -123,6 +153,10 @@ export class Contract<Abi> {
 
   public get methods(): ContractMethods<Abi> {
     return this._methods;
+  }
+
+  public get getters(): ContractGetters<Abi> {
+    return this._getters;
   }
 
   public get fields(): ContractFields<Abi> {
@@ -498,6 +532,15 @@ export type ContractMethods<C> = {
 /**
  * @category Contract
  */
+export type ContractGetters<C> = {
+  [K in AbiGetterName<C>]: (
+    params: AbiGetterInputsWithDefault<C, K>,
+  ) => ContractGetter<AbiGetterInputs<C, K>, DecodedAbiGetterOutputs<C, K>>;
+};
+
+/**
+ * @category Contract
+ */
 export type ContractFields<C> = {
   [K in AbiFieldName<C>]: (params?: GetContractFieldsParams) => Promise<DecodedAbiFields<C>[K]>;
 };
@@ -844,6 +887,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         method: this.method,
         params: this.params,
       },
+      withSignatureId: args.withSignatureId,
     });
 
     if (output == null || code != 0) {
@@ -935,6 +979,61 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       params: this.params,
     });
     return boc;
+  }
+}
+
+/**
+ * @category Contract
+ */
+export interface ContractGetter<I, O> {
+  /**
+   * Target contract address
+   */
+  readonly address: Address;
+  readonly abi: string;
+  readonly getter: string;
+  readonly params: I;
+
+  /**
+   * Runs getter and returns parsed output
+   *
+   * @param args
+   */
+  run(args?: RunGetterParams): Promise<O>;
+}
+
+class ContractGetterImpl implements ContractGetter<any, any> {
+  readonly params: RawTokensObject;
+
+  constructor(
+    readonly provider: ProviderRpcClient,
+    readonly getterAbi: { inputs: AbiParam[]; outputs: AbiParam[] },
+    readonly abi: string,
+    readonly address: Address,
+    readonly getter: string,
+    params: TokensObject,
+  ) {
+    this.params = serializeTokensObject(params);
+  }
+
+  async run(args: RunGetterParams = {}): Promise<any> {
+    await this.provider.ensureInitialized();
+    const { output, code } = await this.provider.rawApi.runGetter({
+      address: this.address.toString(),
+      cachedState: args.cachedState,
+      getterCall: {
+        abi: this.abi,
+        getter: this.getter,
+        params: this.params,
+      },
+      withSignatureId: args.withSignatureId,
+    });
+
+    if (output == null || code != 0) {
+      throw new TvmException(code);
+    } else {
+      return parseTokensObject(this.getterAbi.outputs, output);
+    }
   }
 }
 
@@ -1067,6 +1166,30 @@ export type CallParams = {
    * This will use internal message with unlimited account balance.
    */
   responsible?: boolean;
+  /**
+   * Whether to use the signature id during signature verification (true by default).
+   * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+   * - If `false`, forces signature check to ignore any signature id.
+   * - If `number`, uses the specified number as a signature id.
+   */
+  withSignatureId?: boolean | number;
+};
+
+/**
+ * @category Contract
+ */
+export type RunGetterParams = {
+  /**
+   * Cached contract state
+   */
+  cachedState?: FullContractState;
+  /**
+   * Whether to use the signature id during signature verification (true by default).
+   * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+   * - If `false`, forces signature check to ignore any signature id.
+   * - If `number`, uses the specified number as a signature id.
+   */
+  withSignatureId?: boolean | number;
 };
 
 /**

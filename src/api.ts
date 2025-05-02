@@ -20,6 +20,7 @@ import {
   Network,
   AddNetwork,
   IgnoreTransactionTreeSimulationError,
+  GetterCall,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -1688,6 +1689,46 @@ export type ProviderApi<Addr = Address> = {
     };
     output: {
       network: Network | null;
+    };
+  };
+
+  /**
+   * Execute getter of the contract
+   *
+   * ---
+   * Required permissions: `basic`
+   */
+  runGetter: {
+    input: {
+      /**
+       * Contract address
+       */
+      address: Addr;
+      /**
+       * Cached contract state
+       */
+      cachedState?: FullContractState;
+      /**
+       * Getter call params
+       */
+      getterCall: GetterCall<Addr>;
+      /**
+       * Whether to use the signature id during signature verification (true by default).
+       * - If `true`, uses the signature id of the selected network (if the capability is enabled).
+       * - If `false`, forces signature check to ignore any signature id.
+       * - If `number`, uses the specified number as a signature id.
+       */
+      withSignatureId?: boolean | number;
+    };
+    output: {
+      /**
+       * Execution output
+       */
+      output: TokensObject<Addr> | undefined;
+      /**
+       * TVM execution code
+       */
+      code: number;
     };
   };
 };
