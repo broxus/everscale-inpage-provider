@@ -463,6 +463,24 @@ export type FunctionCall<Addr = Address> = {
   params: TokensObject<Addr>;
 };
 
+/**
+ * @category Models
+ */
+export type GetterCall<Addr = Address> = {
+  /**
+   * Contract ABI
+   */
+  abi: string;
+  /**
+   * Specific getter from specified contract ABI
+   */
+  getter: string;
+  /**
+   * Getter arguments
+   */
+  params: TokensObject<Addr>;
+};
+
 type AbiParamKindUint = 'uint8' | 'uint16' | 'uint24' | 'uint32' | 'uint64' | 'uint128' | 'uint160' | 'uint256';
 type AbiParamKindInt = 'int8' | 'int16' | 'int24' | 'int32' | 'int64' | 'int128' | 'int160' | 'int256';
 type AbiParamKindVarUint = 'varuint16' | 'varuint32';
@@ -753,6 +771,15 @@ export type AbiFunctions<C> = C extends { functions: infer F }
 /**
  * @category Models
  */
+export type AbiGetters<C> = C extends { getters: infer F }
+  ? F extends readonly unknown[]
+    ? ArrayItemType<F>
+    : never
+  : never;
+
+/**
+ * @category Models
+ */
 export type AbiEvents<C> = C extends { events: infer E }
   ? E extends readonly unknown[]
     ? ArrayItemType<E>
@@ -771,12 +798,20 @@ export type AbiFunction<C, T extends AbiFunctionName<C>> = Extract<AbiFunctions<
 /**
  * @category Models
  */
+export type AbiGetter<C, T extends AbiGetterName<C>> = Extract<AbiGetters<C>, { name: T }>;
+/**
+ * @category Models
+ */
 export type AbiEvent<C, T extends AbiEventName<C>> = Extract<AbiEvents<C>, { name: T }>;
 
 /**
  * @category Models
  */
 export type AbiFunctionName<C> = AbiFunctions<C>['name'];
+/**
+ * @category Models
+ */
+export type AbiGetterName<C> = AbiGetters<C>['name'];
 /**
  * @category Models
  */
@@ -813,6 +848,35 @@ export type DecodedAbiFunctionInputs<C, T extends AbiFunctionName<C>> = MergeOut
 export type DecodedAbiFunctionOutputs<C, T extends AbiFunctionName<C>> = MergeOutputObjectsArray<
   AbiFunction<C, T>['outputs']
 >;
+
+/**
+ * @category Models
+ */
+export type AbiGetterInputs<C, T extends AbiGetterName<C>> = MergeInputObjectsArray<AbiGetter<C, T>['inputs']>;
+
+/**
+ * @category Models
+ */
+export type AbiGetterInputsWithDefault<C, T extends AbiGetterName<C>> = AbiGetter<
+  C,
+  T
+>['inputs'] extends readonly []
+  ? void | Record<string, never>
+  : AbiGetterInputs<C, T>;
+
+/**
+ * @category Models
+ */
+export type DecodedAbiGetterInputs<C, T extends AbiGetterName<C>> = MergeOutputObjectsArray<
+  AbiGetter<C, T>['inputs']
+>;
+/**
+ * @category Models
+ */
+export type DecodedAbiGetterOutputs<C, T extends AbiGetterName<C>> = MergeOutputObjectsArray<
+  AbiGetter<C, T>['outputs']
+>;
+
 /**
  * @category Models
  */
