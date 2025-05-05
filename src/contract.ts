@@ -74,7 +74,7 @@ export class Contract<Abi> {
       return functions;
     }, {} as typeof Contract.prototype.methodsAbi);
 
-    this.gettersAbi = ((abi as any).getters as ContractFunction[]).reduce((getters, item) => {
+    this.gettersAbi = (((abi as any).getters ?? []) as ContractFunction[]).reduce((getters, item) => {
       if (item.inputs == null) {
         item.inputs = [];
       }
