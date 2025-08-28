@@ -39,6 +39,14 @@ export function hasEverscaleProvider(): Promise<boolean> {
 }
 
 /**
+ * @category Provider
+ */
+export function hasSparxProvider(): Promise<boolean> {
+    if (!isBrowser) return Promise.resolve(false);
+    return ensurePageLoaded.then(() => !!window.__sparx);
+}
+
+/**
  * A static implementation of the `ProviderAdapter` interface that wraps a given provider instance or a promise that resolves to a provider.
  * This adapter always indicates the presence of a provider.
  * @category Provider
@@ -110,7 +118,7 @@ export class SparxProviderAdapter implements ProviderAdapter {
     }
 
     public hasProvider(): Promise<boolean> {
-        return hasEverscaleProvider();
+        return hasSparxProvider();
     }
 }
 
