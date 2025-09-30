@@ -107,7 +107,7 @@ export class Contract<Abi> {
         },
       },
     ) as unknown as ContractMethods<Abi>;
-    
+
     this._getters = new Proxy(
       {},
       {
@@ -888,6 +888,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         params: this.params,
       },
       withSignatureId: args.withSignatureId,
+      libraries: args.libraries,
     });
 
     if (output == null || code != 0) {
@@ -1027,6 +1028,7 @@ class ContractGetterImpl implements ContractGetter<any, any> {
         params: this.params,
       },
       withSignatureId: args.withSignatureId,
+      libraries: args.libraries,
     });
 
     if (output == null || code != 0) {
@@ -1173,6 +1175,10 @@ export type CallParams = {
    * - If `number`, uses the specified number as a signature id.
    */
   withSignatureId?: boolean | number;
+  /**
+   * Optional libraries map
+   **/
+  libraries?: { [K: string]: string };
 };
 
 /**
@@ -1190,6 +1196,10 @@ export type RunGetterParams = {
    * - If `number`, uses the specified number as a signature id.
    */
   withSignatureId?: boolean | number;
+  /**
+   * Optional libraries map
+   **/
+  libraries?: { [K: string]: string };
 };
 
 /**

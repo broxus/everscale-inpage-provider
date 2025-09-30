@@ -463,6 +463,11 @@ export type ProviderApi<Addr = Address> = {
        * - If `number`, uses the specified number as a signature id.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional libraries map
+       **/
+      libraries?: { [K: string]: string };
     };
     output: {
       /**
@@ -1719,6 +1724,10 @@ export type ProviderApi<Addr = Address> = {
        * - If `number`, uses the specified number as a signature id.
        */
       withSignatureId?: boolean | number;
+      /**
+       * Optional libraries map
+       **/
+      libraries?: { [K: string]: string };
     };
     output: {
       /**
