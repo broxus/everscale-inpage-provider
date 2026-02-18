@@ -1189,7 +1189,7 @@ export type ProviderApi<Addr = Address> = {
        *
        * If provided, this field overrides `withSignatureId`.
        */
-      signatureCtx?: SignatureContext;
+      withSignatureContext?: SignatureContext;
     };
     output: {
       /**
@@ -1329,7 +1329,7 @@ export type ProviderApi<Addr = Address> = {
        *
        * If provided, this field overrides `withSignatureId`.
        */
-      signatureCtx?: SignatureContext;
+      withSignatureContext?: SignatureContext;
     };
     output: {
       /**
@@ -1407,7 +1407,7 @@ export type ProviderApi<Addr = Address> = {
        *
        * If provided, this field overrides `withSignatureId`.
        */
-      signatureCtx?: SignatureContext;
+      withSignatureContext?: SignatureContext;
     };
     output: {
       /**

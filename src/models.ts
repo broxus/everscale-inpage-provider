@@ -327,15 +327,10 @@ export type NetworkDescription = {
 /**
  * @category Models
  */
-export type SignatureContext = {
-  globalId: number | null;
-  signatureType: SignatureType;
-};
-
-/**
- * @category Models
- */
-export type SignatureType = { type: 'empty' } | { type: 'signatureId' } | { type: 'signatureDomain' };
+export type SignatureContext =
+  | { type: 'empty' } // ton/legacy networks
+  | { type: 'signatureId'; globalId: number } // simple prefix
+  | { type: 'signatureDomainL2'; globalId: number }; // full domain prefix
 
 /**
  * @category Models
