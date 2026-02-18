@@ -21,6 +21,7 @@ import {
   AddNetwork,
   IgnoreTransactionTreeSimulationError,
   GetterCall,
+  SignatureContext,
 } from './models';
 
 import { UniqueArray, Address } from './utils';
@@ -1163,8 +1164,32 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
+       * @deprecated
+       * Use `signatureCtx` instead.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional advanced signature configuration.
+       *
+       * In most cases you **do not need to set this manually**.
+       * The wallet or network configuration will choose the correct mode.
+       *
+       * This field controls how the data is prepared before signing:
+       *
+       * - `empty` — signs the data as-is.
+       *   Use for simple or legacy signing.
+       *
+       * - `signatureId` — signs the data together with a network-specific id.
+       *   Prevents signatures from being reused on another network.
+       *
+       * - `signatureDomain` — uses a domain-separated signature mode.
+       *   This is the most secure and modern option.
+       *
+       *
+       * If provided, this field overrides `withSignatureId`.
+       */
+      signatureCtx?: SignatureContext;
     };
     output: {
       /**
@@ -1279,8 +1304,32 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
+       * @deprecated
+       * Use `signatureCtx` instead.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional advanced signature configuration.
+       *
+       * In most cases you **do not need to set this manually**.
+       * The wallet or network configuration will choose the correct mode.
+       *
+       * This field controls how the data is prepared before signing:
+       *
+       * - `empty` — signs the data as-is.
+       *   Use for simple or legacy signing.
+       *
+       * - `signatureId` — signs the data together with a network-specific id.
+       *   Prevents signatures from being reused on another network.
+       *
+       * - `signatureDomain` — uses a domain-separated signature mode.
+       *   This is the most secure and modern option.
+       *
+       *
+       * If provided, this field overrides `withSignatureId`.
+       */
+      signatureCtx?: SignatureContext;
     };
     output: {
       /**
@@ -1333,8 +1382,32 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
+       * @deprecated
+       * Use `signatureCtx` instead.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional advanced signature configuration.
+       *
+       * In most cases you **do not need to set this manually**.
+       * The wallet or network configuration will choose the correct mode.
+       *
+       * This field controls how the data is prepared before signing:
+       *
+       * - `empty` — signs the data as-is.
+       *   Use for simple or legacy signing.
+       *
+       * - `signatureId` — signs the data together with a network-specific id.
+       *   Prevents signatures from being reused on another network.
+       *
+       * - `signatureDomain` — uses a domain-separated signature mode.
+       *   This is the most secure and modern option.
+       *
+       *
+       * If provided, this field overrides `withSignatureId`.
+       */
+      signatureCtx?: SignatureContext;
     };
     output: {
       /**
@@ -1677,7 +1750,7 @@ export type ProviderApi<Addr = Address> = {
       switchNetwork?: boolean;
     };
     output: {
-      network: Network | null
+      network: Network | null;
     };
   };
 
