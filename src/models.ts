@@ -321,7 +321,7 @@ export type NetworkDescription = {
   globalId: number;
   capabilities: string;
   signatureId: number | undefined;
-  signatureCtx: SignatureContext;
+  signatureContext: SignatureContext;
 };
 
 /**

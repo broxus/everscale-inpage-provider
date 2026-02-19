@@ -30,6 +30,7 @@ import {
   AbiGetterInputsWithDefault,
   DecodedAbiGetterOutputs,
   AbiGetterInputs,
+  SignatureContext,
 } from './models';
 import { Stream, Subscriber } from './stream';
 import { ProviderApiResponse, ProviderRpcClient } from './index';
@@ -62,37 +63,46 @@ export class Contract<Abi> {
 
     this._provider = provider;
     this._abi = JSON.stringify(abi);
-    this.methodsAbi = ((abi as any).functions as ContractFunction[]).reduce((functions, item) => {
-      if (item.inputs == null) {
-        item.inputs = [];
-      }
-      if (item.outputs == null) {
-        item.outputs = [];
-      }
+    this.methodsAbi = ((abi as any).functions as ContractFunction[]).reduce(
+      (functions, item) => {
+        if (item.inputs == null) {
+          item.inputs = [];
+        }
+        if (item.outputs == null) {
+          item.outputs = [];
+        }
 
-      (functions as any)[item.name] = item;
-      return functions;
-    }, {} as typeof Contract.prototype.methodsAbi);
+        (functions as any)[item.name] = item;
+        return functions;
+      },
+      {} as typeof Contract.prototype.methodsAbi,
+    );
 
-    this.gettersAbi = (((abi as any).getters ?? []) as ContractFunction[]).reduce((getters, item) => {
-      if (item.inputs == null) {
-        item.inputs = [];
-      }
-      if (item.outputs == null) {
-        item.outputs = [];
-      }
+    this.gettersAbi = (((abi as any).getters ?? []) as ContractFunction[]).reduce(
+      (getters, item) => {
+        if (item.inputs == null) {
+          item.inputs = [];
+        }
+        if (item.outputs == null) {
+          item.outputs = [];
+        }
 
-      (getters as any)[item.name] = item;
-      return getters;
-    }, {} as typeof Contract.prototype.gettersAbi);
+        (getters as any)[item.name] = item;
+        return getters;
+      },
+      {} as typeof Contract.prototype.gettersAbi,
+    );
 
-    this.eventsAbi = ((abi as any).events as ContractFunction[]).reduce((events, item) => {
-      if (item.inputs == null) {
-        item.inputs = [];
-      }
-      (events as any)[item.name] = item;
-      return events;
-    }, {} as typeof Contract.prototype.eventsAbi);
+    this.eventsAbi = ((abi as any).events as ContractFunction[]).reduce(
+      (events, item) => {
+        if (item.inputs == null) {
+          item.inputs = [];
+        }
+        (events as any)[item.name] = item;
+        return events;
+      },
+      {} as typeof Contract.prototype.eventsAbi,
+    );
     this.fieldsAbi = (abi as any).fields;
 
     this._address = address;
@@ -249,9 +259,10 @@ export class Contract<Abi> {
       subscriber = new this._provider.Subscriber();
     }
 
-    const event = await (range?.fromLt != null || range?.fromUtime != null
-      ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
-      : subscriber.transactions(this.address)
+    const event = await (
+      range?.fromLt != null || range?.fromUtime != null
+        ? subscriber.oldTransactions(this._address, range).merge(subscriber.transactions(this._address))
+        : subscriber.transactions(this.address)
     )
       .flatMap(item => item.transactions)
       .takeWhile(
@@ -824,9 +835,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       local: args.local,
       executorParams: args.executorParams
         ? {
-          disableSignatureCheck: args.executorParams.disableSignatureCheck,
-          overrideBalance: args.executorParams.overrideBalance,
-        }
+            disableSignatureCheck: args.executorParams.disableSignatureCheck,
+            overrideBalance: args.executorParams.overrideBalance,
+          }
         : undefined,
     });
 
@@ -888,6 +899,7 @@ class ContractMethodImpl implements ContractMethod<any, any> {
         params: this.params,
       },
       withSignatureId: args.withSignatureId,
+      withSignatureContext: args.withSignatureContext,
       libraries: args.libraries,
     });
 
@@ -921,9 +933,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       executorParams:
         args.executorParams != null
           ? {
-            disableSignatureCheck: args.executorParams.disableSignatureCheck,
-            overrideBalance: args.executorParams.overrideBalance,
-          }
+              disableSignatureCheck: args.executorParams.disableSignatureCheck,
+              overrideBalance: args.executorParams.overrideBalance,
+            }
           : undefined,
     });
 
@@ -959,9 +971,9 @@ class ContractMethodImpl implements ContractMethod<any, any> {
       executorParams:
         args.executorParams != null
           ? {
-            disableSignatureCheck: args.executorParams.disableSignatureCheck,
-            overrideBalance: args.executorParams.overrideBalance,
-          }
+              disableSignatureCheck: args.executorParams.disableSignatureCheck,
+              overrideBalance: args.executorParams.overrideBalance,
+            }
           : undefined,
     });
 
@@ -1028,6 +1040,7 @@ class ContractGetterImpl implements ContractGetter<any, any> {
         params: this.params,
       },
       withSignatureId: args.withSignatureId,
+      withSignatureContext: args.withSignatureContext,
       libraries: args.libraries,
     });
 
@@ -1100,22 +1113,25 @@ export type SendInternalWithResultParams = SendInternalParams & {
 /**
  * @category Contract
  */
-export type SendExternalParams = ({
-  /**
-   * Whether to prepare this message without signature. Default: false
-   */
-  withoutSignature: true;
-} | {
-  /**
-   * The public key of the preferred account.
-   * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
-   */
-  publicKey: string;
-  /**
-   * Whether to prepare this message without signature. Default: false
-   */
-  withoutSignature?: false;
-}) & {
+export type SendExternalParams = (
+  | {
+      /**
+       * Whether to prepare this message without signature. Default: false
+       */
+      withoutSignature: true;
+    }
+  | {
+      /**
+       * The public key of the preferred account.
+       * It is the same publicKey as the `accountInteraction.publicKey`, but it must be explicitly provided
+       */
+      publicKey: string;
+      /**
+       * Whether to prepare this message without signature. Default: false
+       */
+      withoutSignature?: false;
+    }
+) & {
   /**
    * Optional base64 encoded TVC
    */
@@ -1173,8 +1189,30 @@ export type CallParams = {
    * - If `true`, uses the signature id of the selected network (if the capability is enabled).
    * - If `false`, forces signature check to ignore any signature id.
    * - If `number`, uses the specified number as a signature id.
+   * @deprecated
+   * Use `withSignatureContext` instead.
    */
   withSignatureId?: boolean | number;
+  /**
+   * Optional advanced signature configuration.
+   *
+   * In most cases you **do not need to set this manually**.
+   * The wallet or network configuration will choose the correct mode.
+   *
+   * This field controls how the data is prepared before signing:
+   *
+   * - `empty` — signs the data as-is.
+   *   Use for simple or legacy signing.
+   *
+   * - `signatureId` — signs the data together with a network-specific id.
+   *   Prevents signatures from being reused on another network.
+   *
+   * - `signatureDomainL2` — same as signature id but with a different prefix.
+   *   This should be used where the `SignatureComain` capability is enabled.
+   *
+   * If provided, this field overrides `withSignatureId`.
+   */
+  withSignatureContext?: SignatureContext;
   /**
    * Optional libraries map
    **/
@@ -1194,8 +1232,30 @@ export type RunGetterParams = {
    * - If `true`, uses the signature id of the selected network (if the capability is enabled).
    * - If `false`, forces signature check to ignore any signature id.
    * - If `number`, uses the specified number as a signature id.
+   * @deprecated
+   * Use `withSignatureContext` instead.
    */
   withSignatureId?: boolean | number;
+  /**
+   * Optional advanced signature configuration.
+   *
+   * In most cases you **do not need to set this manually**.
+   * The wallet or network configuration will choose the correct mode.
+   *
+   * This field controls how the data is prepared before signing:
+   *
+   * - `empty` — signs the data as-is.
+   *   Use for simple or legacy signing.
+   *
+   * - `signatureId` — signs the data together with a network-specific id.
+   *   Prevents signatures from being reused on another network.
+   *
+   * - `signatureDomainL2` — same as signature id but with a different prefix.
+   *   This should be used where the `SignatureComain` capability is enabled.
+   *
+   * If provided, this field overrides `withSignatureId`.
+   */
+  withSignatureContext?: SignatureContext;
   /**
    * Optional libraries map
    **/
@@ -1342,9 +1402,10 @@ export type DecodeTransactionParams<Abi> = {
 /**
  * @category Contract
  */
-export type DecodedTransaction<Abi, T> = T extends AbiFunctionName<Abi>
-  ? { method: T; input: DecodedAbiFunctionInputs<Abi, T>; output: DecodedAbiFunctionOutputs<Abi, T> }
-  : never;
+export type DecodedTransaction<Abi, T> =
+  T extends AbiFunctionName<Abi>
+    ? { method: T; input: DecodedAbiFunctionInputs<Abi, T>; output: DecodedAbiFunctionOutputs<Abi, T> }
+    : never;
 
 /**
  * @category Contract
@@ -1358,9 +1419,8 @@ export type DecodeInputParams<Abi> = {
 /**
  * @category Contract
  */
-export type DecodedInput<Abi, T> = T extends AbiFunctionName<Abi>
-  ? { method: T; input: DecodedAbiFunctionInputs<Abi, T> }
-  : never;
+export type DecodedInput<Abi, T> =
+  T extends AbiFunctionName<Abi> ? { method: T; input: DecodedAbiFunctionInputs<Abi, T> } : never;
 
 /**
  * @category Contract
@@ -1387,9 +1447,8 @@ export type DecodeEventParams<Abi> = {
 /**
  * @category Contract
  */
-export type DecodedOutput<Abi, T> = T extends AbiFunctionName<Abi>
-  ? { method: T; output: DecodedAbiFunctionOutputs<Abi, T> }
-  : never;
+export type DecodedOutput<Abi, T> =
+  T extends AbiFunctionName<Abi> ? { method: T; output: DecodedAbiFunctionOutputs<Abi, T> } : never;
 
 /**
  * @category Contract
@@ -1401,9 +1460,8 @@ export type DecodeTransactionEventsParams = {
 /**
  * @category Contract
  */
-export type DecodedEvent<Abi, T> = T extends AbiEventName<Abi>
-  ? { event: T; data: DecodedAbiEventData<Abi, T> }
-  : never;
+export type DecodedEvent<Abi, T> =
+  T extends AbiEventName<Abi> ? { event: T; data: DecodedAbiEventData<Abi, T> } : never;
 
 /**
  * @category Contract
