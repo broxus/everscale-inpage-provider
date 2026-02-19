@@ -1165,7 +1165,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
        * @deprecated
-       * Use `signatureCtx` instead.
+       * Use `withSignatureContext` instead.
        */
       withSignatureId?: boolean | number;
 
@@ -1183,9 +1183,8 @@ export type ProviderApi<Addr = Address> = {
        * - `signatureId` — signs the data together with a network-specific id.
        *   Prevents signatures from being reused on another network.
        *
-       * - `signatureDomain` — uses a domain-separated signature mode.
-       *   This is the most secure and modern option.
-       *
+       * - `signatureDomainL2` — same as signature id but with a different prefix.
+       *   This should be used where the `SignatureComain` capability is enabled.
        *
        * If provided, this field overrides `withSignatureId`.
        */
@@ -1305,7 +1304,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
        * @deprecated
-       * Use `signatureCtx` instead.
+       * Use `withSignatureContext` instead.
        */
       withSignatureId?: boolean | number;
 
@@ -1323,9 +1322,8 @@ export type ProviderApi<Addr = Address> = {
        * - `signatureId` — signs the data together with a network-specific id.
        *   Prevents signatures from being reused on another network.
        *
-       * - `signatureDomain` — uses a domain-separated signature mode.
-       *   This is the most secure and modern option.
-       *
+       * - `signatureDomainL2` — same as signature id but with a different prefix.
+       *   This should be used where the `SignatureComain` capability is enabled.
        *
        * If provided, this field overrides `withSignatureId`.
        */
@@ -1383,7 +1381,7 @@ export type ProviderApi<Addr = Address> = {
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
        * @deprecated
-       * Use `signatureCtx` instead.
+       * Use `withSignatureContext` instead.
        */
       withSignatureId?: boolean | number;
 
@@ -1401,9 +1399,8 @@ export type ProviderApi<Addr = Address> = {
        * - `signatureId` — signs the data together with a network-specific id.
        *   Prevents signatures from being reused on another network.
        *
-       * - `signatureDomain` — uses a domain-separated signature mode.
-       *   This is the most secure and modern option.
-       *
+       * - `signatureDomainL2` — same as signature id but with a different prefix.
+       *   This should be used where the `SignatureComain` capability is enabled.
        *
        * If provided, this field overrides `withSignatureId`.
        */
