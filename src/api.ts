@@ -462,8 +462,31 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
+       * @deprecated
+       * Use `withSignatureContext` instead.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional advanced signature configuration.
+       *
+       * In most cases you **do not need to set this manually**.
+       * The wallet or network configuration will choose the correct mode.
+       *
+       * This field controls how the data is prepared before signing:
+       *
+       * - `empty` — signs the data as-is.
+       *   Use for simple or legacy signing.
+       *
+       * - `signatureId` — signs the data together with a network-specific id.
+       *   Prevents signatures from being reused on another network.
+       *
+       * - `signatureDomainL2` — same as signature id but with a different prefix.
+       *   This should be used where the `SignatureComain` capability is enabled.
+       *
+       * If provided, this field overrides `withSignatureId`.
+       */
+      withSignatureContext?: SignatureContext;
 
       /**
        * Optional libraries map
@@ -1792,8 +1815,31 @@ export type ProviderApi<Addr = Address> = {
        * - If `true`, uses the signature id of the selected network (if the capability is enabled).
        * - If `false`, forces signature check to ignore any signature id.
        * - If `number`, uses the specified number as a signature id.
+       * @deprecated
+       * Use `withSignatureContext` instead.
        */
       withSignatureId?: boolean | number;
+
+      /**
+       * Optional advanced signature configuration.
+       *
+       * In most cases you **do not need to set this manually**.
+       * The wallet or network configuration will choose the correct mode.
+       *
+       * This field controls how the data is prepared before signing:
+       *
+       * - `empty` — signs the data as-is.
+       *   Use for simple or legacy signing.
+       *
+       * - `signatureId` — signs the data together with a network-specific id.
+       *   Prevents signatures from being reused on another network.
+       *
+       * - `signatureDomainL2` — same as signature id but with a different prefix.
+       *   This should be used where the `SignatureComain` capability is enabled.
+       *
+       * If provided, this field overrides `withSignatureId`.
+       */
+      withSignatureContext?: SignatureContext;
       /**
        * Optional libraries map
        **/
