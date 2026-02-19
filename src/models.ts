@@ -321,7 +321,16 @@ export type NetworkDescription = {
   globalId: number;
   capabilities: string;
   signatureId: number | undefined;
+  signatureCtx: SignatureContext;
 };
+
+/**
+ * @category Models
+ */
+export type SignatureContext =
+  | { type: 'empty' } // ton/legacy networks
+  | { type: 'signatureId'; globalId: number } // simple prefix
+  | { type: 'signatureDomainL2'; globalId: number }; // full domain prefix
 
 /**
  * @category Models
@@ -340,19 +349,19 @@ export type GqlSocketParams = {
   /**
    * Path to graphql api endpoints
    */
-  endpoints: string[]
+  endpoints: string[];
   /**
    * Frequency of sync latency detection
    */
-  latencyDetectionInterval: number
+  latencyDetectionInterval: number;
   /**
    * Maximum value for the endpoint's blockchain data sync latency
    */
-  maxLatency: number
+  maxLatency: number;
   /**
    * Gql node type
    */
-  local: boolean
+  local: boolean;
 };
 
 /**
@@ -362,7 +371,7 @@ export type JrpcSocketParams = {
   /**
    * Path to jrpc api endpoint
    */
-  endpoint: string
+  endpoint: string;
 };
 
 /**
@@ -370,9 +379,9 @@ export type JrpcSocketParams = {
  */
 export type ProtoSocketParams = JrpcSocketParams & {};
 
-export type GqlConnection = { type: 'graphql', data: GqlSocketParams };
-export type JrpcConnection = { type: 'jrpc', data: JrpcSocketParams };
-export type ProtoConnection = { type: 'proto', data: ProtoSocketParams };
+export type GqlConnection = { type: 'graphql'; data: GqlSocketParams };
+export type JrpcConnection = { type: 'jrpc'; data: JrpcSocketParams };
+export type ProtoConnection = { type: 'proto'; data: ProtoSocketParams };
 
 /**
  * @category Models
@@ -743,10 +752,10 @@ export type OutputTokenObject<O> = O extends { name: infer K; type: infer T; com
 export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? InputTokenObject<T> & MergeInputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-  ? InputTokenObject<T>
-  : A extends readonly []
-  ? {}
-  : never;
+    ? InputTokenObject<T>
+    : A extends readonly []
+      ? {}
+      : never;
 
 /**
  * @category Models
@@ -754,10 +763,10 @@ export type MergeInputObjectsArray<A> = A extends readonly [infer T, ...infer Ts
 export type MergeOutputObjectsArray<A> = A extends readonly [infer T, ...infer Ts]
   ? OutputTokenObject<T> & MergeOutputObjectsArray<[...Ts]>
   : A extends readonly [infer T]
-  ? OutputTokenObject<T>
-  : A extends readonly []
-  ? {}
-  : never;
+    ? OutputTokenObject<T>
+    : A extends readonly []
+      ? {}
+      : never;
 
 /**
  * @category Models
@@ -857,19 +866,14 @@ export type AbiGetterInputs<C, T extends AbiGetterName<C>> = MergeInputObjectsAr
 /**
  * @category Models
  */
-export type AbiGetterInputsWithDefault<C, T extends AbiGetterName<C>> = AbiGetter<
-  C,
-  T
->['inputs'] extends readonly []
+export type AbiGetterInputsWithDefault<C, T extends AbiGetterName<C>> = AbiGetter<C, T>['inputs'] extends readonly []
   ? void | Record<string, never>
   : AbiGetterInputs<C, T>;
 
 /**
  * @category Models
  */
-export type DecodedAbiGetterInputs<C, T extends AbiGetterName<C>> = MergeOutputObjectsArray<
-  AbiGetter<C, T>['inputs']
->;
+export type DecodedAbiGetterInputs<C, T extends AbiGetterName<C>> = MergeOutputObjectsArray<AbiGetter<C, T>['inputs']>;
 /**
  * @category Models
  */
