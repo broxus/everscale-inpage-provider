@@ -1208,7 +1208,7 @@ export type CallParams = {
    *   Prevents signatures from being reused on another network.
    *
    * - `signatureDomainL2` — same as signature id but with a different prefix.
-   *   This should be used where the `SignatureComain` capability is enabled.
+   *   This should be used where the `SignatureDomain` capability is enabled.
    *
    * If provided, this field overrides `withSignatureId`.
    */
@@ -1251,7 +1251,7 @@ export type RunGetterParams = {
    *   Prevents signatures from being reused on another network.
    *
    * - `signatureDomainL2` — same as signature id but with a different prefix.
-   *   This should be used where the `SignatureComain` capability is enabled.
+   *   This should be used where the `SignatureDomain` capability is enabled.
    *
    * If provided, this field overrides `withSignatureId`.
    */
